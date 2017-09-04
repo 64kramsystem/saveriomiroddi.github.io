@@ -4,12 +4,8 @@ title: About
 permalink: /about/
 ---
 
-Some information about you!
-
-### More Information
-
-A place to include any other types of information that you'd like to include about yourself.
+I'm a backend programmer, systems/database administrator/designer, reverse engineer, and security officer at Ticketsolve.
 
 ### Contact me
 
-[email@domain.com](mailto:email@domain.com)
+[saverio.pub2 aaaaaaat gmail.com](mailto:saverio.pub2 aaaaaaat gmail.com)

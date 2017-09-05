@@ -1,0 +1,20 @@
+{% comment %}
+Outputs a comma-separated list of the tag hyperlinks.
+
+Parameters:
+  filter: array of strings representing the tags to filter in (optional)
+{% endcomment %}
+
+{% capture tagsList %}{% endcapture %}
+
+{% for tag in site.tags %}
+  {% if include.filter == nil or include.filter contains tag.slug %}
+    {% if tagsList != "" %}
+      {% capture tagsList %}{{ tagsList }}, {% endcapture %}
+    {% endif %}
+
+    {% capture tagsList %}{{ tagsList }}<a href="{{ tag.url }}">{{ tag.slug }}</a>{% endcapture %}
+  {% endif %}
+{% endfor %}
+
+{{ tagsList }}

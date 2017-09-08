@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Data storage analysis and optimization of (MySQL) InnoDB indexes
-tags: [mysql, innodb, indexes, storage, performance]
+tags: [mysql, innodb, indexes, storage, performance, databases]
 ---
 
 Recently, we decided to clean our data model, in particular, the OLTP section of our schema. We have a reasonably well structured model, but it falls short when it comes to the data type definitions.

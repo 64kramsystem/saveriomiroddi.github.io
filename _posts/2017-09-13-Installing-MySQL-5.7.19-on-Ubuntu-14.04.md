@@ -4,34 +4,52 @@ title: Installing MySQL 5.7.19 on Ubuntu 14.04
 tags: [mysql, sysadmin, trivia]
 ---
 
-MySQL 5.7.19 fixes a [quite dangerous functionality](https://bugs.mysql.com/bug.php?id=84375), which caused corruption of a slave when changing the delay (`CHANGE MASTER TO MASTER_DELAY`) under certain conditions.
+MySQL 5.7.19 fixes a [quite dangerous functionality](https://bugs.mysql.com/bug.php?id=84375) that causes corruption of a slave when changing the delay (`CHANGE MASTER TO MASTER_DELAY=<seconds>`) while the slave threads are stopped; since one wouldn't expect this condition to cause harm, users of such setup should upgrade, if possible.
 
-Users trying to update on Ubuntu 14.04 LTS will face an error when starting the service (in a quite puzzling fashion, as the daemon will exit without reporting anything in the log).
+Users trying to perform the update on Ubuntu 14.04 LTS will face the mysql service not starting.
 
-## Cause and solution
+## Diagnosis and solution
 
-The cause is that v5.7.18 requires a version of `libstdc++6` (6.0.20) more recent than the one available in Ubuntu 14.04 (6.0.19).
+Starting via `/etc/init.d/mysqld.server` will exit without reporting anything in the log, so we'll start `mysqld` directly, which will reveal the problem:
 
-Some users have dangerously tried to use a PPA which upgrades such package; this is discouraged. The safest way is to download and store this library separately, and add the path to the shared libraries load path.
+    /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.20' not found
 
-This solution simply uses the library version from the official Ubuntu Xenial repository, and places in the MySQL own library path:
+The cause is that v5.7.19 requires a version of `libstdc++6` more recent than the one available in Ubuntu 14.04 (6.0.19).
 
-    export MYSQL_PATH=/usr/local/mysql     # change to match the MySQL installation path
-    export TEMP_PATH=/tmp/libstdc          # change at will
+Some users have dangerously tried to use a PPA which with an updated version (`ppa:ubuntu-toolchain-r/test`); this is discouraged. The safest way is to download and store this library separately, and add the path to the shared libraries load path.
+
+The official Ubuntu Xenial package will work; a reasonable strategy is to change the path in `/etc/init.d/mysql.server`.
+
+Execution:
+
+    # Run everything as root
+
+    $ export MYSQL_PATH=/usr/local/mysql     # change to match the MySQL installation path
+    $ export TEMP_PATH=/tmp/mysql_lib_update # change at will
     
-    mkdir -p $TEMP_PATH
+    $ mkdir -p $TEMP_PATH
     
-    wget http://security.ubuntu.com/ubuntu/pool/main/g/gcc-5/libstdc++6_5.4.0-6ubuntu1~16.04.4_amd64.deb -O $TEMP_PATH/libstdc.deb
+    $ wget http://security.ubuntu.com/ubuntu/pool/main/g/gcc-5/libstdc++6_5.4.0-6ubuntu1~16.04.4_amd64.deb -O $TEMP_PATH/libstdc.deb
 
-    cd $TEMP_PATH
-    ar xv libstdc.deb
-    tar xvf data.tar.xz
+    $ cd $TEMP_PATH
+    $ ar xv libstdc.deb
+    $ tar xvf data.tar.xz
     
-    mv ./usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.21 $MYSQL_PATH/lib/
-    ln -s libstdc++.so.6.0.21 $MYSQL_PATH/lib/libstdc++.so.6
+    $ mv ./usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.21 $MYSQL_PATH/lib/
+    $ ln -s libstdc++.so.6.0.21 $MYSQL_PATH/lib/libstdc++.so.6
+    
+    $ awk "NR==1{print; print \"export LD_LIBRARY_PATH=$MYSQL_PATH/lib:\$LD_LIBRARY_PATH\"} NR!=1" /etc/init.d/mysql.server > $TEMP_PATH/mysql.server.fixed
+    $ cat $TEMP_PATH/mysql.server.fixed > /etc/init.d/mysql.server
 
-Now, you'll need to specify the load path in the `/etc/init/mysql.server`; the most trivial way is to add it to the second line:
+The strategy of the last block is to modify the path in the second line of the init script, which is very simple and "good enough".
 
-    awk -i inplace "NR==1{print; print \"export LD_LIBRARY_PATH=$MYSQL_PATH/lib:\$LD_LIBRARY_PATH\"} NR!=1" /etc/init.d/mysql.server
+Note that awk 4.1 supports in-place editing, but Ubuntu Xenial comes with 4.0.
 
-This will solve the problem.
+After this modification, it will be possible to use the `mysql.server` init script as usual.
+
+For curiosity, one can verify that the new library is compatible, by inspecting the library strings:
+
+    $ strings $MYSQL_PATH/lib/libstdc++.so.6 | grep GLIBCXX
+    GLIBCXX_3.4
+    ...
+    GLIBCXX_3.4.20   # Found!

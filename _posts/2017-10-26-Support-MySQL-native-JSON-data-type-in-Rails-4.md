@@ -2,6 +2,7 @@
 layout: post
 title: Support MySQL native JSON data type in Rails 4
 tags: [mysql, data_types, rails]
+last_modified_at: 2017-10-31 10:35:28
 ---
 
 Mysql 5.7 added native support for JSON data type. This opens up several interesting possibilities, but it's not natively supported in Rails 4 (only in 5).
@@ -43,6 +44,8 @@ Create this initializer (e.g. `config/initializers/json_data_type.rb`)
             case value
             when Hash
               value.to_json
+            when ::String
+              value
             else
               raise "Unsupported data/type for JSON conversion: #{value.class}"
             end
@@ -109,6 +112,8 @@ Then we need to define the type casting methods. Rails supports more granular ca
       case value
       when Hash
         value.to_json
+      when ::String
+        value
       ...
       end
     end
@@ -127,10 +132,10 @@ Then we need to define the type casting methods. Rails supports more granular ca
       end
     end
 
-First of all, we need to take a design decision: we'll accept, for simplicity, only hashes, and reject other data types.
+First of all, we need to take a design decision: we'll accept, for simplicity, only hashes and strings, and reject other data types.
 
 The first method, `type_cast_for_database`, performs the conversion from the in-memory value to the value to be sent to the database.  
-We'll simply convert the hash to a JSON string (note that Hash#to_json returns a String).
+We'll simply convert the hash to a JSON string (note that Hash#to_json returns a String). Some cases (eg. `update_all`) can send a value without going through `type_cast` before, so we also support String values.
 
 The second, `type_cast`, performs both the conversion from user and database-read values. In this case, we allow the user to pass strings/hashes (when reading from the database, ActiveRecord will receive strings).
 

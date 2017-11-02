@@ -196,3 +196,5 @@ Some introductory references on JSON in MySQL 5.7:
 - [MySQL 5.7 Introduces a JSON Data Type](https://lornajane.net/posts/2016/mysql-5-7-json-features)
 - [How to Use JSON Data Fields in MySQL Databases](https://www.sitepoint.com/use-json-data-fields-mysql-databases/)
 - [JSON document fast lookup with MySQL 5.7](https://www.percona.com/blog/2016/03/07/json-document-fast-lookup-with-mysql-5-7/)
+
+*Edited 2017-10-31: Added String case in `type_cast_for_database`*

@@ -57,7 +57,7 @@ Indicatively, the structure of the blog posts, and their content, will be:
   - base widgets
   - radio list
   - gauge/text processing/pipes
-4. pathing the binaries in a filesystem, and large file storage: considerations
+4. patching the binaries in a filesystem, and large file storage: considerations
   - git lfs
   - google drive
   - binary patching

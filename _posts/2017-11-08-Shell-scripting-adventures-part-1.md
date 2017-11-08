@@ -2,21 +2,21 @@
 layout: post
 title: Shell scripting adventures (Part 1)
 tags: [shell_scripting,sysadmin]
-last_modified_at: 2017-11-02 23:19:49
+last_modified_at: 2017-11-08 20:50:00
 ---
 
 This is the Part 1 (of 4) of the shell scripting adventures, introduced in the [previous post]({% post_url 2017-11-02-Shell-scripting-adventures-introduction %}).
 
 The following subjects are described in this part:
 
-- [Associative arrays (hash maps)](#associative-arrays-hash-maps)
-- [Escape strings](#escape-strings)
-- [Expand strings into separate options](#expand-strings-into-separate-options)
-- [Regular expressions matching](#regular-expressions-matching)
-- [Find a filename's basename](#find-a-filenames-basename)
-- [Replace the extension of a filename](#replace-the-extension-of-a-filename)
-- [Cycle a multi-line variable](#cycle-a-multi-line-variable)
-- [Heredoc](#heredoc)
+- [Associative arrays (hash maps)](Shell-scripting-adventures-part-1#associative-arrays-hash-maps)
+- [Escape strings](Shell-scripting-adventures-part-1#escape-strings)
+- [Expand strings into separate options](Shell-scripting-adventures-part-1#expand-strings-into-separate-options)
+- [Regular expressions matching](Shell-scripting-adventures-part-1#regular-expressions-matching)
+- [Find a filename's basename](Shell-scripting-adventures-part-1#find-a-filenames-basename)
+- [Replace the extension of a filename](Shell-scripting-adventures-part-1#replace-the-extension-of-a-filename)
+- [Cycle a multi-line variable](Shell-scripting-adventures-part-1#cycle-a-multi-line-variable)
+- [Heredoc](Shell-scripting-adventures-part-1#heredoc)
 
 The examples are taken from my [RPi VPN Router project installation script](https://github.com/saveriomiroddi/rpi_vpn_router/blob/master/install_vpn_router.sh).
 

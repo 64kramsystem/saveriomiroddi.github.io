@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Shell scripting adventures
+title: Shell scripting adventures (Introduction)
 tags: [shell_scripting,sysadmin]
 last_modified_at: 2017-11-02 23:19:49
 ---

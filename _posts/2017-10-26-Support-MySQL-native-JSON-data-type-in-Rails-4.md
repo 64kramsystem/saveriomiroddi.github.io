@@ -13,15 +13,19 @@ In this article, I'll explain how to implement it.
 
 In Rails 5, representing a field in JSON is fairly easy:
 
-    serialiaze :my_json_attribute, JSON
+```ruby
+serialiaze :my_json_attribute, JSON
+```
 
 This is not possible in Rails 4, because this version does't natively understand the data type, deserializing it into a string.
 
 Adding a new data type is fairly easy, though; I've used the following ActiveRecord files are reference:
 
-    /path/to/activerecord_gem/lib/active_record/attributes.rb
-    /path/to/activerecord_gem/lib/active_record/type/value.rb
-    /path/to/activerecord_gem/lib/active_record/type/mutable.rb
+```sh
+/path/to/activerecord_gem/lib/active_record/attributes.rb
+/path/to/activerecord_gem/lib/active_record/type/value.rb
+/path/to/activerecord_gem/lib/active_record/type/mutable.rb
+```
 
 This guide will assume recent versions of Rails 4 and MySQL 5.7.
 
@@ -31,106 +35,115 @@ In the basic form, implementing a new data type consist of coding the rules for 
 
 Create this initializer (e.g. `config/initializers/json_data_type.rb`)
 
-    module ActiveRecord
-      module Type
-        class Json < Type::Value
-          include Type::Mutable
+```ruby
+module ActiveRecord
+  module Type
+    class Json < Type::Value
+      include Type::Mutable
 
-          def type
-            :json
+      def type
+        :json
+      end
+
+      def type_cast_for_database(value)
+        case value
+        when Hash
+          value.to_json
+        when ::String
+          value
+        else
+          raise "Unsupported data/type for JSON conversion: #{value.class}"
+        end
+      end
+
+      private
+
+      def type_cast(value)
+        case value
+        when nil
+          {}
+        when ::String
+          parsed_value = JSON.parse(value)
+
+          if parsed_value.is_a?(Hash)
+            parsed_value.deep_symbolize_keys
+          else
+            raise "Only Hashes are supported (or their string representation)"
           end
-
-          def type_cast_for_database(value)
-            case value
-            when Hash
-              value.to_json
-            when ::String
-              value
-            else
-              raise "Unsupported data/type for JSON conversion: #{value.class}"
-            end
-          end
-
-          private
-
-          def type_cast(value)
-            case value
-            when nil
-              {}
-            when ::String
-              parsed_value = JSON.parse(value)
-
-              if parsed_value.is_a?(Hash)
-                parsed_value.deep_symbolize_keys
-              else
-                raise "Only Hashes are supported (or their string representation)"
-              end
-            when Hash
-              value.deep_symbolize_keys
-            else
-              raise "Unsupported data/type for JSON conversion: #{value.class}"
-            end
-          end
+        when Hash
+          value.deep_symbolize_keys
+        else
+          raise "Unsupported data/type for JSON conversion: #{value.class}"
         end
       end
     end
+  end
+end
+```
 
 add a field in the ActiveRecord desired model:
 
-    class MyModel
-      serialize :my_json_attribute, ActiveRecord::Type::Json.new
-    end
+```ruby
+class MyModel
+  serialize :my_json_attribute, ActiveRecord::Type::Json.new
+end
+```
 
 and create a migration:
 
-    class AddMyJsonAttributeToMyModel < ActiveRecord::Migration
-      def up
-        add_column :my_models, :my_json_attribute, :json
-        MyModel.update_all('my_json_attribute = "{}"')
-      end
-    
-      def down
-        remove_column :my_models, :my_json_attribute
-      end
-    end
+```ruby
+class AddMyJsonAttributeToMyModel < ActiveRecord::Migration
+  def up
+    add_column :my_models, :my_json_attribute, :json
+    MyModel.update_all('my_json_attribute = "{}"')
+  end
+
+  def down
+    remove_column :my_models, :my_json_attribute
+  end
+end
+```
 
 Now I'll break it down; the gotchas will be explained in the next section.
 
-
 First we define the type:
 
-    def type
-      :json
-    end
+```ruby
+def type
+  :json
+end
+```
 
 this will uniquely identify the data type; for example, it allows Rails to create a migration using the standard form (see above).
 
 Then we need to define the type casting methods. Rails supports more granular casting, but for simple data types, we just need to define two methods (here in edited format:
 
-    include Type::Mutable
-    def type_cast_for_database(value)
-      case value
-      when Hash
-        value.to_json
-      when ::String
-        value
-      ...
-      end
-    end
-    
-    def type_cast(value)
-      case value
-      when ::String
-        parsed_value = JSON.parse(value)
+```ruby
+include Type::Mutable
+def type_cast_for_database(value)
+  case value
+  when Hash
+    value.to_json
+  when ::String
+    value
+  ...
+  end
+end
 
-        if parsed_value.is_a?(Hash)
-          HashWithIndifferentAccess.new(parsed_value)
-        ...
-      when Hash
-        HashWithIndifferentAccess.new(parsed_value)
-      ...
-      end
-    end
+def type_cast(value)
+  case value
+  when ::String
+    parsed_value = JSON.parse(value)
+
+    if parsed_value.is_a?(Hash)
+      HashWithIndifferentAccess.new(parsed_value)
+    ...
+  when Hash
+    HashWithIndifferentAccess.new(parsed_value)
+  ...
+  end
+end
+```
 
 First of all, we need to take a design decision: we'll accept, for simplicity, only hashes and strings, and reject other data types.
 
@@ -145,12 +158,16 @@ The `include Type::Mutable` module automatically adds a method (`changed_in_plac
 
 Specifying the attribute in a model is trivial (more on this in the gotchas section):
 
-    serialize :my_json_attribute, ActiveRecord::Type::Json.new
+```ruby
+serialize :my_json_attribute, ActiveRecord::Type::Json.new
+```
 
 and so is creating the migration:
 
-    add_column :my_models, :my_json_attribute, :json
-    MyModel.update_all('my_json_attribute = "{}"')
+```ruby
+add_column :my_models, :my_json_attribute, :json
+MyModel.update_all('my_json_attribute = "{}"')
+```
 
 while taking care of resetting the value that MySQL adds by default (`null`), since we designed the column to only accept hashes.  
 MySQL doesn't accept a default for JSON columns.
@@ -168,12 +185,14 @@ Ideally, we'd like the column to be NOT NULL. For this, we need to set a default
 
 Due to these problems, we'll need to set the column as nullable. On top of this, we'll need to allow `nil` when reading db (/user) input:
 
-    def type_cast(value)
-      case value
-      when nil
-        {}
-      ...
-    end
+```ruby
+def type_cast(value)
+  case value
+  when nil
+    {}
+  ...
+end
+```
 
 so that the `NULL` for the db is converted to an empty hash.
 

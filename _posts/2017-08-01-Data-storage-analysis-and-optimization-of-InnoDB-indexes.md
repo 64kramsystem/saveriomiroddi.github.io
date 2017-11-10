@@ -14,18 +14,22 @@ It's very easy to measure how much the indexes of an InnoDB table take. Bear in 
 
 This is the command used for checking the statistics of a table called `reservations`, with a single regular index, on the column `allocation_id`:
 
-    SELECT table_name, index_name, stat_value*@@innodb_page_size `size`
-    FROM mysql.innodb_index_stats
-    WHERE stat_name = 'size'
-          AND (database_name, table_name) = ('test', 'reservations')
-    ;
+```sql
+SELECT table_name, index_name, stat_value*@@innodb_page_size `size`
+FROM mysql.innodb_index_stats
+WHERE stat_name = 'size'
+      AND (database_name, table_name) = ('test', 'reservations')
+;
+```
 
-    +--------------+----------------------+-----------+
-    | table_name   | index_name           | size      |
-    +--------------+----------------------+-----------+
-    | reservations | PRIMARY              | 871366656 |
-    | reservations | allocation_id        | 476053504 |
-    +--------------+----------------------+-----------+
+```
++--------------+----------------------+-----------+
+| table_name   | index_name           | size      |
++--------------+----------------------+-----------+
+| reservations | PRIMARY              | 871366656 |
+| reservations | allocation_id        | 476053504 |
++--------------+----------------------+-----------+
+```
 
 In this case, the table data (`PRIMARY` index) takes ~831 MiB, while the `allocation_id` takes ~454 MiB.
 
@@ -41,19 +45,25 @@ It's normal and expected to have fragmentation, but it's important to be aware o
 
 In this article we won't explore the fragmentation (a starting point is the `index_page_splits` metric - see `information_schema.innodb_metrics`), but we observe how the size (and indirectly, structure) of a live table changes when rebuilt:
 
-    ALTER TABLE reservations DROP KEY allocation_id, ADD KEY (allocation_id);
+```sql
+ALTER TABLE reservations DROP KEY allocation_id, ADD KEY (allocation_id);
+```
 
-    SELECT table_name, index_name, stat_value*@@innodb_page_size `size`
-    FROM mysql.innodb_index_stats
-    WHERE stat_name = 'size'
-          AND (database_name, table_name, index_name) = ('test', 'reservations', 'allocation_id')
-    ;
+```sql
+SELECT table_name, index_name, stat_value*@@innodb_page_size `size`
+FROM mysql.innodb_index_stats
+WHERE stat_name = 'size'
+      AND (database_name, table_name, index_name) = ('test', 'reservations', 'allocation_id')
+;
+```
 
-    +--------------+---------------+-----------+
-    | table_name   | index_name    | size      |
-    +--------------+---------------+-----------+
-    | reservations | allocation_id | 259784704 |
-    +--------------+---------------+-----------+
+```
++--------------+---------------+-----------+
+| table_name   | index_name    | size      |
++--------------+---------------+-----------+
+| reservations | allocation_id | 259784704 |
++--------------+---------------+-----------+
+```
 
 This is an interesting result; the compacted index takes (248 MiB), which is ~54% of the original size.
 It's up to the administrator, to measure the impact and decide if action needs to be taken, on a per-table basis.
@@ -73,37 +83,45 @@ There are a few reasons why columns should be set as NOT NULL unless strictly/se
 
 In this article, we observe the effect of point 1, using:
 
-    ALTER TABLE reservations MODIFY allocation_id INT; # convert to nullable field
+```sql
+ALTER TABLE reservations MODIFY allocation_id INT; # convert to nullable field
+```
 
 MySQL has [several][InnoDB INFORMATION_SCHEMA System Tables] [statistics tables][InnoDB Persistent Statistics Tables] in the metadata schemas, one of whom is `mysql.innodb_index_stats`:
 
-    +------------------+---------------------+------+-----+-------------------+-----------------------------+
-    | Field            | Type                | Null | Key | Default           | Extra                       |
-    +------------------+---------------------+------+-----+-------------------+-----------------------------+
-    | database_name    | varchar(64)         | NO   | PRI | NULL              |                             |
-    | table_name       | varchar(64)         | NO   | PRI | NULL              |                             |
-    | index_name       | varchar(64)         | NO   | PRI | NULL              |                             |
-    | stat_name        | varchar(64)         | NO   | PRI | NULL              |                             |
-    | stat_value       | bigint(20) unsigned | NO   |     | NULL              |                             |
-    ...
-    +------------------+---------------------+------+-----+-------------------+-----------------------------+
+```
++------------------+---------------------+------+-----+-------------------+-----------------------------+
+| Field            | Type                | Null | Key | Default           | Extra                       |
++------------------+---------------------+------+-----+-------------------+-----------------------------+
+| database_name    | varchar(64)         | NO   | PRI | NULL              |                             |
+| table_name       | varchar(64)         | NO   | PRI | NULL              |                             |
+| index_name       | varchar(64)         | NO   | PRI | NULL              |                             |
+| stat_name        | varchar(64)         | NO   | PRI | NULL              |                             |
+| stat_value       | bigint(20) unsigned | NO   |     | NULL              |                             |
+...
++------------------+---------------------+------+-----+-------------------+-----------------------------+
+```
 
 Statistics in this table are identified by the `stat_name` field; in our case, the related one is `size`, which represents the number of database pages required to store the index.
 In order to get the index size in bytes, we use the InnoDB page size, which is stored in the global (read-only) variable `innodb_page_size`.
 
 The query and the results are therefore:
 
-    SELECT table_name, index_name, stat_value*@@innodb_page_size `size`
-    FROM mysql.innodb_index_stats
-    WHERE stat_name = 'size'
-          AND (database_name, table_name, index_name) = ('test', 'reservations', 'allocation_id')
-    ;
+```sql
+SELECT table_name, index_name, stat_value*@@innodb_page_size `size`
+FROM mysql.innodb_index_stats
+WHERE stat_name = 'size'
+      AND (database_name, table_name, index_name) = ('test', 'reservations', 'allocation_id')
+;
+```
 
-    +--------------+---------------+-----------+
-    | table_name   | index_name    | size      |
-    +--------------+---------------+-----------+
-    | reservations | allocation_id | 278691840 |
-    +--------------+---------------+-----------+
+```
++--------------+---------------+-----------+
+| table_name   | index_name    | size      |
++--------------+---------------+-----------+
+| reservations | allocation_id | 278691840 |
++--------------+---------------+-----------+
+```
 
 The result is 7% more, which is non-negligible (as a low-hanging fruit).
 
@@ -111,72 +129,76 @@ The result is 7% more, which is non-negligible (as a low-hanging fruit).
 
 This is the (anonymized) structure of a table of ours, with the first block highlighting the relevant columns and indexes:
 
-    CREATE TABLE `items` (
-      `type` varchar(255) DEFAULT NULL,
-      `created_at` datetime DEFAULT NULL,
-      `number` int(11) NOT NULL DEFAULT '0',
-      `amount` float DEFAULT NULL,
-      `tenant_id` int(11) DEFAULT NULL,
-      `lock_version` int(11) DEFAULT '0',
-      `report` varchar(4096) DEFAULT NULL,
-      `params` varchar(4900) DEFAULT '--- {}\n\n',
-      `discount_id` int(11) DEFAULT NULL,
-      `discount_type` varchar(64) DEFAULT NULL,
-      `explicit` tinyint(1) DEFAULT '0',
-      KEY `index_line_items_on_account_id` (`account_id`),
-      KEY `index_line_items_on_discount_source_id_and_discount_source_type` (`discount_source_id`,`discount_source_type`),
+```sql
+CREATE TABLE `items` (
+  `type` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `number` int(11) NOT NULL DEFAULT '0',
+  `amount` float DEFAULT NULL,
+  `tenant_id` int(11) DEFAULT NULL,
+  `lock_version` int(11) DEFAULT '0',
+  `report` varchar(4096) DEFAULT NULL,
+  `params` varchar(4900) DEFAULT '--- {}\n\n',
+  `discount_id` int(11) DEFAULT NULL,
+  `discount_type` varchar(64) DEFAULT NULL,
+  `explicit` tinyint(1) DEFAULT '0',
+  KEY `index_line_items_on_account_id` (`account_id`),
+  KEY `index_line_items_on_discount_source_id_and_discount_source_type` (`discount_source_id`,`discount_source_type`),
 
-      `id` int(11) NOT NULL AUTO_INCREMENT,
-      `field_01` int(11) DEFAULT NULL,
-      `field_02` int(11) DEFAULT NULL,
-      `field_03` int(11) DEFAULT NULL,
-      `field_04` float NOT NULL DEFAULT '0',
-      `field_05` int(11) DEFAULT NULL,
-      `field_05` int(11) DEFAULT NULL,
-      `field_07` int(11) DEFAULT '1',
-      `field_08` int(11) DEFAULT NULL,
-      `field_09` float DEFAULT '0',
-      `field_10` int(11) DEFAULT NULL,
-      `field_11` tinyint(1) NOT NULL DEFAULT '0',
-      `field_12` decimal(13,9) NOT NULL DEFAULT '0.000000000',
-      `field_13` int(11) DEFAULT NULL,
-      `field_14` int(11) DEFAULT NULL,
-      `field_15` char(36) NOT NULL,
-      `field_16` int(11) DEFAULT NULL,
-      `field_17` varchar(64) NOT NULL,
-      `field_18` char(36) DEFAULT NULL,
-      PRIMARY KEY (`id`),
-      UNIQUE KEY `index_line_items_on_field_18` (`field_18`),
-      KEY `line_items_field_01_index` (`field_01`),
-      KEY `line_items_field_03_index` (`field_03`),
-      KEY `index_line_items_on_field_10` (`field_10`),
-      KEY `index_line_items_on_field_02` (`field_02`),
-      KEY `index_line_items_on_field_05` (`field_05`),
-      KEY `index_line_items_on_field_05` (`field_05`),
-      KEY `index_line_items_on_field_08` (`field_08`),
-      KEY `index_line_items_on_field_13` (`field_13`),
-      KEY `index_line_items_on_field_14` (`field_14`),
-      KEY `index_line_items_on_field_16` (`field_16`),
-      KEY `index_line_items_on_field_15` (`field_15`)
-    );
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `field_01` int(11) DEFAULT NULL,
+  `field_02` int(11) DEFAULT NULL,
+  `field_03` int(11) DEFAULT NULL,
+  `field_04` float NOT NULL DEFAULT '0',
+  `field_05` int(11) DEFAULT NULL,
+  `field_05` int(11) DEFAULT NULL,
+  `field_07` int(11) DEFAULT '1',
+  `field_08` int(11) DEFAULT NULL,
+  `field_09` float DEFAULT '0',
+  `field_10` int(11) DEFAULT NULL,
+  `field_11` tinyint(1) NOT NULL DEFAULT '0',
+  `field_12` decimal(13,9) NOT NULL DEFAULT '0.000000000',
+  `field_13` int(11) DEFAULT NULL,
+  `field_14` int(11) DEFAULT NULL,
+  `field_15` char(36) NOT NULL,
+  `field_16` int(11) DEFAULT NULL,
+  `field_17` varchar(64) NOT NULL,
+  `field_18` char(36) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `index_line_items_on_field_18` (`field_18`),
+  KEY `line_items_field_01_index` (`field_01`),
+  KEY `line_items_field_03_index` (`field_03`),
+  KEY `index_line_items_on_field_10` (`field_10`),
+  KEY `index_line_items_on_field_02` (`field_02`),
+  KEY `index_line_items_on_field_05` (`field_05`),
+  KEY `index_line_items_on_field_05` (`field_05`),
+  KEY `index_line_items_on_field_08` (`field_08`),
+  KEY `index_line_items_on_field_13` (`field_13`),
+  KEY `index_line_items_on_field_14` (`field_14`),
+  KEY `index_line_items_on_field_16` (`field_16`),
+  KEY `index_line_items_on_field_15` (`field_15`)
+);
+```
 
 The table has ~22.4M records.
 
 We perform the following cleanup on it:
 
-    ALTER TABLE items
-      MODIFY type           VARCHAR(32) NOT NULL,
-      MODIFY created_at     DATETIME NOT NULL,
-      MODIFY number         TINYINT(4) NOT NULL DEFAULT 0,
-      MODIFY amount         FLOAT NOT NULL,
-      MODIFY tenant_id      SMALLINT UNSIGNED NOT NULL,
-      MODIFY lock_version   INT NOT NULL DEFAULT 0,
-      MODIFY report         VARCHAR(128),
-      MODIFY params         VARCHAR(1536) DEFAULT '--- {}\n\n',
-      MODIFY discount_id    INT NOT NULL,
-      MODIFY discount_type  VARCHAR(24) NOT NULL,
-      MODIFY explicit       TINYINT(1) NOT NULL DEFAULT 0
-    ;
+```sql
+ALTER TABLE items
+  MODIFY type           VARCHAR(32) NOT NULL,
+  MODIFY created_at     DATETIME NOT NULL,
+  MODIFY number         TINYINT(4) NOT NULL DEFAULT 0,
+  MODIFY amount         FLOAT NOT NULL,
+  MODIFY tenant_id      SMALLINT UNSIGNED NOT NULL,
+  MODIFY lock_version   INT NOT NULL DEFAULT 0,
+  MODIFY report         VARCHAR(128),
+  MODIFY params         VARCHAR(1536) DEFAULT '--- {}\n\n',
+  MODIFY discount_id    INT NOT NULL,
+  MODIFY discount_type  VARCHAR(24) NOT NULL,
+  MODIFY explicit       TINYINT(1) NOT NULL DEFAULT 0
+;
+```
 
 The changes affecting indexes are:
 
@@ -188,23 +210,27 @@ The changes affecting indexes are:
 
 And we measure the effect of the change (the suffixed name represent the various versions):
 
-    SELECT table_name, IF(index_name = 'PRIMARY', 'primary', 'secondary') `indexes_type`, SUM(stat_value*@@innodb_page_size) `size`
-    FROM mysql.innodb_index_stats
-    WHERE stat_name = 'size'
-          AND database_name = 'test' AND table_name LIKE ('items_%')
-    GROUP BY table_name, indexes_type
-    ;
+```sql
+SELECT table_name, IF(index_name = 'PRIMARY', 'primary', 'secondary') `indexes_type`, SUM(stat_value*@@innodb_page_size) `size`
+FROM mysql.innodb_index_stats
+WHERE stat_name = 'size'
+      AND database_name = 'test' AND table_name LIKE ('items_%')
+GROUP BY table_name, indexes_type
+;
+```
 
-    +------------------+--------------+-------------+
-    | table_name       | indexes_type | size        |
-    +------------------+--------------+-------------+
-    | items_live       | primary      |  8288714752 |
-    | items_live       | secondary    |   517095424 |
-    | items_compacted  | primary      |  4077912064 |
-    | items_compacted  | secondary    |   373161984 |
-    | items_cleaned    | primary      |  3930062848 |
-    | items_cleaned    | secondary    |   295452672 |
-    +------------------+--------------+-------------+
+```
++------------------+--------------+-------------+
+| table_name       | indexes_type | size        |
++------------------+--------------+-------------+
+| items_live       | primary      |  8288714752 |
+| items_live       | secondary    |   517095424 |
+| items_compacted  | primary      |  4077912064 |
+| items_compacted  | secondary    |   373161984 |
+| items_cleaned    | primary      |  3930062848 |
+| items_cleaned    | secondary    |   295452672 |
++------------------+--------------+-------------+
+```
 
 When comparing the cleaned version to the reference (`compacted`) one:
 

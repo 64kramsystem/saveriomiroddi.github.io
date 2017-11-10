@@ -17,7 +17,9 @@ The ENUM data type is stored in two locations:
 
 The difference compared to using a (VAR)CHAR are significant. Suppose a column defined as `latin1 VARCHAR NOT NULL`, with an average string length of 6 bytes (which requires 1 extra byte due to VARCHAR), and a million rows, we save:
 
-    10^6 * (7-1) = 60 out of 70 MB (~86%)
+```
+10^6 * (7-1) = 60 out of 70 MB (~86%)
+```
 
 In addition to the space saved, there is a performance improvement in related indexes scanning due to:
 
@@ -45,25 +47,31 @@ In particular, one use case is worth exploring: polymorphic associations.
 
 One design pattern is polymorphic associations; this is a (simplified) example of the underlying structure of a widespread Rails gem:
 
-    CREATE TABLE taggings (
-      id            int(11) NOT NULL AUTO_INCREMENT,
-      tag_id        int(11) NOT NULL,
-      taggable_id   int(11) NOT NULL,
-      taggable_type varchar(255) NULL,
-      PRIMARY KEY (id),
-      KEY index_taggings_on_tag_id_and_taggable_type (tag_id, taggable_type),
-      KEY index_taggings_on_taggable_id_and_taggable_type (taggable_id,taggable_type)
-    );
+```sql
+CREATE TABLE taggings (
+  id            int(11) NOT NULL AUTO_INCREMENT,
+  tag_id        int(11) NOT NULL,
+  taggable_id   int(11) NOT NULL,
+  taggable_type varchar(255) NULL,
+  PRIMARY KEY (id),
+  KEY index_taggings_on_tag_id_and_taggable_type (tag_id, taggable_type),
+  KEY index_taggings_on_taggable_id_and_taggable_type (taggable_id,taggable_type)
+);
+```
 
 and some column/rows statistics:
 
-    SELECT AVG(CHAR_LENGTH(taggable_type)) `average_size`, COUNT(*) FROM taggings `count`;
+```sql
+SELECT AVG(CHAR_LENGTH(taggable_type)) `average_size`, COUNT(*) FROM taggings `count`;
+```
 
-    +--------------+----------+
-    | average_size | count    |
-    +--------------+----------+
-    |       5.3578 | 30601263 |
-    +--------------+----------+
+```
++--------------+----------+
+| average_size | count    |
++--------------+----------+
+|       5.3578 | 30601263 |
++--------------+----------+
+```
 
 There are a few elements that make this case a good candidate:
 
@@ -73,44 +81,52 @@ There are a few elements that make this case a good candidate:
 
 We'll use the following tweaked query to aggregate the results:
 
-    SELECT table_name, index_name, SUM(ROUND(stat_value*@@innodb_page_size/1048576, 2)) `size`
-    FROM mysql.innodb_index_stats
-    WHERE stat_name = 'size'
-          AND (database_name, table_name) = ('temp', '_copy_taggings')
-    GROUP BY table_name, index_name
-    WITH ROLLUP
-    HAVING table_name IS NOT NULL;
+```sql
+SELECT table_name, index_name, SUM(ROUND(stat_value*@@innodb_page_size/1048576, 2)) `size`
+FROM mysql.innodb_index_stats
+WHERE stat_name = 'size'
+      AND (database_name, table_name) = ('temp', '_copy_taggings')
+GROUP BY table_name, index_name
+WITH ROLLUP
+HAVING table_name IS NOT NULL;
+```
 
 As mentioned previously, in InnoDB, the rows are kept in an index, `PRIMARY`.
 
 This is the index statistics before the change (after having rebuilt the table):
 
-    +----------------+-------------------------------------------------+---------+
-    | table_name     | index_name                                      | size    |
-    +----------------+-------------------------------------------------+---------+
-    | _copy_taggings | PRIMARY                                         | 1322.98 |
-    | _copy_taggings | index_taggings_on_tag_id_and_taggable_type      |  668.98 |
-    | _copy_taggings | index_taggings_on_taggable_id_and_taggable_type |  668.98 |
-    | _copy_taggings | NULL                                            | 2660.94 |
-    +----------------+-------------------------------------------------+---------+
+```
++----------------+-------------------------------------------------+---------+
+| table_name     | index_name                                      | size    |
++----------------+-------------------------------------------------+---------+
+| _copy_taggings | PRIMARY                                         | 1322.98 |
+| _copy_taggings | index_taggings_on_tag_id_and_taggable_type      |  668.98 |
+| _copy_taggings | index_taggings_on_taggable_id_and_taggable_type |  668.98 |
+| _copy_taggings | NULL                                            | 2660.94 |
++----------------+-------------------------------------------------+---------+
+```
 
 ALTER TABLE[s]:
 
-    ALTER TABLE _copy_taggings MODIFY taggable_type ENUM(
-        'Cart','Customer','Discount','Event','LineItem','Order','Payment','Product','Show','Subdomain',
-        'TicketAllocation','TicketPrice','User','Venue'
-      ) NOT NULL;
+```sql
+ALTER TABLE _copy_taggings MODIFY taggable_type ENUM(
+    'Cart','Customer','Discount','Event','LineItem','Order','Payment','Product','Show','Subdomain',
+    'TicketAllocation','TicketPrice','User','Venue'
+  ) NOT NULL;
+```
 
 And the index statistics after the change (after having rebuilt the table):
 
-    +----------------+-------------------------------------------------+---------+
-    | table_name     | index_name                                      | size    |
-    +----------------+-------------------------------------------------+---------+
-    | _copy_taggings | PRIMARY                                         | 1130.98 |
-    | _copy_taggings | index_taggings_on_tag_id_and_taggable_type      |  488.98 |
-    | _copy_taggings | index_taggings_on_taggable_id_and_taggable_type |  488.98 |
-    | _copy_taggings | NULL                                            | 2108.94 |
-    +----------------+-------------------------------------------------+---------+
+```
++----------------+-------------------------------------------------+---------+
+| table_name     | index_name                                      | size    |
++----------------+-------------------------------------------------+---------+
+| _copy_taggings | PRIMARY                                         | 1130.98 |
+| _copy_taggings | index_taggings_on_tag_id_and_taggable_type      |  488.98 |
+| _copy_taggings | index_taggings_on_taggable_id_and_taggable_type |  488.98 |
+| _copy_taggings | NULL                                            | 2108.94 |
++----------------+-------------------------------------------------+---------+
+```
 
 There is a significant reduction in size:
 
@@ -122,14 +138,18 @@ This is a significant size reduction.
 
 Of course, this is not always the case. On our generic settings table, which has 10 columns, and the following statistics:
 
-    SELECT AVG(CHAR_LENGTH(resource_type)) `average_type_size`, AVG(CHAR_LENGTH(value)) `average_value_size`, COUNT(*) `count`
-    FROM settings;
+```sql
+SELECT AVG(CHAR_LENGTH(resource_type)) `average_type_size`, AVG(CHAR_LENGTH(value)) `average_value_size`, COUNT(*) `count`
+FROM settings;
+```
 
-    +-------------------+--------------------+-------+
-    | average_type_size | average_value_size | count |
-    +-------------------+--------------------+-------+
-    |            6.0933 |           384.1169 | 70017 |
-    +-------------------+--------------------+-------+
+```
++-------------------+--------------------+-------+
+| average_type_size | average_value_size | count |
++-------------------+--------------------+-------+
+|            6.0933 |           384.1169 | 70017 |
++-------------------+--------------------+-------+
+```
 
 The saving would be around 1%, which is not worth considering.
 

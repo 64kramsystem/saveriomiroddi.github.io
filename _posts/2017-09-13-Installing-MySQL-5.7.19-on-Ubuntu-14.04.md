@@ -12,7 +12,9 @@ Users trying to perform the update on Ubuntu 14.04 LTS will face the mysql servi
 
 Starting via `/etc/init.d/mysqld.server` will exit without reporting anything in the log, so we'll start `mysqld` directly, which will reveal the problem:
 
-    /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.20' not found
+```sh
+/usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.20' not found
+```
 
 The cause is that v5.7.19 requires a version of `libstdc++6` more recent than the one available in Ubuntu 14.04 (6.0.19).
 
@@ -22,24 +24,26 @@ The official Ubuntu Xenial package will work; a reasonable strategy is to change
 
 Execution:
 
-    # Run everything as root
+```sh
+# Run everything as root
 
-    $ export MYSQL_PATH=/usr/local/mysql     # change to match the MySQL installation path
-    $ export TEMP_PATH=/tmp/mysql_lib_update # change at will
-    
-    $ mkdir -p $TEMP_PATH
-    
-    $ wget http://security.ubuntu.com/ubuntu/pool/main/g/gcc-5/libstdc++6_5.4.0-6ubuntu1~16.04.4_amd64.deb -O $TEMP_PATH/libstdc.deb
+export MYSQL_PATH=/usr/local/mysql     # change to match the MySQL installation path
+export TEMP_PATH=/tmp/mysql_lib_update # change at will
 
-    $ cd $TEMP_PATH
-    $ ar xv libstdc.deb
-    $ tar xvf data.tar.xz
-    
-    $ mv ./usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.21 $MYSQL_PATH/lib/
-    $ ln -s libstdc++.so.6.0.21 $MYSQL_PATH/lib/libstdc++.so.6
-    
-    $ awk "NR==1{print; print \"export LD_LIBRARY_PATH=$MYSQL_PATH/lib:\$LD_LIBRARY_PATH\"} NR!=1" /etc/init.d/mysql.server > $TEMP_PATH/mysql.server.fixed
-    $ cat $TEMP_PATH/mysql.server.fixed > /etc/init.d/mysql.server
+mkdir -p $TEMP_PATH
+
+wget http://security.ubuntu.com/ubuntu/pool/main/g/gcc-5/libstdc++6_5.4.0-6ubuntu1~16.04.4_amd64.deb -O $TEMP_PATH/libstdc.deb
+
+cd $TEMP_PATH
+ar xv libstdc.deb
+tar xvf data.tar.xz
+
+mv ./usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.21 $MYSQL_PATH/lib/
+ln -s libstdc++.so.6.0.21 $MYSQL_PATH/lib/libstdc++.so.6
+
+awk "NR==1{print; print \"export LD_LIBRARY_PATH=$MYSQL_PATH/lib:\$LD_LIBRARY_PATH\"} NR!=1" /etc/init.d/mysql.server > $TEMP_PATH/mysql.server.fixed
+cat $TEMP_PATH/mysql.server.fixed > /etc/init.d/mysql.server
+```
 
 The strategy of the last block is to modify the path in the second line of the init script, which is very simple and "good enough".
 
@@ -49,7 +53,9 @@ After this modification, it will be possible to use the `mysql.server` init scri
 
 For curiosity, one can verify that the new library is compatible, by inspecting the library strings:
 
-    $ strings $MYSQL_PATH/lib/libstdc++.so.6 | grep GLIBCXX
-    GLIBCXX_3.4
-    ...
-    GLIBCXX_3.4.20   # Found!
+```sh
+$ strings $MYSQL_PATH/lib/libstdc++.so.6 | grep GLIBCXX
+GLIBCXX_3.4
+...
+GLIBCXX_3.4.20   # Found!
+```

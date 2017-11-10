@@ -30,38 +30,52 @@ An example convenient case is to collect some device links, mapped to the device
 
 Instantiation:
 
-    declare -A v_usb_storage_devices
+```sh
+declare -A v_usb_storage_devices
+```
 
 Adding/reassigning a key/value pair:
 
-    v_usb_storage_devices[$devname]=$model
+```sh
+v_usb_storage_devices[$devname]=$model
+```
 
 Lookup:
 
-    echo ${v_usb_storage_devices[$dev]}
+```sh
+echo ${v_usb_storage_devices[$dev]}
+```
 
 Count:
 
-    if [[ ${#v_usb_storage_devices[@]} > 0 ]] ; then
-      echo "There are pairs!"
-    fi
+```sh
+if [[ ${#v_usb_storage_devices[@]} > 0 ]] ; then
+  echo "There are pairs!"
+fi
+```
 
 Iteration:
 
-    for dev in "${!v_usb_storage_devices[@]}"; do
-      echo ${v_usb_storage_devices[$dev]}
-    done
+```sh
+for dev in "${!v_usb_storage_devices[@]}"; do
+  echo ${v_usb_storage_devices[$dev]}
+done
+```
 
 For clearing, the easiest way is to unset the variable, then re-instantiate it:
 
-    unset v_usb_storage_devices
-    declare -A v_usb_storage_devices
+```sh
+unset v_usb_storage_devices
+declare -A v_usb_storage_devices
+```
 
 ## Escape strings
 
 String can be quoted via `printf`:
 
-    entries_option+=$(printf "%q" ${v_usb_storage_devices[$dev]})
+```sh
+entries_option+=$(printf "%q" ${v_usb_storage_devices[$dev]})
+```
 
 ## Expand strings into separate options
 
@@ -71,25 +85,31 @@ In the building process, where parameter quoting is required (since the variable
 
 In this (edited) example, the variable is `entries_option`, and the program is `whiptail`:
 
-    for dev in "${!v_usb_storage_devices[@]}"; do
-      entries_option+=" $dev "
-      entries_option+=$(printf "%q" ${v_usb_storage_devices[$dev]})
-      let entries_count+=1
-    done
-    
-    whiptail --radiolist "$message" 30 100 $entries_count $entries_option
+```sh
+for dev in "${!v_usb_storage_devices[@]}"; do
+  entries_option+=" $dev "
+  entries_option+=$(printf "%q" ${v_usb_storage_devices[$dev]})
+  let entries_count+=1
+done
+
+whiptail --radiolist "$message" 30 100 $entries_count $entries_option
+```
 
 This will evaluate, for example, to:
 
-    whiptail --radiolist "$message" 30 100 2 /dev/sdb Chinese\ USB\ Disk /dev/sdc Super\ Flash\ Card
+```sh
+whiptail --radiolist "$message" 30 100 2 /dev/sdb Chinese\ USB\ Disk /dev/sdc Super\ Flash\ Card
+```
 
 ## Regular expressions matching
 
 Bash can match strings against regular expressions:
 
-    if [[ $v_rpi_static_ip_on_modem_net =~ ^[0-9]{1,3}(\.[0-9]{1,3}){3}$ ]]; then
-      break
-    fi
+```sh
+if [[ $v_rpi_static_ip_on_modem_net =~ ^[0-9]{1,3}(\.[0-9]{1,3}){3}$ ]]; then
+  break
+fi
+```
 
 The left operand doesn't need quoting.
 
@@ -99,8 +119,10 @@ The example above will match an IP.
 
 The basename of a filename (path, or also http address), can be found with another cryptic construct:
 
-    c_os_archive_address=http://vx2-downloads.raspberrypi.org/.../2017-09-07-raspbian-stretch-lite.zip
-    echo "${c_os_archive_address##*/}"
+```sh
+c_os_archive_address=http://vx2-downloads.raspberrypi.org/.../2017-09-07-raspbian-stretch-lite.zip
+echo "${c_os_archive_address##*/}"
+```
 
 The above will result in `2017-09-07-raspbian-stretch-lite.zip`.
 
@@ -108,8 +130,10 @@ The above will result in `2017-09-07-raspbian-stretch-lite.zip`.
 
 Replace the extension of a filename:
 
-    os_archive_filename=2017-09-07-raspbian-stretch-lite.zip
-    echo "${os_archive_filename%.zip}.img"
+```sh
+os_archive_filename=2017-09-07-raspbian-stretch-lite.zip
+echo "${os_archive_filename%.zip}.img"
+```
 
 The above will result in `2017-09-07-raspbian-stretch-lite.img`.
 
@@ -117,9 +141,11 @@ The above will result in `2017-09-07-raspbian-stretch-lite.img`.
 
 Cycling a multi-line variable is tricky. This is a solution:
 
-    while IFS=$'\n' read -r partition_data; do
-      message+="$partition_data"
-    done <<< "$(mount)"
+```sh
+while IFS=$'\n' read -r partition_data; do
+  message+="$partition_data"
+done <<< "$(mount)"
+```
 
 Description:
 
@@ -133,12 +159,14 @@ Heredoc is a convenient construct to handle complex input.
 
 Bash already supports multi-line string literals, but more complex cases it's messy to escape the quotes inside the literal. Heredoc allows the user to define an arbitrary delimiter:
 
-        cat >> "$c_data_dir_mountpoint/etc/dhcpcd.conf" << EOS
-    interface eth0
-    static ip_address=$v_rpi_static_ip_on_modem_net/24
-    static routers=$modem_ip
-    static domain_name_servers=$v_pia_dns_server_1 $v_pia_dns_server_2
-    EOS
+```sh
+cat >> "$c_data_dir_mountpoint/etc/dhcpcd.conf" << EOS
+interface eth0
+static ip_address=$v_rpi_static_ip_on_modem_net/24
+static routers=$modem_ip
+static domain_name_servers=$v_pia_dns_server_1 $v_pia_dns_server_2
+EOS
+```
 
 The delimiter name, in this case `EOS`, is arbitrary.
 
@@ -150,11 +178,13 @@ There are a few important notes:
 
 In order to assign a heredoc string to a variable, some trickery is required:
 
-    read -r -d '' body << STR
-    {
-      "title": "$1",
-      "body": "$2",
-    }
-    STR
+```sh
+read -r -d '' body << STR
+{
+  "title": "$1",
+  "body": "$2",
+}
+STR
+```
 
 The above will set the variable `$body` to the heredoc content, by piping it to `read`, which will read it and set it without delimiter (`-d ''`). Don't forget that in order to use the resulting variable correctly, it must be quoted (`"$body"`)!

@@ -30,8 +30,12 @@ The examples are taken from my [RPi VPN Router project installation script](http
 
 Awk, sed and perl are very common utilities for text processing.
 
-I personally don't like to use many tools for doing similar jobs (basic users will only use a few patterns), so my personal choice is to use each of them in very specific patterns.
-It's important to consider, under this perspective, that perl (or other scripting languages) can do everything the other two do, although not with the same compactness.
+I personally don't like to use many tools for doing similar jobs (at least, basic jobs), so my personal choice is to use each of them with very specific patterns.
+
+There are two important things to consider:
+
+1. perl (or other scripting languages) can do everything the other two do, although not with the same compactness;
+2. compactness is not a constructive goal (to say the least); the perspective to look at the following examples is to think of them, and know them, as patterns - of course, (relatively) advanced text processing patterns.
 
 I will expose here the ones that I find generally useful.
 
@@ -216,7 +220,7 @@ Note that, while more compact than Perl, we can't print a capturing group (in fa
 
 ## Progress bars processing with awk (and stdbuf)
 
-Somethimes, we want to process progressbars. Although this may seem masochistic, there is actually a legitimate case, and it's to process the output to send it to a separate program for displaying in a different way.
+Sometimes, we want to process progress bars. Although this may seem masochistic, there is actually a legitimate case, and it's to process the output to send it to a separate program for displaying in a different way.
 
 Suppose you want to display the `dd` progress in a nice window.
 
@@ -240,7 +244,7 @@ There are a few problems to know:
 
 First, we need to detail the problem.
 
-From a techical perspective, single-line progress outputs are accomplished by using the "carriage return character" (`\r`), which returns to the beginning of the line.
+From a technfical perspective, single-line progress outputs are accomplished by using the "carriage return character" (`\r`), which returns to the beginning of the line.
 
 So, now we know what to do: to tell awk to process the string received once it gets a `\r` (rather than waiting for a newline (`n`)).
 
@@ -297,7 +301,7 @@ there is not `stdout` output, because it's sent to `/dev/null`.
 
 ### Putting things together
 
-Although the statment looks ugly, it makes sense with the understanding of the above concepts:
+Although the statement looks ugly, it makes sense with the understanding of the above concepts:
 
 ```sh
 $ (dd status=progress if=/dev/zero bs=1GB count=100 > /dev/null) 2>&1 | \

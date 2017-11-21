@@ -2,7 +2,7 @@
 layout: post
 title: Shell scripting adventures (Part 2, Text processing extravaganza)
 tags: [shell_scripting,sysadmin,text_processing,perl,awk]
-last_modified_at: 2017-11-22 00:39:00
+last_modified_at: 2017-11-22 18:35:00
 ---
 
 This is the Part 2 (of 5) of the shell scripting adventures, introduced in the [previous post]({% post_url 2017-11-02-Shell-scripting-adventures-introduction %}).
@@ -30,8 +30,12 @@ The examples are taken from my [RPi VPN Router project installation script](http
 
 Awk, sed and perl are very common utilities for text processing.
 
-I personally don't like to use many tools for doing similar jobs (basic users will only use a few patterns), so my personal choice is to use each of them in very specific patterns.
-It's important to consider, under this perspective, that perl (or other scripting languages) can do everything the other two do, although not with the same compactness.
+I personally don't like to use many tools for doing similar jobs (at least, basic jobs), so my personal choice is to use each of them with very specific patterns.
+
+There are two important things to consider:
+
+1. perl (or other scripting languages) can do everything the other two do, although not with the same compactness;
+2. compactness is not a constructive goal (to say the least); the perspective to look at the following examples is to think of them, and know them, as patterns - of course, (relatively) advanced text processing patterns.
 
 I will expose here the ones that I find generally useful.
 
@@ -40,9 +44,18 @@ I will expose here the ones that I find generally useful.
 These are the most commonly used perl patterns for text processing:
 
 ```sh
-echo mytext | perl -pe 's/<search>/<replace/<modifiers>'       # input stdin, output stdout
-perl -i -pe 's/<search>/<replace/<modifiers>' file1 [file2...] # modifies the file[s] in place
+echo mytext | perl -pe 's/<search>/<replace/<modifiers>'
+perl -i -pe 's/<search>/<replace/<modifiers>' file1 [file2...]
 ```
+
+`-pe` is composed of two common parameters (in scripting languages, e.g. Ruby):
+
+- `-p`: for each line of the input, executes the script, and prints the processed line
+- `-e`: executes the script provided as argument (opposed to executing the code in a file)
+
+An alternative to `-p` is `-n`, which cycles without printing. This is also explored in a subsequent section.
+
+`-i` will modify files in-place, as seen in the second form.
 
 Everybody loves regexes ;-), so I'll skip them, and focus on a few interesting concepts.
 
@@ -50,13 +63,9 @@ Everybody loves regexes ;-), so I'll skip them, and focus on a few interesting c
 
 Modifiers will change the way the search and replace act.
 
-The most common is `g`, which is *very important*: it will perform multiple replacements per string - the default is to replace only once.
+The most common is `g`, which is *very important*: it will perform multiple replacements per iterated line - the default is to replace only once.
 
-Other two modifiers are `s` and `m` are explained in the next section.
-
-- `g`: *very important*,
-- `s`: see the next chapter
-- `m`: see the next section
+The other two modifiers discussed in the next sections are `s` and `m`.
 
 ### Replace multiple lines
 
@@ -216,7 +225,7 @@ Note that, while more compact than Perl, we can't print a capturing group (in fa
 
 ## Progress bars processing with awk (and stdbuf)
 
-Somethimes, we want to process progressbars. Although this may seem masochistic, there is actually a legitimate case, and it's to process the output to send it to a separate program for displaying in a different way.
+Sometimes, we want to process progress bars. Although this may seem masochistic, there is actually a legitimate case, and it's to process the output to send it to a separate program for displaying in a different way.
 
 Suppose you want to display the `dd` progress in a nice window.
 
@@ -240,7 +249,7 @@ There are a few problems to know:
 
 First, we need to detail the problem.
 
-From a techical perspective, single-line progress outputs are accomplished by using the "carriage return character" (`\r`), which returns to the beginning of the line.
+From a technfical perspective, single-line progress outputs are accomplished by using the "carriage return character" (`\r`), which returns to the beginning of the line.
 
 So, now we know what to do: to tell awk to process the string received once it gets a `\r` (rather than waiting for a newline (`n`)).
 
@@ -297,7 +306,7 @@ there is not `stdout` output, because it's sent to `/dev/null`.
 
 ### Putting things together
 
-Although the statment looks ugly, it makes sense with the understanding of the above concepts:
+Although the statement looks ugly, it makes sense with the understanding of the above concepts:
 
 ```sh
 $ (dd status=progress if=/dev/zero bs=1GB count=100 > /dev/null) 2>&1 | \

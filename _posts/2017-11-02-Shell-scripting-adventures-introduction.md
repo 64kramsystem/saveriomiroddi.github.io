@@ -2,7 +2,7 @@
 layout: post
 title: Shell scripting adventures (Introduction)
 tags: [shell_scripting,sysadmin]
-last_modified_at: 2017-11-02 23:19:49
+last_modified_at: 2017-11-22 00:47:00
 ---
 
 I've always thought of shell scripting as a second class scripting form, being awkward and limited.
@@ -35,16 +35,21 @@ Although the description may be easy, many areas are covered, and especially, ga
 
 Indicatively, the structure of the blog posts, and their content, will be:
 
-1. bash
-  - associative arrays
-  - expand strings into separate options
-  - escape strings
-  - regexes
-  - find file basename
-  - replace extension
-  - cycle a multi-line input
-  - heredoc
-2. linux tools/system concepts
+1. Bash general functionalities
+  - Associative arrays (hash maps)
+  - Escape strings
+  - Expand strings into separate options
+  - Regular expressions matching
+  - Find a filename's basename
+  - Replace the extension of a filename
+  - Cycle a multi-line variable
+  - Heredoc
+2. Text processing extravaganza
+  - Awk/sed/perl considerations
+  - Perl text processing
+  - Awk text processing
+  - Progress bars processing with awk (and stdbuf)
+3. linux tools/system concepts
   - check sudo
   - awk/sed/perl
   - stdbuf
@@ -53,11 +58,11 @@ Indicatively, the structure of the blog posts, and their content, will be:
   - usb storage devices/udev
   - trap
   - disk resize
-3. using whiptail
+4. using whiptail
   - base widgets
   - radio list
   - gauge/text processing/pipes
-4. patching the binaries in a filesystem, and large file storage: considerations
+5. patching the binaries in a filesystem, and large file storage: considerations
   - git lfs
   - google drive
   - binary patching

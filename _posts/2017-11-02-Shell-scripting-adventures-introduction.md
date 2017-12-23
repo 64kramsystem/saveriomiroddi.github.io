@@ -49,20 +49,20 @@ Indicatively, the structure of the blog posts, and their content, will be:
   - Perl text processing
   - Awk text processing
   - Progress bars processing with awk (and stdbuf)
-3. linux tools/system concepts
+3. Terminal-based dialog boxes: Whiptail
+  - Widgets, with snippets
+    - Message box
+    - Yes/no box
+    - Gauge
+    - Radio list
+  - Other widgets
+4. Linux tools/system concepts
   - check sudo
-  - awk/sed/perl
-  - stdbuf
-  - process wget/dd progress (pipes shuffling)
   - xz
   - usb storage devices/udev
   - trap
   - disk resize
-4. using whiptail
-  - base widgets
-  - radio list
-  - gauge/text processing/pipes
-5. patching the binaries in a filesystem, and large file storage: considerations
+5. Patching the binaries in a filesystem, and large file storage: considerations
   - git lfs
   - google drive
   - binary patching

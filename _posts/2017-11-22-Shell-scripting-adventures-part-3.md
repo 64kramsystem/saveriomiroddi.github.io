@@ -1,20 +1,12 @@
 ---
 layout: post
-title: Shell scripting adventures (Part 3, Terminal-based dialog boxes)
+title: Shell scripting adventures (Part 3, Terminal-based dialog boxes: Whiptail)
 tags: [gui,shell_scripting,sysadmin]
 ---
 
 This is the Part 3 (of 5) of the shell scripting adventures, introduced in a [previous post]({% post_url 2017-11-02-Shell-scripting-adventures-introduction %}).
 
 The following subjects are described in this part:
-
-- [Introduction to Whiptail; base widgets listing]
-
-Since Whiptail is simple to use, the objective of this post is rather to show some useful code snippets/patterns.
-
-The examples are taken from my [RPi VPN Router project installation script](https://github.com/saveriomiroddi/rpi_vpn_router/blob/master/install_vpn_router.sh).
-
-## Table of contents
 
 - [Introduction to Whiptail](#introduction-to-whiptail)
 - [Widgets, with snippets](#widgets-with-snippets)
@@ -29,9 +21,13 @@ The examples are taken from my [RPi VPN Router project installation script](http
   - [Menus](#menus)
   - [Check list](#check-list)
 
+Since Whiptail is simple to use, the objective of this post is rather to show some useful code snippets/patterns.
+
+The examples are taken from my [RPi VPN Router project installation script](https://github.com/saveriomiroddi/rpi_vpn_router/blob/master/install_vpn_router.sh).
+
 ## Introduction to Whiptail
 
-Whiptail is a dialog boxes program, with some useful widgets, which makes shell scripting more user-friendly. It's included in all the Debian-based distributions, and it's used during the execution of some base Debian packages.
+Whiptail is a dialog boxes program, with some useful widgets, which makes shell scripting more user-friendly; it's included in all the Debian-based distributions.
 
 ## Widgets, with snippets
 

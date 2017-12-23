@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Shell scripting adventures (Part 3, Terminal-based dialog boxes: Whiptail)
+title: Shell scripting adventures (Part 3, Terminal-based dialog boxes&#58; Whiptail)
 tags: [gui,shell_scripting,sysadmin]
 ---
 
@@ -35,7 +35,7 @@ Whiptail is a dialog boxes program, with some useful widgets, which makes shell 
 
 The message box shows a message, waiting for the user to hit the OK button:
 
- ![Message box]({{ "/images/2017-11-22-Shell-scripting-adventures-part-3/message_box.png" }})
+ ![Message box]({{ "/images/2017-12-23-Shell-scripting-adventures-part-3/message_box.png" }})
 
 Command:
 
@@ -57,7 +57,7 @@ The parameters are:
 
 The yes/no works like the message box, but has two buttons:
 
- ![Message box]({{ "/images/2017-11-22-Shell-scripting-adventures-part-3/yesno_box.png" }})
+ ![Message box]({{ "/images/2017-12-23-Shell-scripting-adventures-part-3/yesno_box.png" }})
 
 Commands:
 
@@ -83,7 +83,7 @@ The message variable is quoted using [ANSI C Quoting](http://www.gnu.org/softwar
 
 The gauge is a very interesting widget used for displaying a progress:
 
- ![Gauge]({{ "/images/2017-11-22-Shell-scripting-adventures-part-3/gauge.png" }})
+ ![Gauge]({{ "/images/2017-12-23-Shell-scripting-adventures-part-3/gauge.png" }})
 
 The widget reads from the stdin a numeric value from 0 to 100, which regulates the progress, and exits when the stream is closed.
 
@@ -103,7 +103,7 @@ The functioning of this example is explained in detail in a section of [the prev
 
 The radio list provides a list of entries, for choosing one:
 
- ![Radio list]({{ "/images/2017-11-22-Shell-scripting-adventures-part-3/radio_list.png" }})
+ ![Radio list]({{ "/images/2017-12-23-Shell-scripting-adventures-part-3/radio_list.png" }})
 
 An interesting way of implementing this functionality is to use a Bash associative array:
 

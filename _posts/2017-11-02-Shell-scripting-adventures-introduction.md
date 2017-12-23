@@ -2,7 +2,7 @@
 layout: post
 title: Shell scripting adventures (Introduction)
 tags: [shell_scripting,sysadmin]
-last_modified_at: 2017-11-22 00:47:00
+last_modified_at: 2017-12-23 22:38:11
 ---
 
 I've always thought of shell scripting as a second class scripting form, being awkward and limited.

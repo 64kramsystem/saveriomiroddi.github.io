@@ -9,20 +9,20 @@ This is the Part 2 (of 5) of the shell scripting adventures, introduced in the [
 
 The following subjects are described in this part:
 
-- [Awk/sed/perl considerations](Shell-scripting-adventures-part-2#awksedperl-considerations)
-- [Perl text processing](Shell-scripting-adventures-part-2#perl-text-processing)
-  - [Regex modifiers](Shell-scripting-adventures-part-2#regex-modifiers)
-  - [Replace multiple lines](Shell-scripting-adventures-part-2#replace-multiple-lines)
-    - [`m` modifier](Shell-scripting-adventures-part-2#m-modifier)
-    - [`s` modifier](Shell-scripting-adventures-part-2#s-modifier)
-  - [Isolating ambiguous group references](Shell-scripting-adventures-part-2#isolating-ambiguous-group-references)
-  - [Printing a matching group (of matching lines)](Shell-scripting-adventures-part-2#printing-a-matching-group-of-matching-lines)
-- [Awk text processing](Shell-scripting-adventures-part-2#awk-text-processing)
-- [Progress bars processing with awk (and stdbuf)](Shell-scripting-adventures-part-2#progress-bars-processing-with-awk-and-stdbuf)
-  - [Processing single-line progress outputs](Shell-scripting-adventures-part-2#processing-single-line-progress-outputs)
-  - [Working around the buffering](Shell-scripting-adventures-part-2#working-around-the-buffering)
-  - [Streams processing](Shell-scripting-adventures-part-2#streams-processing)
-  - [Putting things together](Shell-scripting-adventures-part-2#putting-things-together)
+- [Awk/sed/perl considerations](/Shell-scripting-adventures-part-2#awksedperl-considerations)
+- [Perl text processing](/Shell-scripting-adventures-part-2#perl-text-processing)
+  - [Regex modifiers](/Shell-scripting-adventures-part-2#regex-modifiers)
+  - [Replace multiple lines](/Shell-scripting-adventures-part-2#replace-multiple-lines)
+    - [`m` modifier](/Shell-scripting-adventures-part-2#m-modifier)
+    - [`s` modifier](/Shell-scripting-adventures-part-2#s-modifier)
+  - [Isolating ambiguous group references](/Shell-scripting-adventures-part-2#isolating-ambiguous-group-references)
+  - [Printing a matching group (of matching lines)](/Shell-scripting-adventures-part-2#printing-a-matching-group-of-matching-lines)
+- [Awk text processing](/Shell-scripting-adventures-part-2#awk-text-processing)
+- [Progress bars processing with awk (and stdbuf)](/Shell-scripting-adventures-part-2#progress-bars-processing-with-awk-and-stdbuf)
+  - [Processing single-line progress outputs](/Shell-scripting-adventures-part-2#processing-single-line-progress-outputs)
+  - [Working around the buffering](/Shell-scripting-adventures-part-2#working-around-the-buffering)
+  - [Streams processing](/Shell-scripting-adventures-part-2#streams-processing)
+  - [Putting things together](/Shell-scripting-adventures-part-2#putting-things-together)
 
 The examples are taken from my [RPi VPN Router project installation script](https://github.com/saveriomiroddi/rpi_vpn_router/blob/master/install_vpn_router.sh).
 

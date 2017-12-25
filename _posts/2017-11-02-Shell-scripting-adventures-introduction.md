@@ -35,7 +35,7 @@ Although the description may be easy, many areas are covered, and especially, ga
 
 Indicatively, the structure of the blog posts, and their content, will be:
 
-1. Bash general functionalities
+- 1) Bash general functionalities
   - Associative arrays (hash maps)
   - Escape strings
   - Expand strings into separate options
@@ -44,25 +44,25 @@ Indicatively, the structure of the blog posts, and their content, will be:
   - Replace the extension of a filename
   - Cycle a multi-line variable
   - Heredoc
-2. Text processing extravaganza
+- 2) Text processing extravaganza
   - Awk/sed/perl considerations
   - Perl text processing
   - Awk text processing
   - Progress bars processing with awk (and stdbuf)
-3. Terminal-based dialog boxes: Whiptail
+- 3) Terminal-based dialog boxes: Whiptail
   - Widgets, with snippets
     - Message box
     - Yes/no box
     - Gauge
     - Radio list
   - Other widgets
-4. Linux tools/system concepts
+- 4) Linux tools/system concepts
   - check sudo
   - xz
   - usb storage devices/udev
   - trap
   - disk resize
-5. Patching the binaries in a filesystem, and large file storage: considerations
+- 5) Patching the binaries in a filesystem, and large file storage: considerations
   - git lfs
   - google drive
   - binary patching

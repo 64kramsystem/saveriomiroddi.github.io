@@ -2,7 +2,7 @@
 layout: post
 title: Shell scripting adventures (Part 1, Bash general functionalities)
 tags: [shell_scripting,sysadmin]
-last_modified_at: 2017-11-22 00:47:00
+last_modified_at: 2017-12-25 23:35:00
 ---
 
 This is the Part 1 (of 5) of the shell scripting adventures, introduced in the [previous post]({% post_url 2017-11-02-Shell-scripting-adventures-introduction %}).
@@ -10,6 +10,7 @@ This is the Part 1 (of 5) of the shell scripting adventures, introduced in the [
 The following subjects are described in this part:
 
 - [Associative arrays (hash maps)](Shell-scripting-adventures-part-1#associative-arrays-hash-maps)
+- [ANSI-C quoting](Shell-scripting-adventures-part-1#ansi-c-quoting)
 - [Escape strings](Shell-scripting-adventures-part-1#escape-strings)
 - [Expand strings into separate options](Shell-scripting-adventures-part-1#expand-strings-into-separate-options)
 - [Regular expressions matching](Shell-scripting-adventures-part-1#regular-expressions-matching)
@@ -68,6 +69,45 @@ For clearing, the easiest way is to unset the variable, then re-instantiate it:
 unset v_usb_storage_devices
 declare -A v_usb_storage_devices
 ```
+
+## ANSI-C quoting
+
+In bash, like many other languages, there are two main types of quoting: single and double quotes.
+
+Common limitations of the double quotes:
+
+- can't represent a newline as `\n`
+- they interpolate values (when one doesn't want to interpolate)
+
+Common limitations of the single quotes:
+
+- can't represent a newline as `\n`
+- escaping single quotes is very awkward (`'\''`)
+
+ANSI-C quoting are convenient for some cases.
+
+They are represented like the single quotes, preceded by the dollar simbol; this is an example:
+
+```sh
+$ echo $'This is an ANSI-C quoted string:\nmyvar=$\'string content\''
+This is an ANSI-C quoted string:
+myvar=$'string content'
+```
+
+Those are the equivalent with single and double quotes:
+```sh
+$ echo 'This is an ANSI-C quoted string:
+myvar=$'\''string content'\'''
+```
+
+and
+
+```sh
+$ echo "This is an ANSI-C quoted string:
+myvar=\$'string content'"
+```
+
+This quoting syntax supports some escape sequences; they can be found [here](https://www.gnu.org/software/bash/manual/html_node/ANSI_002dC-Quoting.html).
 
 ## Escape strings
 

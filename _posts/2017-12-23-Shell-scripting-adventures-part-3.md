@@ -8,18 +8,18 @@ This is the Part 3 (of 5) of the shell scripting adventures, introduced in a [pr
 
 The following subjects are described in this part:
 
-- [Introduction to Whiptail](#introduction-to-whiptail)
-- [Widgets, with snippets](#widgets-with-snippets)
-  - [Message box](#message-box)
-  - [Yes/no box](#yesno-box)
-  - [Gauge](#gauge)
-  - [Radio list](#radio-list)
-- [Other widgets](#other-widgets)
-  - [Input box](#input-box)
-  - [Text box](#text-box)
-  - [Password box](#password-box)
-  - [Menus](#menus)
-  - [Check list](#check-list)
+- [Introduction to Whiptail](/Shell-scripting-adventures-part-3#introduction-to-whiptail)
+- [Widgets, with snippets](/Shell-scripting-adventures-part-3#widgets-with-snippets)
+  - [Message box](/Shell-scripting-adventures-part-3#message-box)
+  - [Yes/no box](/Shell-scripting-adventures-part-3#yesno-box)
+  - [Gauge](/Shell-scripting-adventures-part-3#gauge)
+  - [Radio list](/Shell-scripting-adventures-part-3#radio-list)
+- [Other widgets](/Shell-scripting-adventures-part-3#other-widgets)
+  - [Input box](/Shell-scripting-adventures-part-3#input-box)
+  - [Text box](/Shell-scripting-adventures-part-3#text-box)
+  - [Password box](/Shell-scripting-adventures-part-3#password-box)
+  - [Menus](/Shell-scripting-adventures-part-3#menus)
+  - [Check list](/Shell-scripting-adventures-part-3#check-list)
 
 Since Whiptail is simple to use, the objective of this post is rather to show some useful code snippets/patterns.
 

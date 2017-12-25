@@ -9,15 +9,15 @@ This is the Part 1 (of 5) of the shell scripting adventures, introduced in the [
 
 The following subjects are described in this part:
 
-- [Associative arrays (hash maps)](Shell-scripting-adventures-part-1#associative-arrays-hash-maps)
-- [ANSI-C quoting](Shell-scripting-adventures-part-1#ansi-c-quoting)
-- [Escape strings](Shell-scripting-adventures-part-1#escape-strings)
-- [Expand strings into separate options](Shell-scripting-adventures-part-1#expand-strings-into-separate-options)
-- [Regular expressions matching](Shell-scripting-adventures-part-1#regular-expressions-matching)
-- [Find a filename's basename](Shell-scripting-adventures-part-1#find-a-filenames-basename)
-- [Replace the extension of a filename](Shell-scripting-adventures-part-1#replace-the-extension-of-a-filename)
-- [Cycle a multi-line variable](Shell-scripting-adventures-part-1#cycle-a-multi-line-variable)
-- [Heredoc](Shell-scripting-adventures-part-1#heredoc)
+- [Associative arrays (hash maps)](/Shell-scripting-adventures-part-1#associative-arrays-hash-maps)
+- [ANSI-C quoting](/Shell-scripting-adventures-part-1#ansi-c-quoting)
+- [Escape strings](/Shell-scripting-adventures-part-1#escape-strings)
+- [Expand strings into separate options](/Shell-scripting-adventures-part-1#expand-strings-into-separate-options)
+- [Regular expressions matching](/Shell-scripting-adventures-part-1#regular-expressions-matching)
+- [Find a filename's basename](/Shell-scripting-adventures-part-1#find-a-filenames-basename)
+- [Replace the extension of a filename](/Shell-scripting-adventures-part-1#replace-the-extension-of-a-filename)
+- [Cycle a multi-line variable](/Shell-scripting-adventures-part-1#cycle-a-multi-line-variable)
+- [Heredoc](/Shell-scripting-adventures-part-1#heredoc)
 
 The examples are taken from my [RPi VPN Router project installation script](https://github.com/saveriomiroddi/rpi_vpn_router/blob/master/install_vpn_router.sh).
 

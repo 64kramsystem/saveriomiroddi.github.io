@@ -101,8 +101,9 @@ irb> sleep 0.1
 irb> Process.kill('SIGHUP', child_pid)
 ```
 
-We send a [SIGHUP](https://en.wikipedia.org/wiki/Signal_(IPC)#SIGHUP) signal.  
-SIGHUP responses vary by program; in the case of `irb` and shell `sleep`/`find`, it will terminate the program, so it's appropriate for our purpose.
+For the defined use case, using processes has a significant advantage: we know precisely the termination details, as we control the signal sent, and how the processes deal with it.
+
+In the example we send a [SIGHUP](https://en.wikipedia.org/wiki/Signal_(IPC)#SIGHUP) signal. SIGHUP responses vary by program; in the case of `irb` and shell `sleep`/`find`, they will cleanly terminate, so it's an appropriate signal for our purpose.
 
 This is the process information, pre-kill:
 
@@ -144,10 +145,12 @@ As we've seen, when a signal is sent to a process, it's its own task to handle i
 
 We can solve this problem by detaching the child process, which then becomes a child of the root process; this will take care of it:
 
+```
 child_pid = fork { `sleep 10` }
 sleep 0.1
 Process.detach(child_pid)
 Process.kill('SIGHUP', child_pid)
+```
 
 After `fork`:
 
@@ -355,7 +358,7 @@ Parent: exiting...
 
 We can see on the third line that `Process.setsid` changed the forked process group id; the parent won't belong any more to it, so we're free to send signals without interrupting the parent process.
 
-Processes information:
+Processes information before killing:
 
 ```
  1836 ?        Ss     0:00 /sbin/upstart --user
@@ -364,6 +367,8 @@ Processes information:
 30733 ?        Ssl    0:00  |   |       \_ ruby /tmp/test.rb
 30736 ?        S      0:00  |   |           \_ sleep 10
 ```
+
+and after killing:
 
 ```
  1836 ?        Ss     0:00 /sbin/upstart --user

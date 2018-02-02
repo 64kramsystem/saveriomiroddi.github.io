@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Shell scripting adventures (Part 3, Terminal-based dialog boxes&#58; Whiptail)
+title: Shell scripting adventures (Part 3, Terminal-based dialog boxes&colon; Whiptail)
 tags: [gui,shell_scripting,sysadmin]
 ---
 

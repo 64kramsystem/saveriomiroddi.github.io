@@ -4,7 +4,7 @@ title: Shell scripting adventures (Part 3, Terminal-based dialog boxes&colon; Wh
 tags: [gui,shell_scripting,sysadmin]
 ---
 
-This is the Part 3 (of 5) of the shell scripting adventures, introduced in a [previous post]({% post_url 2017-11-02-Shell-scripting-adventures-introduction %}).
+This is the Part 3 (of 3) of the shell scripting adventures, introduced in a [previous post]({% post_url 2017-11-02-Shell-scripting-adventures-introduction %}).
 
 The following subjects are described in this part:
 

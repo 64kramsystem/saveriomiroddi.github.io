@@ -5,7 +5,7 @@ tags: [shell_scripting,sysadmin]
 last_modified_at: 2017-12-25 23:35:00
 ---
 
-This is the Part 1 (of 5) of the shell scripting adventures, introduced in the [previous post]({% post_url 2017-11-02-Shell-scripting-adventures-introduction %}).
+This is the Part 1 (of 3) of the shell scripting adventures, introduced in the [previous post]({% post_url 2017-11-02-Shell-scripting-adventures-introduction %}).
 
 The following subjects are described in this part:
 

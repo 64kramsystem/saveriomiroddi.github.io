@@ -56,15 +56,11 @@ Indicatively, the structure of the blog posts, and their content, will be:
     - Gauge
     - Radio list
   - Other widgets
+
+An extra article won't be published; it originally was planned to include:
+
 - 4) Linux tools/system concepts
-  - check sudo
-  - xz
-  - usb storage devices/udev
-  - trap
-  - disk resize
-- 5) Patching the binaries in a filesystem, and large file storage: considerations
-  - git lfs
-  - google drive
-  - binary patching
-  - dpkg --root
-  - rsync
+  - handling xz archives
+  - handling usb storage devices/udev
+  - signals trapping
+  - resizing a disk, via parted, in a non-interactive way

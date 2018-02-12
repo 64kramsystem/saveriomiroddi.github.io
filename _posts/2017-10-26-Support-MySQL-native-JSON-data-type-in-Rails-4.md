@@ -2,7 +2,7 @@
 layout: post
 title: Support MySQL native JSON data type in ActiveRecord (Rails) 4
 tags: [mysql, data_types, rails]
-last_modified_at: 2018-11-11 00:44:00
+last_modified_at: 2018-02-12 22:16:00
 ---
 
 Mysql 5.7 added native support for JSON data type. This opens up several interesting possibilities, but it's not natively supported in Rails 4 (only in v5).
@@ -84,12 +84,8 @@ and create a migration:
 
 ```ruby
 class AddMyJsonAttributeToMyModel < ActiveRecord::Migration
-  def up
+  def change
     add_column :my_models, :my_json_attribute, :json
-  end
-
-  def down
-    remove_column :my_models, :my_json_attribute
   end
 end
 ```
@@ -150,11 +146,9 @@ and so is creating the migration:
 
 ```ruby
 add_column :my_models, :my_json_attribute, :json
-MyModel.update_all('my_json_attribute = "{}"')
 ```
 
-while taking care of resetting the value that MySQL adds by default (`null`), since we designed the column to only accept hashes.  
-MySQL doesn't accept a default for JSON columns.
+Note that MySQL doesn't accept a default for JSON columns.
 
 ### Gotchas
 
@@ -187,4 +181,4 @@ Some introductory references on JSON in MySQL 5.7:
 - [How to Use JSON Data Fields in MySQL Databases](https://www.sitepoint.com/use-json-data-fields-mysql-databases/)
 - [JSON document fast lookup with MySQL 5.7](https://www.percona.com/blog/2016/03/07/json-document-fast-lookup-with-mysql-5-7/)
 
-*Edited 2018-11-11: Added gem reference, and minor code updates*
+*Edited 2018-02-11: Added gem reference, and minor code updates*

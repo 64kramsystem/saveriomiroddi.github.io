@@ -2,7 +2,7 @@
 layout: post
 title: Support MySQL native JSON data type in ActiveRecord (Rails) 4
 tags: [mysql, data_types, rails]
-last_modified_at: 2018-02-12 22:16:00
+last_modified_at: 2018-02-14 11:04:00
 ---
 
 Mysql 5.7 added native support for JSON data type. This opens up several interesting possibilities, but it's not natively supported in Rails 4 (only in v5).
@@ -163,6 +163,14 @@ Ideally, we'd like the column to be NOT NULL. For this, we need to set a default
 
 Due to these problems, we'll need to set the column as nullable.
 
+#### MySQL JSON SELECT bug (IMPORTANT!)
+
+MySQL version up to at least 5.7.12 have a serious JSON bug.
+
+In some cases, queries using DISTINCT on VARCHAR and JSON columns, will not perform the deduplication, resulting in duplicate rows being returned, if there are any.
+
+This has been fixed between 5.7.13 and 5.7.18 (I couldn't find the related enty in the release notes), therefore, MySQL 5.7 users are urged to upgrade to a recent version if they use JSON columns.
+
 #### MySQL decimal normalization
 
 MySQL (up to 8.0.3, included) will normalize decimal numbers with zero fractional (e.g. `5.0`) to integers, therefore, changing the data type on save.
@@ -181,4 +189,5 @@ Some introductory references on JSON in MySQL 5.7:
 - [How to Use JSON Data Fields in MySQL Databases](https://www.sitepoint.com/use-json-data-fields-mysql-databases/)
 - [JSON document fast lookup with MySQL 5.7](https://www.percona.com/blog/2016/03/07/json-document-fast-lookup-with-mysql-5-7/)
 
+*Edited 2018-02-14: Added JSON DISTINCT bug information*
 *Edited 2018-02-11: Added gem reference, and minor code updates*

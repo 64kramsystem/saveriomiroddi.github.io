@@ -150,18 +150,9 @@ add_column :my_models, :my_json_attribute, :json
 
 Note that MySQL doesn't accept a default for JSON columns.
 
-### Gotchas
+### MySQL JSON bugs/limitations
 
 There are a couple of gotchas to take care of.
-
-#### Default value
-
-Ideally, we'd like the column to be NOT NULL. For this, we need to set a default. Although `serialize()` supports a default, it doesn't work well in this case, for two problems:
-
-1. on the first persistence, `changed_in_place?()` will be called; it will find the old value to be `{}` (because it's the default), and the new value to be the same, therefore, ActiveRecord won't include the column in the INSERTed ones;
-2. we can work this around by setting the default to `'{ }'` (with a space): the method `changed_in_place?()` will compare it against `{ }` (since it will serialize and deserialize the value for comparison); for unclear reasons, the default value will be set on `MyModel.new()`, but not on `MyModel.create!()`
-
-Due to these problems, we'll need to set the column as nullable.
 
 #### MySQL JSON SELECT bug (IMPORTANT!)
 
@@ -176,6 +167,10 @@ This has been fixed between 5.7.13 and 5.7.18 (I couldn't find the related enty 
 MySQL (up to 8.0.3, included) will normalize decimal numbers with zero fractional (e.g. `5.0`) to integers, therefore, changing the data type on save.
 
 See [relevant bug](https://bugs.mysql.com/bug.php?id=88230).
+
+#### Default value
+
+MySQL doesn't support default values for JSON columns, so it will need to be set at Rails level.
 
 ## Conclusion
 

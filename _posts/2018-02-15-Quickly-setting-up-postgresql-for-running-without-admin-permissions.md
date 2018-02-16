@@ -11,8 +11,8 @@ This guide will show how to easily setup PostgreSQL (both via package and binary
 Contents:
 
 - [Setup notes/requirements](/Quickly-setting-up-postgresql-for-running-without-admin-permissions#setup-notesrequirements)
-- [Installion via apt package (Ubuntu)](/Quickly-setting-up-postgresql-for-running-without-admin-permissions#installion-via-apt-package-ubuntu)
-- [Installion via binary tarball](/Quickly-setting-up-postgresql-for-running-without-admin-permissions#installion-via-binary-tarball)
+- [Installation via apt package (Ubuntu)](/Quickly-setting-up-postgresql-for-running-without-admin-permissions#installation-via-apt-package-ubuntu)
+- [Installation via binary tarball (universal)](/Quickly-setting-up-postgresql-for-running-without-admin-permissions#installation-via-binary-tarball-universal)
 - [Persisting the PGSQL data location, and adding the binaries to the `$PATH`](/Quickly-setting-up-postgresql-for-running-without-admin-permissions#persisting-the-pgsql-data-location-and-adding-the-binaries-to-the-path)
 - [Conclusion](/Quickly-setting-up-postgresql-for-running-without-admin-permissions#conclusion)
 
@@ -24,7 +24,7 @@ The procedure is run as the local user, in a modern Bash shell; `sudo` is provid
 
 The `$PGDATA` directory name must not contain quotes (which would complicate the commands).
 
-## Installion via apt package (Ubuntu)
+## Installation via apt package (Ubuntu)
 
 First, set a few variables, for convenience:
 
@@ -80,7 +80,7 @@ $ psql -h localhost postgres
 
 Check out the [last section](#persisting-the-pgsql-data-location-and-adding-the-binaries-to-the-path) for persisting the data location, and adding the binaries to the `$PATH`!
 
-## Installion via binary tarball
+## Installation via binary tarball (universal)
 
 First, variables setup:
 

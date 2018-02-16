@@ -13,6 +13,7 @@ Contents:
 - [Setup notes/requirements](/Quickly-setting-up-postgresql-for-running-without-admin-permissions#setup-notesrequirements)
 - [Installion via apt package (Ubuntu)](/Quickly-setting-up-postgresql-for-running-without-admin-permissions#installion-via-apt-package-ubuntu)
 - [Installion via binary tarball](/Quickly-setting-up-postgresql-for-running-without-admin-permissions#installion-via-binary-tarball)
+- [Persisting the PGSQL data location, and adding the binaries to the `$PATH`](/Quickly-setting-up-postgresql-for-running-without-admin-permissions#persisting-the-pgsql-data-location-and-adding-the-binaries-to-the-path)
 - [Conclusion](/Quickly-setting-up-postgresql-for-running-without-admin-permissions#conclusion)
 
 ## Setup notes/requirements
@@ -65,17 +66,10 @@ $ ruby -i -pe "sub /^#(unix_socket_directories = ).*/, %q(\1'$PGDATA')" "$PGDATA
 
 Note that we use Ruby for using slashes and quotes without having to perform complex quoting (with Perl/Sed, we would have to).
 
-For convenience, the `pg_ctl` binary can be symlinked to the `$HOME/bin` directory (which, in Ubuntu, is in the default `$PATH`):
-
-```sh
-$ mkdir -p "$HOME/bin"
-$ ln -s "/usr/lib/postgresql/$PGSQL_VERSION/bin/pg_ctl" !$
-```
-
 Now PostgreSQL can be started via:
 
 ```sh
-$ pg_ctl start
+$ "/usr/lib/postgresql/$PGSQL_VERSION/bin/pg_ctl" start
 ```
 
 Ready to connect!:
@@ -83,6 +77,8 @@ Ready to connect!:
 ```sh
 $ psql -h localhost postgres
 ```
+
+Check out the [last section](#persisting-the-pgsql-data-location-and-adding-the-binaries-to-the-path) for persisting the data location, and adding the binaries to the `$PATH`!
 
 ## Installion via binary tarball
 
@@ -114,25 +110,42 @@ $ "$LOCAL_LIB/pgsql/bin/initdb"
 
 With the binary tarball version, we don't need to change any configuration!
 
-Symlink the `postgres`/`psql` binaries:
-
-```sh
-$ mkdir -p "$HOME/bin"
-$ ln -s "$LOCAL_LIB/pgsql/bin/pg_ctl" !$
-$ ln -s "$LOCAL_LIB/pgsql/bin/psql" !$
-$ ln -s "$LOCAL_LIB/pgsql/bin/psql.bin" !$
-```
-
 Now, start PostgreSQL:
 
 ```sh
-$ pg_ctl start
+$ "$LOCAL_LIB/pgsql/bin/pg_ctl" start
 ```
 
 and connect via client:
 
 ```sh
-$ psql -h localhost postgres
+$ "$LOCAL_LIB/pgsql/bin/psql" -h localhost postgres
+```
+
+Check out the [last section](#persisting-the-pgsql-data-location-and-adding-the-binaries-to-the-path) for persisting the data location, and adding the binaries to the `$PATH`!
+
+## Persisting the PGSQL data location, and adding the binaries to the `$PATH`
+
+In order to persist the PGSQL data location, and add the binaries to the `$PATH` for convenience, we need to extend the shell init scripts.
+
+Shell init scripts vary slightly dependign on the login conditions/configuration. For simplicity, extend `$HOME/.bashrc`.
+
+The env variable `$PGDATA` tells PGSQL where the data resides:
+
+```sh
+echo 'export PGDATA="$HOME/databases/pgsql_data"' >> "$HOME/.bashrc"
+```
+
+It's convenient to have the PGSQL binaries in the path as well, in order to avoid having to write the full path:
+
+```sh
+# For apt package installations
+export PGSQL_VERSION=10
+echo "export PATH=/usr/lib/postgresql/$PGSQL_VERSION/bin:\$PATH" >> "$HOME/.bashrc"
+
+# For binary tarball installations
+$ export LOCAL_LIB="$HOME/local"
+$ echo "export PATH=$LOCAL_LIB:\$PATH" >> "$HOME/.bashrc"
 ```
 
 ## Conclusion

@@ -2,10 +2,10 @@
 layout: post
 title: Shell scripting adventures (Part 1, Bash general functionalities)
 tags: [shell_scripting,sysadmin]
-last_modified_at: 2017-12-25 23:35:00
+last_modified_at: 2018-03-09 18:15:00
 ---
 
-This is the Part 1 (of 3) of the shell scripting adventures, introduced in the [previous post]({% post_url 2017-11-02-Shell-scripting-adventures-introduction %}).
+This is the Part 1 (of 3) of the shell scripting adventures.
 
 The following subjects are described in this part:
 
@@ -20,6 +20,12 @@ The following subjects are described in this part:
 - [Heredoc](/Shell-scripting-adventures-part-1#heredoc)
 
 The examples are taken from my [RPi VPN Router project installation script](https://github.com/saveriomiroddi/rpi_vpn_router/blob/master/install_vpn_router.sh).
+
+Previous/Following chapters:
+
+- [Introduction]({% post_url 2017-11-02-Shell-scripting-adventures-introduction %})
+- [Part 2]({% post_url 2017-11-22-Shell-scripting-adventures-part-2 %})
+- [Part 3]({% post_url 2017-12-23-Shell-scripting-adventures-part-3 %})
 
 ## Associative arrays (hash maps)
 

@@ -2,9 +2,10 @@
 layout: post
 title: Shell scripting adventures (Part 3, Terminal-based dialog boxes&colon; Whiptail)
 tags: [gui,shell_scripting,sysadmin]
+last_modified_at: 2018-03-09 18:15:00
 ---
 
-This is the Part 3 (of 3) of the shell scripting adventures, introduced in a [previous post]({% post_url 2017-11-02-Shell-scripting-adventures-introduction %}).
+This is the Part 3 (of 3) of the shell scripting adventures.
 
 The following subjects are described in this part:
 
@@ -24,6 +25,12 @@ The following subjects are described in this part:
 Since Whiptail is simple to use, the objective of this post is rather to show some useful code snippets/patterns.
 
 The examples are taken from my [RPi VPN Router project installation script](https://github.com/saveriomiroddi/rpi_vpn_router/blob/master/install_vpn_router.sh).
+
+Previous chapters:
+
+- [Introduction]({% post_url 2017-11-02-Shell-scripting-adventures-introduction %})
+- [Part 1]({% post_url 2017-11-08-Shell-scripting-adventures-part-1 %})
+- [Part 2]({% post_url 2017-11-22-Shell-scripting-adventures-part-2 %})
 
 ## Introduction to Whiptail
 

@@ -2,7 +2,7 @@
 layout: post
 title: Support MySQL native JSON data type in ActiveRecord (Rails) 4
 tags: [mysql, data_types, rails]
-last_modified_at: 2018-02-14 11:04:00
+last_modified_at: 2018-03-09 19:00:00
 ---
 
 Mysql 5.7 added native support for JSON data type. This opens up several interesting possibilities, but it's not natively supported in Rails 4 (only in v5).
@@ -139,7 +139,9 @@ The `include Type::Mutable` module automatically adds a method (`changed_in_plac
 Specifying the attribute in a model is trivial (more on this in the gotchas section):
 
 ```ruby
-serialize :my_json_attribute, ActiveRecord::Type::Json.new
+class MyModel < ActiveRecord::Base
+  serialize :my_json_attribute, ActiveRecord::Type::Json.new
+end
 ```
 
 and so is creating the migration:
@@ -148,7 +150,36 @@ and so is creating the migration:
 add_column :my_models, :my_json_attribute, :json
 ```
 
-Note that MySQL doesn't accept a default for JSON columns.
+result:
+
+```sql
+mysql> DESCRIBE my_models;
++-------------------+---------+------+-----+---------+----------------+
+| Field             | Type    | Null | Key | Default | Extra          |
++-------------------+---------+------+-----+---------+----------------+
+| id                | int(11) | NO   | PRI | NULL    | auto_increment |
+| my_json_attribute | json    | YES  |     | NULL    |                |
++-------------------+---------+------+-----+---------+----------------+
+```
+
+The `json_on_rails` gem, which uses the same base structure while also adding the JSON support at `mysql2` driver level, makes it possible to use `ActiveRecord::Store` backed by the native MySQL JSON data type:
+
+```ruby
+class MyModel < ActiveRecord::Base
+  store_accessor :my_json_column, :my_attribute, :my_other_attribute
+end
+
+MyModel.create!(my_attribute: [1, 2, 3])
+```
+
+```sql
+mysql> SELECT my_json_column FROM my_models;
+------------------------------+
+| my_json_column              |
++-----------------------------+
+| {"my_attribute": [1, 2, 3]} |
++-----------------------------+
+```
 
 ### MySQL JSON bugs/limitations
 

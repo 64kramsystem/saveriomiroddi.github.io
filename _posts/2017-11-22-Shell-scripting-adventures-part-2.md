@@ -2,10 +2,10 @@
 layout: post
 title: Shell scripting adventures (Part 2, Text processing extravaganza)
 tags: [shell_scripting,sysadmin,text_processing,perl,awk]
-last_modified_at: 2017-11-22 18:35:00
+last_modified_at: 2018-03-09 18:15:00
 ---
 
-This is the Part 2 (of 3) of the shell scripting adventures, introduced in the [previous post]({% post_url 2017-11-02-Shell-scripting-adventures-introduction %}).
+This is the Part 2 (of 3) of the shell scripting adventures.
 
 The following subjects are described in this part:
 
@@ -25,6 +25,12 @@ The following subjects are described in this part:
   - [Putting things together](/Shell-scripting-adventures-part-2#putting-things-together)
 
 The examples are taken from my [RPi VPN Router project installation script](https://github.com/saveriomiroddi/rpi_vpn_router/blob/master/install_vpn_router.sh).
+
+Previous/following chapters:
+
+- [Introduction]({% post_url 2017-11-02-Shell-scripting-adventures-introduction %})
+- [Part 1]({% post_url 2017-11-08-Shell-scripting-adventures-part-1 %})
+- [Part 3]({% post_url 2017-12-23-Shell-scripting-adventures-part-3 %})
 
 ## Awk/sed/perl considerations
 

@@ -2,7 +2,7 @@
 layout: post
 title: Shell scripting adventures (Introduction)
 tags: [shell_scripting,sysadmin]
-last_modified_at: 2017-12-23 22:38:11
+last_modified_at: 2018-03-09 18:15:00
 ---
 
 I've always thought of shell scripting as a second class scripting form, being awkward and limited.
@@ -11,6 +11,12 @@ After a deep dive in my [RPi VPN router project](https://github.com/saveriomirod
 Shell scripting generally can't be disassociated from system/infrastructure administration, so developing the project has been actually, as a whole, a very interesting and pleasant undertaking.
 
 This post lays the structure of the future posts I'll publish about the experience.
+
+Following chapters:
+
+- [Part 1]({% post_url 2017-11-08-Shell-scripting-adventures-part-1 %})
+- [Part 2]({% post_url 2017-11-22-Shell-scripting-adventures-part-2 %})
+- [Part 3]({% post_url 2017-12-23-Shell-scripting-adventures-part-3 %})
 
 ## The domain
 

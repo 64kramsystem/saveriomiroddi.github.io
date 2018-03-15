@@ -1,12 +1,13 @@
 ---
 layout: post
-title: An overview of Ruby GUI development in 2018
+title: An overview of Desktop Ruby GUI development in 2018
 tags: [gui,ruby]
+last_modified_at: 2018-03-15 10:47:00
 ---
 
 Ruby GUI development is a seldom mentioned subject, but it has value. Probably after some Rails development (cough...), developing a desktop tool may be an interesting diversion (or even a requirement).
 
-During the development of my [PM-Spotlight](https://github.com/saveriomiroddi/pm-spotlight) desktop application, I evaluated most of the Ruby GUI toolkits, and prototyped the application with three of them (Shoes 3, FXRuby, and Tk).
+During the development of my [PM-Spotlight](https://github.com/saveriomiroddi/pm-spotlight) desktop application, I evaluated most of the Desktop Ruby GUI toolkits, and prototyped the application with three of them (Shoes 3, FXRuby, and Tk).
 
 This article presents a summary of what I've experienced (or gathered) while I was "Developing GUI applications with Ruby"!
 
@@ -29,21 +30,30 @@ Reference table:
 
 | Framework   | Distribution | Functionality | Documentation | Widgets     |
 |-------------|--------------|---------------|---------------|-------------|
-| Shoes 3     | good         | good/poor     | so-so         | lightweight |
-| Shoes 4     | good         | good/poor     | poor          | native      |
+| Shoes 3     | good         | poor          | so-so         | lightweight |
+| Shoes 4     | good         | poor          | poor          | native      |
 | Fox Toolkit | good         | good          | good          | lightweight |
 | Tk          | poor         | good          | good          | mixed       |
 | WxWidgets   | (dead)       | -             | -             | native      |
 | Qt          | obsolete     | good?         | ?             | mixed       |
-| GTK+        | good         | good?         | ?             | mixed       |
+| GTK+        | good?        | good?         | ?             | mixed       |
+| JRubyFX     | ?            | ?             | ?             | ?           |
 
 This is certainly a reductionist view, so it's crucial to read to full article to get a grasp.
 
-I did not prototype my application with Qt/GTK+, so for those, I only evaluated what I could gather by reading the documentation.
+### Notes about platforms/toolkits
 
-The widgets implementation is listed in this table, but not referenced in the evaluations, because in the current landscape, the other aspects are significantly more pressuring; also, native widgets are not necessarily better than lightweight.
+- Essentially all the toolkits are evaluated on the MRI (except Shoes 4, based on JRuby); compatibility with other interpreters is not specified;
+- I did not prototype my application with Qt/GTK+, so for those, I only evaluated what I could gather by reading the documentation;
+- RubyMotion is not included, as it doesn't support the major desktop platforms;
+- I didn't evaluate JRubyFX, since I wasn't aware of it at the time of publication of the post.
 
-The size of the packages has not been considered as well, as in the cases where packages applications are small, the libraries still need to be downloaded.
+### Notes about evaluation
+
+- The distribution refers to the main desktop platforms: Linux, MacOS and Windows;
+- The widgets implementation is listed in this table, but not referenced in the evaluations, because in the current landscape, the other aspects are significantly more pressuring; also, native widgets are not necessarily better than lightweight;
+- I didn't consider ease of development;
+- I didn't consider the size of the packages, as in the cases where packages applications are small, the libraries still need to be downloaded.
 
 ## Extension/mistakes
 
@@ -75,7 +85,7 @@ This is excellent for distribution:
 
 #### Functionality
 
-Design-wise, a Shoes program needs to be wrapped in the `Shoes.app` block:
+Design-wise, a Shoes program needs to be wrapped in the `Shoes.app` block, with the GUI elements being used in DSL form:
 
 ```ruby
 Shoes.app do
@@ -83,7 +93,7 @@ Shoes.app do
 end
 ```
 
-This orients the architecture to be GUI-centered, in a way, similarly to Visual Basic 6 (which is good and bad at the same time).
+This orients the design to be GUI-centered, in a way, similarly to Visual Basic 6 - this has advantages, but also potentially terrifying disadvantages.
 
 Although one can potentially produce a good design, it's not possible to fully decouple a program from the Shoes framework; this general structure is not possible:
 
@@ -97,7 +107,7 @@ class ShoesGuiFrontend
 end
 
 class MyProgram
-  def initialize(params)
+  def initialize
     @frontend = initialize_gui_frontend
   end
 
@@ -107,15 +117,13 @@ class MyProgram
 end
 ```
 
-For very simple apps, this may still be acceptabe.
-
-In terms of general API richness, Shoes is a limited GUI toolkit. For example, events are attached to layout containers, not to widgets [¹](#footnote01).
+In terms of general API richness, Shoes is a very limited toolkit. For example, events are attached to layout containers, not to widgets [¹](#footnote01); there are basic widgets, but not all the typical ones present in mature toolkits (eg. tree list).
 
 I experienced a crash (on the current release version, 3.3.5) after testing a handful of the demo examples, which is not a very good sign.
 
-Both versions are slow to start, which needs to be considered.
+Shoes applications start slowly.
 
-For the above reasons, I gave an evaluation of both `good` and `poor`: the former for trivial programs, the latter for general development.
+For the above reasons, I give a `poor` evaluation, although Shoes could still be an appropriate choice for trivial applications.
 
 #### Documentation
 
@@ -125,7 +133,7 @@ In general, the documentation is not suited to (more) advanced development.
 
 Shoes 4's documentation is outdated, which leads to a `poor` evaluation.
 
-Shoes 3's documentation is unusually distributed; it's up to date, but it's readable only from the library main program (!). Gets a `so-so` evaluation for the basic, shared, content.
+Shoes 3's documentation is unusually distributed; it's up to date, but it's readable only from the library main program (!). Gets a `so-so` evaluation for the basic, shared (with v4), content.
 
 ### Fox toolkit
 
@@ -141,7 +149,7 @@ In order to run a Fox Ruby application, the user needs to install the Fox Toolki
 
 The Fox toolkit is a mature and flexible library - there are professional applications making use of it.
 
-FXRuby applications start very quickly.
+FXRuby applications start quickly.
 
 For the reasons above, Fox toolkit gets a `good` evaluation.
 
@@ -159,7 +167,7 @@ Tk is a mature, flexible and widespread library; in fact, it's Python's standard
 
 #### Distribution
 
-Although Tk is the official Ruby GUI library, it needs to be explicitly specified when compiling, which is not common in the distributed forms.
+Although Tk is the official Ruby GUI library, the Ruby interpreter needs to be compiled with specific options in order to support it; generally, distributed Ruby versions don't support it out of the box.
 
 This can be simplified in some cases (e.g. on Ubuntu, Brightbox provides precompiled Ruby versions up to 2.3), but it's not something to expect from a casual end-user.
 
@@ -197,7 +205,7 @@ I haven't developed with Qt; due to the Qt backing, I gave a purely guessed `goo
 
 GTK+ is a mature and flexibly library. It's extremely widespread.
 
-Packaging GTK+ application seems to be very easy, therefore my `good` evaluation.
+Packaging GTK+ application seems to be very easy, therefore my `good?` evaluation.
 
 I haven't developed with GTK+; due to the GTK+ backing, I gave a purely guessed `good?` functionality evaluation.
 
@@ -207,7 +215,7 @@ It's very difficult to give general guidelines, but I'll still give a shot.
 
 For distributing applications, my guidelines are:
 
-- for general purpose, FXRuby or GTK+;
+- for general purpose, FXRuby (also try GTK+);
 - for *extremely* simple applications, try Shoes 3.
 
 The other libraries/bindings has very shortcomings that in my opinion/use cases are far too inconvenient.

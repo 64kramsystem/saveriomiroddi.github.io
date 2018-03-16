@@ -48,7 +48,8 @@ This is certainly a reductionist view, so it's crucial to read to full article t
 - Essentially all the toolkits are evaluated on the MRI (except Shoes 4, based on JRuby); compatibility with other interpreters is not specified;
 - I did not prototype my application with Qt/GTK+, so for those, I only evaluated what I could gather by reading the documentation;
 - RubyMotion is not included, as it doesn't support the major desktop platforms;
-- I didn't evaluate JRubyFX, since I wasn't aware of it at the time of publication of the post.
+- I didn't evaluate JRubyFX, since I wasn't aware of it at the time of publication of the post;
+- I've excluded the browser-based toolkits/transpilers, Opal and Flammarion.
 
 ### Notes about evaluation
 

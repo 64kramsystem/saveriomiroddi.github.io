@@ -17,36 +17,42 @@ Contents:
 - [Extension/mistakes](/An-overview-of-ruby-gui-development-in-2018#extensionmistakes)
 - [Frameworks](/An-overview-of-ruby-gui-development-in-2018#frameworks)
   - [Shoes 3/4](/An-overview-of-ruby-gui-development-in-2018#shoes-34)
-  - [Fox toolkit](/An-overview-of-ruby-gui-development-in-2018#fox-toolkit)
+  - [FXRuby](/An-overview-of-ruby-gui-development-in-2018#fxruby)
   - [Tk](/An-overview-of-ruby-gui-development-in-2018#tk)
-  - [WxWidgets](/An-overview-of-ruby-gui-development-in-2018#WxWidgets)
-  - [Qt](/An-overview-of-ruby-gui-development-in-2018#qt)
-  - [GTK+](/An-overview-of-ruby-gui-development-in-2018#gtk)
+  - [Ruby-GNOME2](/An-overview-of-ruby-gui-development-in-2018#ruby-gnome2)
+  - [qtbindings](/An-overview-of-ruby-gui-development-in-2018#qtbindings)
+  - [wxRuby](/An-overview-of-ruby-gui-development-in-2018#wxruby)
 - [Conclusion](/An-overview-of-ruby-gui-development-in-2018#conclusion)
+- [Some references](/An-overview-of-ruby-gui-development-in-2018#some-references)
+- [Footnotes](/An-overview-of-ruby-gui-development-in-2018#footnotes)
 
 ## TL;DR: The summary
 
 Reference table:
 
-| Framework   | Distribution | Functionality | Documentation | Widgets     |
-|-------------|--------------|---------------|---------------|-------------|
-| Shoes 3     | good         | poor          | so-so         | lightweight |
-| Shoes 4     | good         | poor          | poor          | native      |
-| Fox Toolkit | good         | good          | good          | lightweight |
-| Tk          | poor         | good          | good          | mixed       |
-| WxWidgets   | (dead)       | -             | -             | native      |
-| Qt          | obsolete     | good?         | ?             | mixed       |
-| GTK+        | good?        | good?         | ?             | mixed       |
-| JRubyFX     | ?            | ?             | ?             | ?           |
+| Framework   | Distribution | Functionality | Documentation | Widgets     | Status           |
+|-------------|--------------|---------------|---------------|-------------|------------------|
+| Shoes 3     | good         | poor          | so-so         | lightweight | Active           |
+| Shoes 4     | good         | poor          | poor          | native      | Active           |
+| FXRuby      | good         | good          | good          | lightweight | Active           |
+| Tk          | poor         | good          | good          | mixed       | Active           |
+| Ruby-GNOME2 | good?        | good?         | ?             | mixed       | Active           |
+| qtbindings  | so-so        | good?         | ?             | mixed       | Old backend      |
+| wxRuby      | -            | -             | -             | native      | Dead             |
+
+Other projects, which haven't been assessed for any reason (activity/platforms/etc.):
+
+- Ruby-QML: support MacOS and Linux, but not Windows;
+- RubyMotion: supports MacOS + mobile, but not Windows/Linux;
+- JRubyFX: status not clear (last commit from 2015) - may be still relevant;
+- Opal/Flammarion: browser-based.
 
 This is certainly a reductionist view, so it's crucial to read to full article to get a grasp.
 
 ### Notes about platforms/toolkits
 
 - Essentially all the toolkits are evaluated on the MRI (except Shoes 4, based on JRuby); compatibility with other interpreters is not specified;
-- I did not prototype my application with Qt/GTK+, so for those, I only evaluated what I could gather by reading the documentation;
-- RubyMotion is not included, as it doesn't support the major desktop platforms;
-- I didn't evaluate JRubyFX, since I wasn't aware of it at the time of publication of the post.
+- I did not prototype my application with Qt/GTK+, so for those, I only evaluated what I could gather by reading the documentation.
 
 ### Notes about evaluation
 
@@ -135,11 +141,9 @@ Shoes 4's documentation is outdated, which leads to a `poor` evaluation.
 
 Shoes 3's documentation is unusually distributed; it's up to date, but it's readable only from the library main program (!). Gets a `so-so` evaluation for the basic, shared (with v4), content.
 
-### Fox toolkit
+### FXRuby
 
-Fox is the underdog of the GUI libraries - rarely mentioned, but active and very functional.
-
-The Ruby binding library is called `FXRuby`.
+FXRuby, based on the FOX toolkit, are the underdog of the GUI libraries - rarely mentioned, but active and very functional.
 
 #### Distribution
 
@@ -147,17 +151,17 @@ In order to run a Fox Ruby application, the user needs to install the Fox Toolki
 
 #### Functionality
 
-The Fox toolkit is a mature and flexible library - there are professional applications making use of it.
+The FOX toolkit is a mature and flexible library - there are professional applications making use of it.
 
 FXRuby applications start quickly.
 
-For the reasons above, Fox toolkit gets a `good` evaluation.
+For the reasons above, FOX toolkit gets a `good` evaluation.
 
 #### Documentation
 
-The Fox toolkit documentation has a `good` evaluation, since there is a [good book written](https://pragprog.com/book/fxruby/fxruby).
+The FOX toolkit documentation has a `good` evaluation, since there is a [good book written](https://pragprog.com/book/fxruby/fxruby).
 
-The book is old, but valid. The downside is that the documentation for widgets outside of the ones presented in the book is cryptic, as the Fox toolkit provides a very plain, low-level API documentation.
+The book is old, but valid. The downside is that the documentation for widgets outside of the ones presented in the book is cryptic, as the FOX toolkit provides a very plain, low-level API documentation.
 
 FXRuby examples are very thorough; there is even one dedicated to threading, which is a very delicate and generally overlooked problem (for example, Shoes and Tk don't mention it at all).
 
@@ -187,27 +191,27 @@ All in all though, functionality itself is `good`.
 
 Tk is vastly documented (with the mentioned exception of threading), and it has a very good (multi-language) tutorial, therefore, it gets a `good` evaluation.
 
-### WxWidgets
+### Ruby-GNOME2
 
-The Ruby binding project is dead! It's a shame, because the library is mature, flexible, and widespread.
+Ruby-GNOME2 is based on GTK+, which is a mature and flexibly library. It's extremely widespread.
 
-### Qt
+Packaging GTK+ application seems to be very easy, therefore my `good?` evaluation.
+
+I haven't developed with GTK+; due to the GTK+ backing, I gave a purely guessed `good?` functionality evaluation.
+
+### qtbindings
 
 Qt is a mature and flexible library. It's not only a GUI toolkit, but an entire application framework. It's extremely widespread.
 
 Qt bindings development for Ruby has roots in [QtRuby](https://en.wikipedia.org/wiki/QtRuby); after the project died, [qtbindings](https://github.com/ryanmelt/qtbindings) followed.
 
-qtbindings supports Qt only up to an old version (4.8.6, released in 2011), therefore, my `obsolete` evaluation.
+qtbindings supports Qt only up to an old version (4.8.6, released in 2011).
 
 I haven't developed with Qt; due to the Qt backing, I gave a purely guessed `good?` functionality evaluation.
 
-### GTK+
+### wxRuby
 
-GTK+ is a mature and flexibly library. It's extremely widespread.
-
-Packaging GTK+ application seems to be very easy, therefore my `good?` evaluation.
-
-I haven't developed with GTK+; due to the GTK+ backing, I gave a purely guessed `good?` functionality evaluation.
+The Ruby binding project is dead! It's a shame, because the library is mature, flexible, and widespread.
 
 ## Conclusion
 
@@ -219,5 +223,14 @@ For distributing applications, my guidelines are:
 - for *extremely* simple applications, try Shoes 3.
 
 The other libraries/bindings has very shortcomings that in my opinion/use cases are far too inconvenient.
+
+## Some references
+
+This section is currently under works; if/once more links will be gathered, I will structure merge them in the toolkit sections.
+
+- GTK
+  - [A very good introduction on building a Ruby GTK GUI (Jan/2018)](https://iridakos.com/tutorials/2018/01/25/creating-a-gtk-todo-application-with-ruby.html)
+
+## Footnotes
 
 <a name="footnote01">¹</a>: I'm not sure if this can be worked around or not, for example by wrapping each evented widget in one container.

@@ -24,6 +24,7 @@ Contents:
   - [GTK+](/An-overview-of-ruby-gui-development-in-2018#gtk)
 - [Conclusion](/An-overview-of-ruby-gui-development-in-2018#conclusion)
 - [Some references](/An-overview-of-ruby-gui-development-in-2018#some-references)
+- [Footnotes](/An-overview-of-ruby-gui-development-in-2018#footnotes)
 
 ## TL;DR: The summary
 
@@ -227,5 +228,7 @@ This section is currently under works; if/once more links will be gathered, I wi
 
 - GTK
   - [A very good introduction on building a Ruby GTK GUI (Jan/2018)](https://iridakos.com/tutorials/2018/01/25/creating-a-gtk-todo-application-with-ruby.html)
+
+## Footnotes
 
 <a name="footnote01">¹</a>: I'm not sure if this can be worked around or not, for example by wrapping each evented widget in one container.

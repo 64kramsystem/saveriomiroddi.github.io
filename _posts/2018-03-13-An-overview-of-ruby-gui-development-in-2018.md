@@ -2,7 +2,7 @@
 layout: post
 title: An overview of Desktop Ruby GUI development in 2018
 tags: [gui,ruby]
-last_modified_at: 2018-03-16 22:18:00
+last_modified_at: 2018-03-16 23:15:00
 ---
 
 Ruby GUI development is a seldom mentioned subject, but it has value. Probably after some Rails development (cough...), developing a desktop tool may be an interesting diversion (or even a requirement).
@@ -30,16 +30,17 @@ Contents:
 
 Reference table:
 
-| Framework   | Distribution | Functionality | Documentation | Widgets     | Status                  |
-|-------------|--------------|---------------|---------------|-------------|-------------------------|
-| Shoes 3     | good         | poor          | so-so         | lightweight | Active                  |
-| Shoes 4     | good         | poor          | poor          | native      | Active                  |
-| FXRuby      | good         | good          | good          | lightweight | Active                  |
-| Tk          | poor         | good          | good          | mixed       | Active                  |
-| Ruby-GNOME2 | good?        | good?         | ?             | mixed       | Active                  |
-| qtbindings  | so-so        | good?         | ?             | mixed       | Old backend             |
-| JRubyFX     | ?            | ?             | ?             | ?           | Last commit: 1 year old |
-| wxRuby      | -            | -             | -             | native      | Dead                    |
+| Framework       | Distribution | Functionality | Documentation | Widgets     | Status                  |
+|-------------    |--------------|---------------|---------------|-------------|-------------------------|
+| Shoes 3         | good         | poor          | so-so         | lightweight | Active                  |
+| Shoes 4         | good         | poor          | poor          | native      | Active                  |
+| FXRuby          | good         | good          | good          | lightweight | Active                  |
+| Tk              | poor         | good          | good          | mixed       | Active                  |
+| Ruby-GNOME2     | good?        | good?         | ?             | mixed       | Active                  |
+| qtbindings      | so-so        | good?         | ?             | mixed       | Old backend             |
+| JRubyFX         | ?            | ?             | ?             | ?           | Last commit: 1 year old |
+| JRuby+Java libs | good?        | good?         | good?         | (varies)    | (Not applicable)        |
+| wxRuby          | -            | -             | -             | native      | Dead                    |
 
 Other projects, which haven't been assessed for any reason (activity/platforms/etc.):
 
@@ -51,9 +52,8 @@ This is certainly a reductionist view, so it's crucial to read to full article t
 
 ### Notes about platforms/toolkits
 
-- Essentially all the toolkits are evaluated on the MRI (except Shoes 4, based on JRuby); compatibility with other interpreters is not specified;
-- I did not prototype my application with Qt/GTK+, so for those, I only evaluated what I could gather by reading the documentation;
-- I didn't evaluate JRubyFX, since I wasn't aware of it at the time of publication of the post.
+- Almost all the toolkits are based on the MRI (except those explicitly based on JRuby, and Shoes 4); compatibility with other interpreters is not specified;
+- I did not prototype my application with half of the libraries, so for those, I only evaluated what I could gather by reading the documentation or what's implicit in the platform; I've marked such judgments with a question mark.
 
 ### Notes about evaluation
 
@@ -92,41 +92,9 @@ This is excellent for distribution:
 
 #### Functionality
 
-Design-wise, a Shoes program needs to be wrapped in the `Shoes.app` block, with the GUI elements being used in DSL form:
-
-```ruby
-Shoes.app do
-  button "Click me" { close }
-end
-```
-
-This orients the design to be GUI-centered, in a way, similarly to Visual Basic 6 - this has advantages, but also potentially terrifying disadvantages.
-
-Although one can potentially produce a good design, it's not possible to fully decouple a program from the Shoes framework; this general structure is not possible:
-
-```ruby
-class ShoesGuiFrontend
-  def display
-    Shoes.app do
-      button "Click me" { close }
-    end
-  end
-end
-
-class MyProgram
-  def initialize
-    @frontend = initialize_gui_frontend
-  end
-
-  def display_gui
-    @frontend.display
-  end
-end
-```
-
 In terms of general API richness, Shoes is a very limited toolkit. For example, events are attached to layout containers, not to widgets [¹](#footnote01); there are basic widgets, but not all the typical ones present in mature toolkits (eg. tree list).
 
-I experienced a crash (on the current release version, 3.3.5) after testing a handful of the demo examples, which is not a very good sign.
+Shoes 3[.3.5] segfaulted after testing a handful of demo examples; Shoes 4 is more solid by design though, since it's backed by Java.
 
 Shoes applications start slowly.
 
@@ -206,9 +174,15 @@ Qt is a mature and flexible library. It's not only a GUI toolkit, but an entire 
 
 Qt bindings development for Ruby has roots in [QtRuby](https://en.wikipedia.org/wiki/QtRuby); after the project died, [qtbindings](https://github.com/ryanmelt/qtbindings) followed.
 
-qtbindings supports Qt only up to an old version (4.8.6, released in 2011).
+qtbindings supports Qt only up to an old version (4.8.6, released in 2014).
 
 I haven't developed with Qt; due to the Qt backing, I gave a purely guessed `good?` functionality evaluation.
+
+#### Distribution
+
+qtbindings does not support the last release (4.8.7) of the supported version (4.8); also, it's very odd not to support Ruby 2.3 (which is a supported Ruby version) with the latest version of the gem.
+
+This is somewhat messy, therefore, I assess `so-so`.
 
 ### wxRuby
 
@@ -221,7 +195,7 @@ It's very difficult to give general guidelines, but I'll still give a shot.
 For distributing applications, my guidelines are:
 
 - for general purpose, FXRuby (also try GTK+);
-- for *extremely* simple applications, try Shoes 3.
+- for *trivial* applications, try Shoes 3 (or 4, which right now is in RC).
 
 The other libraries/bindings has very shortcomings that in my opinion/use cases are far too inconvenient.
 

@@ -19,9 +19,9 @@ Contents:
   - [Shoes 3/4](/An-overview-of-ruby-gui-development-in-2018#shoes-34)
   - [FXRuby](/An-overview-of-ruby-gui-development-in-2018#fxruby)
   - [Tk](/An-overview-of-ruby-gui-development-in-2018#tk)
-  - [wxRuby](/An-overview-of-ruby-gui-development-in-2018#wxruby)
-  - [qtbindings](/An-overview-of-ruby-gui-development-in-2018#qtbindings)
   - [Ruby-GNOME2](/An-overview-of-ruby-gui-development-in-2018#ruby-gnome2)
+  - [qtbindings](/An-overview-of-ruby-gui-development-in-2018#qtbindings)
+  - [wxRuby](/An-overview-of-ruby-gui-development-in-2018#wxruby)
 - [Conclusion](/An-overview-of-ruby-gui-development-in-2018#conclusion)
 - [Some references](/An-overview-of-ruby-gui-development-in-2018#some-references)
 - [Footnotes](/An-overview-of-ruby-gui-development-in-2018#footnotes)
@@ -36,10 +36,10 @@ Reference table:
 | Shoes 4     | good         | poor          | poor          | native      | Active           |
 | FXRuby      | good         | good          | good          | lightweight | Active           |
 | Tk          | poor         | good          | good          | mixed       | Active           |
-| wxRuby      | -            | -             | -             | native      | Dead             |
-| qtbindings  | so-so        | good?         | ?             | mixed       | Old backend      |
 | Ruby-GNOME2 | good?        | good?         | ?             | mixed       | Active           |
+| qtbindings  | so-so        | good?         | ?             | mixed       | Old backend      |
 | JRubyFX     | ?            | ?             | ?             | ?           | Inactive/unclear |
+| wxRuby      | -            | -             | -             | native      | Dead             |
 
 This is certainly a reductionist view, so it's crucial to read to full article to get a grasp.
 
@@ -188,9 +188,13 @@ All in all though, functionality itself is `good`.
 
 Tk is vastly documented (with the mentioned exception of threading), and it has a very good (multi-language) tutorial, therefore, it gets a `good` evaluation.
 
-### wxRuby
+### Ruby-GNOME2
 
-The Ruby binding project is dead! It's a shame, because the library is mature, flexible, and widespread.
+Ruby-GNOME2 is based on GTK+, which is a mature and flexibly library. It's extremely widespread.
+
+Packaging GTK+ application seems to be very easy, therefore my `good?` evaluation.
+
+I haven't developed with GTK+; due to the GTK+ backing, I gave a purely guessed `good?` functionality evaluation.
 
 ### qtbindings
 
@@ -202,13 +206,9 @@ qtbindings supports Qt only up to an old version (4.8.6, released in 2011).
 
 I haven't developed with Qt; due to the Qt backing, I gave a purely guessed `good?` functionality evaluation.
 
-### Ruby-GNOME2
+### wxRuby
 
-Ruby-GNOME2 is based on GTK+, which is a mature and flexibly library. It's extremely widespread.
-
-Packaging GTK+ application seems to be very easy, therefore my `good?` evaluation.
-
-I haven't developed with GTK+; due to the GTK+ backing, I gave a purely guessed `good?` functionality evaluation.
+The Ruby binding project is dead! It's a shame, because the library is mature, flexible, and widespread.
 
 ## Conclusion
 

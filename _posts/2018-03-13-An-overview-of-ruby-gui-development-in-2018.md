@@ -2,7 +2,7 @@
 layout: post
 title: An overview of Desktop Ruby GUI development in 2018
 tags: [gui,ruby]
-last_modified_at: 2018-03-15 10:47:00
+last_modified_at: 2018-03-16 21:46:00
 ---
 
 Ruby GUI development is a seldom mentioned subject, but it has value. Probably after some Rails development (cough...), developing a desktop tool may be an interesting diversion (or even a requirement).

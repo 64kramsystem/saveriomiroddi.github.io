@@ -2,7 +2,7 @@
 layout: post
 title: An overview of Desktop Ruby GUI development in 2018
 tags: [gui,ruby]
-last_modified_at: 2018-03-16 22:58:00
+last_modified_at: 2018-03-16 23:15:00
 ---
 
 Ruby GUI development is a seldom mentioned subject, but it has value. Probably after some Rails development (cough...), developing a desktop tool may be an interesting diversion (or even a requirement).
@@ -174,9 +174,15 @@ Qt is a mature and flexible library. It's not only a GUI toolkit, but an entire 
 
 Qt bindings development for Ruby has roots in [QtRuby](https://en.wikipedia.org/wiki/QtRuby); after the project died, [qtbindings](https://github.com/ryanmelt/qtbindings) followed.
 
-qtbindings supports Qt only up to an old version (4.8.6, released in 2011).
+qtbindings supports Qt only up to an old version (4.8.6, released in 2014).
 
 I haven't developed with Qt; due to the Qt backing, I gave a purely guessed `good?` functionality evaluation.
+
+#### Distribution
+
+qtbindings does not support the last release (4.8.7) of the supported version (4.8); also, it's very odd not to support Ruby 2.3 (which is a supported Ruby version) with the latest version of the gem.
+
+This is somewhat messy, therefore, I assess `so-so`.
 
 ### wxRuby
 

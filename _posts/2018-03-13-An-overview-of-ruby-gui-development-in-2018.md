@@ -42,7 +42,7 @@ Reference table:
 
 Other projects, which haven't been assessed for any reason (activity/platforms/etc.):
 
-- Ruby-QML: support MacOS and Linux, but not Windows;
+- Ruby-QML: supports MacOS and Linux, but not Windows;
 - RubyMotion: supports MacOS + mobile, but not Windows/Linux;
 - JRubyFX: status not clear (last commit from 2015) - may be still relevant;
 - Opal/Flammarion: browser-based.

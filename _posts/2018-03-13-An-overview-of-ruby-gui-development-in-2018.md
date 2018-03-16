@@ -38,18 +38,21 @@ Reference table:
 | Tk          | poor         | good          | good          | mixed       | Active           |
 | Ruby-GNOME2 | good?        | good?         | ?             | mixed       | Active           |
 | qtbindings  | so-so        | good?         | ?             | mixed       | Old backend      |
-| JRubyFX     | ?            | ?             | ?             | ?           | Inactive/unclear |
 | wxRuby      | -            | -             | -             | native      | Dead             |
+
+Other projects, which haven't been assessed for any reason (activity/platforms/etc.):
+
+- Ruby-QML: support MacOS and Linux, but not Windows;
+- RubyMotion: supports MacOS + mobile, but not Windows/Linux;
+- JRubyFX: status not clear (last commit from 2015) - may be still relevant;
+- Opal/Flammarion: browser-based.
 
 This is certainly a reductionist view, so it's crucial to read to full article to get a grasp.
 
 ### Notes about platforms/toolkits
 
 - Essentially all the toolkits are evaluated on the MRI (except Shoes 4, based on JRuby); compatibility with other interpreters is not specified;
-- I did not prototype my application with Qt/GTK+, so for those, I only evaluated what I could gather by reading the documentation;
-- RubyMotion is not included, as it doesn't support the major desktop platforms;
-- I didn't evaluate JRubyFX, since I wasn't aware of it at the time of publication of the post;
-- I've excluded the browser-based toolkits/transpilers, Opal and Flammarion.
+- I did not prototype my application with Qt/GTK+, so for those, I only evaluated what I could gather by reading the documentation.
 
 ### Notes about evaluation
 

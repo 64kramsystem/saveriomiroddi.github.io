@@ -2,7 +2,7 @@
 layout: post
 title: An overview of Desktop Ruby GUI development in 2018
 tags: [gui,ruby]
-last_modified_at: 2018-03-16 21:46:00
+last_modified_at: 2018-03-16 22:18:00
 ---
 
 Ruby GUI development is a seldom mentioned subject, but it has value. Probably after some Rails development (cough...), developing a desktop tool may be an interesting diversion (or even a requirement).
@@ -30,21 +30,21 @@ Contents:
 
 Reference table:
 
-| Framework   | Distribution | Functionality | Documentation | Widgets     | Status           |
-|-------------|--------------|---------------|---------------|-------------|------------------|
-| Shoes 3     | good         | poor          | so-so         | lightweight | Active           |
-| Shoes 4     | good         | poor          | poor          | native      | Active           |
-| FXRuby      | good         | good          | good          | lightweight | Active           |
-| Tk          | poor         | good          | good          | mixed       | Active           |
-| Ruby-GNOME2 | good?        | good?         | ?             | mixed       | Active           |
-| qtbindings  | so-so        | good?         | ?             | mixed       | Old backend      |
-| wxRuby      | -            | -             | -             | native      | Dead             |
+| Framework   | Distribution | Functionality | Documentation | Widgets     | Status                  |
+|-------------|--------------|---------------|---------------|-------------|-------------------------|
+| Shoes 3     | good         | poor          | so-so         | lightweight | Active                  |
+| Shoes 4     | good         | poor          | poor          | native      | Active                  |
+| FXRuby      | good         | good          | good          | lightweight | Active                  |
+| Tk          | poor         | good          | good          | mixed       | Active                  |
+| Ruby-GNOME2 | good?        | good?         | ?             | mixed       | Active                  |
+| qtbindings  | so-so        | good?         | ?             | mixed       | Old backend             |
+| JRubyFX     | ?            | ?             | ?             | ?           | Last commit: 1 year old |
+| wxRuby      | -            | -             | -             | native      | Dead                    |
 
 Other projects, which haven't been assessed for any reason (activity/platforms/etc.):
 
 - Ruby-QML: supports MacOS and Linux, but not Windows;
 - RubyMotion: supports MacOS + mobile, but not Windows/Linux;
-- JRubyFX: status not clear (last commit from 2015) - may be still relevant;
 - Opal/Flammarion: browser-based.
 
 This is certainly a reductionist view, so it's crucial to read to full article to get a grasp.
@@ -52,7 +52,8 @@ This is certainly a reductionist view, so it's crucial to read to full article t
 ### Notes about platforms/toolkits
 
 - Essentially all the toolkits are evaluated on the MRI (except Shoes 4, based on JRuby); compatibility with other interpreters is not specified;
-- I did not prototype my application with Qt/GTK+, so for those, I only evaluated what I could gather by reading the documentation.
+- I did not prototype my application with Qt/GTK+, so for those, I only evaluated what I could gather by reading the documentation;
+- I didn't evaluate JRubyFX, since I wasn't aware of it at the time of publication of the post.
 
 ### Notes about evaluation
 

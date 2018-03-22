@@ -128,9 +128,7 @@ For the reasons above, FOX toolkit gets a `good` evaluation.
 
 #### Documentation
 
-The FOX toolkit documentation has a `good` evaluation, since there is a [good book written](https://pragprog.com/book/fxruby/fxruby).
-
-The book is old, but valid. The downside is that the documentation for widgets outside of the ones presented in the book is cryptic, as the FOX toolkit provides a very plain, low-level API documentation.
+The FXRuby documentation has a `good` evaluation, primarily because there is a [dedicated book](https://pragprog.com/book/fxruby/fxruby), which is old, but still valid. The (FXRuby) API documentation is also pretty good.
 
 FXRuby examples are very thorough; there is even one dedicated to threading, which is a very delicate and generally overlooked problem (for example, Shoes and Tk don't mention it at all).
 

@@ -2,6 +2,7 @@
 layout: post
 title: Considerations (review) of Raspberry Pi/Odroid XU4 usage as home server
 tags: [hardware]
+last_modified_at: 2018-04-17 00:26:00
 ---
 
 With the large diffusion of SBCs [Single Board Computers], and subsequent maturation of their ecosystem, it's now relatively easy to setup a home server.
@@ -23,8 +24,12 @@ Contents:
   - [Specifications](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#specifications)
   - [Support and documentation](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#support-and-documentation)
   - [Usage impressions](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#usage-impressions)
-    - [Power draw](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#power-draw)
-    - [The infamous fan](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#the-infamous-fan)
+  - [Power draw](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#power-draw)
+  - [The infamous fan noise](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#the-infamous-fan-noise)
+    - [Introduction](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#introduction)
+    - [Base setup](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#base-setup)
+    - [Solutions and references](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#solutions-and-references)
+  - [Performance tweaking](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#performance-tweaking)
 - [Conclusions](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#conclusions)
 - [Footnotes](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#footnotes)
 
@@ -147,9 +152,9 @@ For reference, one core (likely, one of the A15) bottlenecks the download bandwi
 
 The downside of this is the power draw. There is no way an XU4 can be fed from the USB port of another device. With higher power demands, cooling also plays a role.
 
-#### Power draw
+### Power draw
 
-Samples of power draw taken at different loads:
+Samples of power draw taken at different loads, with default settings (see next sections):
 
 ```csv
 Load,Draw,Temperature (°C)
@@ -160,32 +165,62 @@ Idle,5,45
 8,14.5,86
 ```
 
-#### The infamous fan
+### The infamous fan noise
+
+#### Introduction
 
 There is a significant amount of discussion about the fan, which is in fact annoyingly noisy.
 
 I spent some time investigating, and I've found that, fortunately, the XU4 standard cooling can be made fairly quiet without any hardware change.
 
-In order to understand the problem and the solution, one needs to know the cooling logic.
+There are two concepts two be aware of in order to tackle the solution: the governor and the fan driver trip points.
 
-The XU4 fan driver supports for "trip points" - a set of temperatures associated with fan speeds.
+The CPU governor is the kernel code that manages the CPU speed based on the demand. Although of course the implementation are strictly based on the O/S and CPU, there are a few denominations which are typically shared between all the governors.
 
-There are four trip points:
+Two typical governors are `Ondemand` and `Performance`. The former adjusts the load very dynamically, based on the load; the latter runs the CPU at full speed.
+
+The second concept to know is how the fan driver works.
+
+The XU4 fan driver is based on "trip points" - a set of temperatures associated with fan speeds.
+
+There are four trip points; the preset values are:
 
 - up to 60 °C: no fan
 - 60 °C: 120 PWM
 - 70 °C: 180 PWM
 - 80 °C: 240 PWM
 
-While this configuration works well for an idle state, it leads to disaster under mild load.
+#### Base setup
 
-Since without active cooling, with the standard fan, the temperature rises quickly, as soon as a user starts to perform some tasks, the CPU will alternate frequently below and after 60 °C, causing the fan to start and stop very frequently, which is *very* annoying.
+On Ubuntu 4.14, the XU is setup with a `performance` governor, and the trip points above.
 
-There are a couple of solutions to this.
+The problem is that the first trip point is excessively optimistic: with passive cooling [of the standard fan], the temperature rises quickly even under idle conditions or light load.
 
-The most conservative, and simple, is to set the PWM of the first trip point to 80 (the minimum achievable); with this configuration, the fan will be always active, but also fairly quiet.
+This will cause an infinite cycle:
 
-A more sophisticated approach, which requires tweaking, is to set the first trip point to around 50 °C at 80 PWM; this way, during idle times, the fan doesn't rotate, while during active (low) usage, it will rotate but quietly. The trickiness of this approach is that it requires to find the right temperature, which depends on the active usage load.
+1. the fan kicks in at 60 °C;
+2. the temperature drops;
+3. the fan stops;
+4. the temperature rises;
+5. back to point 1.
+
+The continuous switch on/off is very noisy, and essentially, can't be interrupted.
+
+#### Solutions and references
+
+The most conservative, and simple solution, is to set the PWM of the first trip point to 80 (the minimum achievable); with this configuration, the fan will be always active, but also fairly quiet.
+
+Under idle conditions, or light load, the temperature will stabilize at \~45 °C, which is cool.
+
+A more elaborate solution is to use the `ondemand` governor; since the CPU will not run all the time at the max speed, the power consumption will be lower, potentially allowing passive cooling for idle/light load.
+
+The downside of an `ondemand` governor is that it needs to be tweaked accordingly to the usage pattern, in order to react quick enough, but not too rigidly, to the CPU load changes; this concept is essentially the same of how car shock absorbers work.
+
+A reference article for governor tweaking can be found [here](https://obihoernchen.net/1235/odroid-xu4-with-openmediavault/).
+
+### Performance tweaking
+
+For power users, it's possible to "pin" demanding processes to the faster cores; a discussion about a pinning example is [here](https://forum.odroid.com/viewtopic.php?f=95&t=30613).
 
 ## Conclusions
 

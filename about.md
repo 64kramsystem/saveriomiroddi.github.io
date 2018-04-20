@@ -2,11 +2,12 @@
 layout: page
 title: About
 permalink: /about/
+last_modified_at: 2018-04-20 12:36:00
 ---
 
 I'm a backend programmer, systems/database engineer, and occasional reverse engineer at Ticketsolve.
 
-I'm also a sponsored open source programmer, again by Ticketsolve.
+Ticketsolve also sponsors a significant part of my open source development, including this blog.
 
 ### Contact me
 

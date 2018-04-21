@@ -2,7 +2,7 @@
 layout: post
 title: Considerations (review) of Raspberry Pi/Odroid XU4 usage as home server
 tags: [hardware]
-last_modified_at: 2018-04-17 00:26:00
+last_modified_at: 2018-04-21 21:50:00
 ---
 
 With the large diffusion of SBCs [Single Board Computers], and subsequent maturation of their ecosystem, it's now relatively easy to setup a home server.
@@ -39,12 +39,17 @@ The root question when considering SBC is: what is a home server?
 
 Although there is no strict definition, a home server, typically:
 
-- provides services within a private network
-- the services are not computationally intensive
-- it is based on an easily maintainable operating system
-- it is realiable as much as desktop machine - in other words, it should operate for potentially extended amount of times, but without requiring any form of redundancy (processors, RAM, disks...)
+- provides services within a private network;
+- the services are not computationally intensive;
+- it is relatively cheap;
+- it is based on an easily maintainable operating system;
+- it is realiable as much as desktop machine - in other words, it should operate for potentially extended amount of times, but without requiring any form of redundancy (processors, RAM, disks...);
+- it may or may not have a large amount of storage (from dozens of GB to TB);
+- it is compact in size.
 
-All the SBC mentioned are able to satisfy the above requirements.
+Requirements are always very tricky; people may give more weight to a certain requirement rather than another.
+
+In general, the SBC mentioned satisfy the above requirements.
 
 Originally, the Raspberry Pi was groundbreaking because it made hobbyist electronics easy, due to the very low barrier of entry (both in price and in tooling).  
 Although this is not strictly related to home server projects, it's important as context under which evaluate the boards.
@@ -53,12 +58,14 @@ In the following sections I will not discuss the RPi 2B - only the 3B and the XU
 
 ## Brief informations about ARM processors
 
-The ARM processors for SBC are generally classified in two series (latest to oldest generation):
+The ARM processors for SBC are generally classified in two series; in the lower/mid-range, the most common are (latest > earliest generation):
 
 - High-power: A72 > A57 > A15
 - Low-power: A53 > A7
 
-SBCs can also use a combination of both architecture, in order to suit the demand of the current load, swapping cores dynamically.
+SBCs can also use a combination of more CPUs (like XU4's Exynos-5422), in order to suit the demand of the current load, swapping cores dynamically.
+
+A searchable database of SBCs is [Board-DB.org](https://www.board-db.org).
 
 ## Raspberry Pi 3 Model B
 
@@ -68,13 +75,13 @@ The RPi 3B is a 4-core 1.4 GHz A53 machine, with 1 GiB of RAM; it uses micro SD 
 
 It's not very easy to assess the price; a standard configuration comprises:
 
-- board: 40€
-- sd card, 16 GB: 13€
-- power supply + cable: 15€
+- board: 50$
+- sd card, 16 GB: 16$
+- power supply + cable: 18$
 
-For a very approximate amount of 65/70€.
+For a very approximate amount of 85$.
 
-It's possible to save 10 or more Euros by buying an incendiary power supply from Amazon or any Chinese direct seller.
+It's possible to save 10 or more USD by buying an incendiary power supply from Amazon or any Chinese direct seller.
 
 ### Support and documentation
 
@@ -92,13 +99,15 @@ There is [a critical bug](https://bugs.launchpad.net/ubuntu/+source/linux-raspi2
 
 I consider this an exceptional case of irresponsibility because the maintainer(s) are refusing to put any warning (check out [the website](https://ubuntu-pi-flavour-maker.org)), or pull out this distribution entirely, even if this source is one of the top results in the search engines, and the bug is official.
 
-Instead, RPi 3 users should use [Raspbian](https://www.raspbian.org/), which works as intended.
+Instead, RPi 3 users should use [Raspbian](https://www.raspbian.org), which works as intended.
 
 ### Usage impressions
 
-The RPi 3B works OK as home server. The major problem is that it's very slow, due to both the processor and the storage; while the available RAM, 1 GiB, is not a lot, it is not a bottleneck for the typical home server services.
+The RPi 3B works OK as home server; the major problem is that it's very slow, due to both the processor and the storage.
 
-Having both slow processor and storage is a deadly combination, as many tasks will be affected either by one or another.
+While the available RAM, 1 GiB, is not a lot, it is not a bottleneck for the typical home server services; on a headless configuration, assuming 100/150 MB per service, there is space for 6/7 running in parallel (even ignoring that unused process pages can be swapped out).
+
+Having both slow processor and storage though, is a deadly combination, as many tasks will be affected either by one or another.
 
 Even basic tasks like updating the packages can take long times (dozens of minutes); let alone intensive tasks like compiling a program.
 
@@ -119,13 +128,13 @@ The XU4 is the top of the line Odroid, although it's in under development an RK3
 A crucial development in the Odroid business strategy has been the partnership with a network of world-wide distributors.  
 I advice not to buy an SBC from an overseas distributor/producer, for the high demand (time and money) in case of issues.
 
-I purchased (from the German distributor) an XU4 all-inclusive set (with 16 GB eMMC) for 115€.
+I purchased (from the German distributor) an XU4 all-inclusive set (with 16 GB eMMC) for 140$.
 
 ### Support and documentation
 
-Odroid is a Chinese company, historical competitor of the RPi foundation (the other being Banana Pis; nowadays, the market is crowded).
+Hardkernel is a Chinese company, historical competitor of the RPi foundation (the other being Banana Pis; nowadays, the market is crowded).
 
-I've been very impressed by the dedication put by Odroid to the documentation an support of their products.
+I've been very impressed by the dedication put by Hardkernel to the documentation and support of their products.
 
 While they're clearly not comparable to a world-size community like the RPi one, the company:
 
@@ -134,19 +143,19 @@ While they're clearly not comparable to a world-size community like the RPi one,
 - improves the product based on community feedback
 - maintains official Ubuntu and Android distributions
 
-Again, the limitation must be kept in mind, however, when buying an Odroid product, a user has significant means of support.
+Hardkernel provides an Ubuntu 16.04 distribution (provided in both desktop and server versions), and an Android one.
 
-Odroid provides an Ubuntu 16.04 distribution (provided in both desktop and server versions), and an Android one.
+Again, the community limitation must be kept in mind - especially in the Linux case, it's not possible to know if the hardware support will be mainlined in the next years, and if not, what will happen to it. 
 
 There is also an Armbian distribution (developed by the Armbian community).
 
 ### Usage impressions
 
-I was blown away by the XU4 as soon as I started using it. Actually, before: writing to the eMMC was ten times as fast as writing to a (class 10) micro SD (30 MB/s vs. 3 MB/s).
+I was blown away by the XU4 as soon as I started using it. Actually, even before: writing to the eMMC was an order of magnitude faster than writing to a (class 10) micro SD (30+ MB/s vs. 3+ MB/s).
 
 The XU4's performance is essentially comparable to a low-end desktop, in a tiny package that consumes up to 15 W. I consider this impressive.
 
-The amount of RAM (2 GiB) and the number of cores (8) allow a wide amount of operations to be performed; for example, one can build qBittorent (a relatively large C++ program) in a few minutes, with 8 parallel jobs.
+The amount of RAM (2 GiB) and the number of cores (8) allow a wide amount of operations to be performed; for example, one can build qBittorent (a mid-sized C++ program) in a few minutes, with 8 parallel jobs.
 
 For reference, one core (likely, one of the A15) bottlenecks the download bandwidth of a VPN connection at 100 MBit/s - five times as fast as the RPi 3B.
 
@@ -222,11 +231,33 @@ A reference article for governor tweaking can be found [here](https://obihoernch
 
 For power users, it's possible to "pin" demanding processes to the faster cores; a discussion about a pinning example is [here](https://forum.odroid.com/viewtopic.php?f=95&t=30613).
 
+## Alternatives
+
+The market is very quickly evolving, so new CPUs are introduced every year.
+
+A notable CPU is the relatively new RK3399; it has 2 high-power (A72) and 4 low-power (A53) cores, less but newer/faster than the Exynos-5422 (4\*A15 + 4\*A7). RK3399 SBCs are not distributed as much as the XU4, although Hardkernel is about to distribute an RK3399-based board.
+
 ## Conclusions
+
+Users have wildly different requirements, so there is no better or worse product, in absolute terms.
+
+In general, there are three categories of home servers:
+
+- as cheapest as possible SBCs (~50/60$ range)
+- moderately cheap but sufficiently performing SBCs (~100/120$)
+- mini servers PCs (300$+)
+
+Mini servers are frequently mentioned in discussions, however, their price point and size is significantly higher (they can be found for lower prices in special offers, but that makes them an apples-to-oranges comparison).  
+I'm also excluding SBCs with big (3.5") disks (or even RAID configurations) because they start to lose the advantages compared to mini server PCS.
 
 In my opinion, the Raspberry Pis are excellent for the use case where they broke ground: hobbyist electronics.
 
-I don't think that they are suitable as home servers, where the radically superior performance and flexibility of the XU4 makes a fundamental difference, for a relatively low difference in price (115 vs. 65 Euros).
+They're OK as home server, however it's important to consider the long term usage; buying a cheap board as a toy it's fine, however, in the longer term, the low performance can be limiting or significantly annoying.
+
+In the long-term perspective, SBCs like the XU4 make a radical difference, for a relatively low difference in price (in the configuration above, 140 vs. 85 USD).
+
+Considering external storage makes the comparison somewhat more complex; there's plenty of compact cases for RPis with 2.5" disks, and only a few (or even only one) for XU4.  
+On the other hand, velcroing an XU4 case to a portable 2.5" is still a very functional solution, being very compact and not requiring an additional power supply. This is not a solution for everybody's taste, though.
 
 ## Footnotes
 

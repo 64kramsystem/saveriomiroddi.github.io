@@ -2,7 +2,7 @@
 layout: post
 title: Considerations (review) of Raspberry Pi/Odroid XU4 usage as home server
 tags: [hardware]
-last_modified_at: 2018-04-21 21:50:00
+last_modified_at: 2018-06-26 15:37:00
 ---
 
 With the large diffusion of SBCs [Single Board Computers], and subsequent maturation of their ecosystem, it's now relatively easy to setup a home server.
@@ -10,6 +10,8 @@ With the large diffusion of SBCs [Single Board Computers], and subsequent matura
 I've had three SBCs until now; a Raspberry Pi 2 model B, a 3 model B, and recently, an Odroid XU4.
 
 In this post, I'm going to share some considerations about their usage as home servers.
+
+*Updated on Jun/26/2018: added benchmark.*
 
 Contents:
 
@@ -30,6 +32,7 @@ Contents:
     - [Base setup](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#base-setup)
     - [Solutions and references](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#solutions-and-references)
   - [Performance tweaking](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#performance-tweaking)
+- [Benchmark](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#benchmark)
 - [Conclusions](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#conclusions)
 - [Footnotes](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#footnotes)
 
@@ -236,6 +239,31 @@ For power users, it's possible to "pin" demanding processes to the faster cores;
 The market is very quickly evolving, so new CPUs are introduced every year.
 
 A notable CPU is the relatively new RK3399; it has 2 high-power (A72) and 4 low-power (A53) cores, less but newer/faster than the Exynos-5422 (4\*A15 + 4\*A7). RK3399 SBCs are not distributed as much as the XU4, although Hardkernel is about to distribute an RK3399-based board.
+
+## Benchmark
+
+I've tested the XU4 with the Phoronix Test Suite; this benchmark uses real-world applications, so the test results can be reasonably (within limits) used a reference.
+
+The results are published on OpenBenchmarking.org, [on this page](https://openbenchmarking.org/result/1805276-FO-1703199RI52).
+
+This is a summary composed of an RPi 3B, the XU4, and also the Nvidia Jetson TX1:
+
+| Test | Raspberry Pi 3 Model B | ODROID-XU4 | Jetson TX1 |
+| ---- | ---------------------- | ---------- | ---------- |
+| pts/fftw-1.1.0 - fftw-stock/tests/bench  --time-repeat 100 -opatient ibc256x256 | 150.89 | 1218.18 | 1615.9 |
+| pts/john-the-ripper-1.5.1 - BLOWFISH | 510 | 1284 | 1354 |
+| pts/c-ray-1.1.0 - | 254.13 | 85.04 | 107.22 |
+| pts/smallpt-1.0.2 - | 1400 | 499 | 441 |
+| pts/encode-flac-1.5.0 - | 228.74 | 53.35 | 43.81 |
+| pts/redis-1.0.0 - -t set | 138793.89 | 179642.33 | 396905.94 |
+| pts/redis-1.0.0 - -t get | 170020.06 | 206553.59 | 484971.9 |
+| pts/mafft-1.4.0 - | 54.92 | 17.14 | 16.88 |
+| pts/himeno-1.2.0 - | 56.51 | 161.38 | 229.56 |
+| pts/openssl-1.9.0 - | 19.98 | 60.37 | 39.07 |
+
+For reference, the Jetson TX1 is has 4\*A57@1.73 GHz.
+
+The XU4 is consistently faster, around 3 times as the RPi. This large margin is inline with my experience, where OpenVPN decryption is 5x as fast.
 
 ## Conclusions
 

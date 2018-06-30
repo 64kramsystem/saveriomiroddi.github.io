@@ -2,6 +2,7 @@
 layout: post
 title: Using scripts in any language for Bash/Zsh tab completion
 tags: [linux,shell_scripting]
+last_modified_at: 2018-06-30 13:40:00
 ---
 
 I've recently moved from Bash to Zsh, and I needed to port my tab completion scripts. Zsh has a sophisticated built-in tab completion, however, the documentation is not very beginner-friendly; moreover, Bash scripts can be used without any change in Zsh. Therefore, I've opted for using them directly.
@@ -35,14 +36,14 @@ The program the tab-completion applies to is called `open_project`.
 
 Its programming language is irrelevant; what matters, from a tab-completion perspective, is:
 
-- the programmer interface;
+- the program commandline interface;
 - how to find out the tab completion entries.
 
-This is the script help, to give an idea of the working:
+This is the program help, to give an idea of the interface:
 
 ```
 $ open_project --help
-Usage: open_project [-s|--switch-only] project_name.
+Usage: open_project [-s|--switch-only] project_name
 
 Opens the project in `$PROJECTS_DIR/<project_name>` with the default editor; if a corresponding project configfile is found in `$PROJECTS_DIR/_configs/<project_name>.<cfg_ext>`, the file is opened instead with the associated editor.
 
@@ -68,8 +69,8 @@ Note that in this section, I use the term `Zsh` referring to the combination of 
 require 'shellwords'
 require 'getoptlong'
 
-class EesCompletion
-  def matches(command_line, projects_dir)
+class OpenProjectTabCompletion
+  def find_matches(command_line, projects_dir)
     prepare_argv!(command_line)
     parse_and_consume_options!
 
@@ -122,7 +123,7 @@ if __FILE__ == $PROGRAM_NAME
   command_line = ENV.fetch('COMP_LINE')
   projects_dir = ENV.fetch('PROJECTS_DIR')
 
-  EesCompletion.new.matches(command_line, projects_dir)
+  OpenProjectTabCompletion.new.find_matches(command_line, projects_dir)
 end
 ```
 
@@ -138,9 +139,9 @@ First, we prepare ARGV:
   end
 ```
 
-We need to manually parse the command line, because Bash and Zsh differ: Bash populates ARGV, while Zsh doesn't.
+We need to manually parse the command line, because Bash and Zsh differ: Bash populates ARGV, Zsh doesn't.
 
-The `shellwords` library contains useful APIs for working with shell commands (more precisely, their string representation); `Shellwords.split` will make sure that an command like :
+The `shellwords` library contains useful APIs for working with shell commands (more precisely, their string representation); `Shellwords.split` will make sure that a command like:
 
 ```
 my command "option 1" 'option 2' option_3
@@ -152,9 +153,9 @@ is split into:
 ["option 1", "option 2", option_3]
 ```
 
-which is what ARGV would hold in a regular execution.
+which is what ARGV would be in a regular execution.
 
-The, we handle the options:
+Then, we handle the options:
 
 ```ruby
   def parse_and_consume_options!
@@ -167,16 +168,16 @@ The, we handle the options:
   end
 ```
 
-Note that we're (likely) duplicating the option parsing - both the tab completion script, and the script itself, need to parse the options.  
-However, the tab completion script has trivial code - it doesn't act on options; it only parses and consumes them.  For this reason, this solution can be considered acceptable.
+Note that we're (likely) duplicating the option parsing: both the tab completion script and the program need to parse the options.  
+However, the tab completion script has trivial logic: it doesn't act on options, instead, it only parses and consumes them; for this reason, this solution can be considered acceptable.
 
-For parsing, here we use the `getoptlong` library. The Ruby standard library provides both this, and `optparse`; in this context, they're both equivalent.
+For parsing, here we use the `getoptlong` library. The Ruby standard library provides both `getoptlong` and `optparse`; in this context, they're both equivalent.
 
 For more information on option parsing, refer to the [getoptlong](https://docs.ruby-lang.org/en/2.5.0/OptionParser.html) and/or [optparse](https://docs.ruby-lang.org/en/2.5.0/OptionParser.html) library API references.
 
-Getoptlong will be raise an error and stop consuming tokens if an invalid option is passed by the user.
+Getoptlong will print a message, raise an error and stop consuming tokens if an invalid option is passed by the user.
 
-After this, we check the number of non-option arguments passed:
+Then, we check the number of non-option arguments passed:
 
 ```ruby
   def extract_project_name_prefix
@@ -193,7 +194,7 @@ Here, Bash and Zsh differ again:
 - Bash needs the filtered (end-resulting) list of entries;
 - Zsh can take the whole list, and it will filter it for us, based on the characters on the commandline (argument).
 
-For compatibility with both, we use the argument.
+For compatibility with both, we apply the filter in both cases.
 
 Now we just find and filter the project names:
 
@@ -207,7 +208,7 @@ Now we just find and filter the project names:
   end
 ```
 
-In case of error, things get very confusing; the behavior differs between Bash and Zsh, and GetOptLong also prints the error to stderr even if the error is `rescue`d.
+In case of error, things get very confusing; the behavior differs between Bash and Zsh, and additionally, GetOptLong also prints a message to stderr even if the error is `rescue`d.
 
 For this reason, in case of error we just return an empty list, and expect the user to abort the command:
 
@@ -230,7 +231,7 @@ For this reason, in case of error we just return an empty list, and expect the u
   end
 ```
 
-The `exit(1)` statements are not required; they're used only for cleanness.
+The `exit(1)` statements are not required; they're present only for cleanness' sake.
 
 ## Setting up autocompletion
 
@@ -241,7 +242,7 @@ autoload bashcompinit
 bashcompinit
 ```
 
-Then, for both shells, we invoke the `complete` command for associating the completion script with the script itself (append to the respective init script - `$HOME/.bash_profile` for Bash, and `$HOME/.zshrc` for Zsh):
+Then, for both shells, we invoke the `complete` command for associating the completion script with the script itself (append to `$HOME/.bash_profile` for Bash and `$HOME/.zshrc` for Zsh):
 
 ```sh
 complete -C "/path/to/open_project_tab_completion.rb" -o default open_project
@@ -256,9 +257,11 @@ $ open_project -n g<tab>
 geet       gitlab-ce  goby-dev
 ```
 
+Note that Bash has multiple init scripts; `.bash_profile` may not be appropriate for some configurations.
+
 ## Debugging
 
-In order to debug the script, just execute the script, passing a custom `COMP_LINE`:
+In order to debug the script, just execute it passing a custom `COMP_LINE`:
 
 ```sh
 $ COMP_LINE="open_project --switch-only g" /path/to/open_project_tab_completion.rb

@@ -2,7 +2,7 @@
 layout: post
 title: An overview of Desktop Ruby GUI development in 2018
 tags: [gui,ruby]
-last_modified_at: 2018-03-22 21:06:00
+last_modified_at: 2018-07-01 15:28:00
 ---
 
 Ruby GUI development is a seldom mentioned subject, but it has value. Probably after some Rails development (cough...), developing a desktop tool may be an interesting diversion (or even a requirement).
@@ -18,9 +18,9 @@ Contents:
 - [Frameworks](/An-overview-of-ruby-gui-development-in-2018#frameworks)
   - [Shoes 3/4](/An-overview-of-ruby-gui-development-in-2018#shoes-34)
   - [FXRuby](/An-overview-of-ruby-gui-development-in-2018#fxruby)
-  - [Tk](/An-overview-of-ruby-gui-development-in-2018#tk)
   - [Ruby-GNOME2](/An-overview-of-ruby-gui-development-in-2018#ruby-gnome2)
   - [qtbindings](/An-overview-of-ruby-gui-development-in-2018#qtbindings)
+  - [Tk](/An-overview-of-ruby-gui-development-in-2018#tk)
   - [wxRuby](/An-overview-of-ruby-gui-development-in-2018#wxruby)
 - [Conclusion](/An-overview-of-ruby-gui-development-in-2018#conclusion)
 - [Some references](/An-overview-of-ruby-gui-development-in-2018#some-references)
@@ -35,11 +35,11 @@ Reference table:
 | Shoes 3         | good         | poor          | so-so         | lightweight | Active                  |
 | Shoes 4         | good         | poor          | poor          | native      | Active                  |
 | FXRuby          | good         | good          | good          | lightweight | Active                  |
-| Tk              | poor         | good          | good          | mixed       | Active                  |
 | Ruby-GNOME2     | good?        | good?         | ?             | mixed       | Active                  |
 | qtbindings      | so-so        | good?         | ?             | mixed       | Old backend             |
 | JRubyFX         | ?            | ?             | ?             | ?           | Last commit: 1 year old |
 | JRuby+Java libs | good?        | good?         | good?         | (varies)    | (Not applicable)        |
+| Tk              | -            | good          | good          | mixed       | Dead                    |
 | wxRuby          | -            | -             | -             | native      | Dead                    |
 
 Other projects, which haven't been assessed for any reason (activity/platforms/etc.):
@@ -132,32 +132,6 @@ The FXRuby documentation has a `good` evaluation, primarily because there is a [
 
 FXRuby examples are very thorough; there is even one dedicated to threading, which is a very delicate and generally overlooked problem (for example, Shoes and Tk don't mention it at all).
 
-### Tk
-
-Tk is a mature, flexible and widespread library; in fact, it's Python's standard.
-
-#### Distribution
-
-Although Tk is the official Ruby GUI library, the Ruby interpreter needs to be compiled with specific options in order to support it; generally, distributed Ruby versions don't support it out of the box.
-
-This can be simplified in some cases (e.g. on Ubuntu, Brightbox provides precompiled Ruby versions up to 2.3), but it's not something to expect from a casual end-user.
-
-This yields a `poor` evaluation.
-
-#### Functionality
-
-Tk is a mature and flexible library.
-
-The only exception is threading, which is obscure and poorly documented, so it's somewhat discouraged for applications making use of it.
-
-Tk applications start slowly.
-
-All in all though, functionality itself is `good`.
-
-#### Documentation
-
-Tk is vastly documented (with the mentioned exception of threading), and it has a very good (multi-language) tutorial, therefore, it gets a `good` evaluation.
-
 ### Ruby-GNOME2
 
 Ruby-GNOME2 is based on GTK+, which is a mature and flexibly library. It's extremely widespread.
@@ -181,6 +155,28 @@ I haven't developed with Qt; due to the Qt backing, I gave a purely guessed `goo
 qtbindings does not support the last release (4.8.7) of the supported version (4.8); also, it's very odd not to support Ruby 2.3 (which is a supported Ruby version) with the latest version of the gem.
 
 This is somewhat messy, therefore, I assess `so-so`.
+
+### Tk
+
+Tk is a mature, flexible and widespread library; in fact, it's Python's standard.
+
+Unfortunately, the Tk support library on Ruby is dead; it was the official Ruby library up to 2.3, then, its codebase has been split into a [separate gem](https://github.com/ruby/tk), which is now unmaintained.
+
+The Tk sections have been kept for reference, although writing Ruby Tk applications for general distribution doesn't make sense anymore.
+
+#### Functionality
+
+Tk is a mature and flexible library.
+
+The only exception is threading, which is obscure and poorly documented, so it's somewhat discouraged for applications making use of it.
+
+Tk applications start slowly.
+
+All in all though, functionality itself is `good`.
+
+#### Documentation
+
+Tk is vastly documented (with the mentioned exception of threading), and it has a very good (multi-language) tutorial, therefore, it gets a `good` evaluation.
 
 ### wxRuby
 

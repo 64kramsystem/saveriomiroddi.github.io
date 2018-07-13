@@ -2,7 +2,7 @@
 layout: post
 title: Considerations (review) of Raspberry Pi/Odroid XU4 usage as home server
 tags: [hardware]
-last_modified_at: 2018-06-26 15:37:00
+last_modified_at: 2018-07-13 13:20:00
 ---
 
 With the large diffusion of SBCs [Single Board Computers], and subsequent maturation of their ecosystem, it's now relatively easy to setup a home server.
@@ -32,6 +32,7 @@ Contents:
     - [Base setup](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#base-setup)
     - [Solutions and references](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#solutions-and-references)
   - [Performance tweaking](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#performance-tweaking)
+- [Alternatives](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#alternatives)
 - [Benchmark](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#benchmark)
 - [Conclusions](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#conclusions)
 - [Footnotes](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#footnotes)

@@ -2,7 +2,7 @@
 layout: post
 title: Considerations (review) of Raspberry Pi/Odroid XU4 usage as home server
 tags: [hardware]
-last_modified_at: 2018-06-26 15:37:00
+last_modified_at: 2018-07-13 13:35:00
 ---
 
 With the large diffusion of SBCs [Single Board Computers], and subsequent maturation of their ecosystem, it's now relatively easy to setup a home server.
@@ -11,7 +11,7 @@ I've had three SBCs until now; a Raspberry Pi 2 model B, a 3 model B, and recent
 
 In this post, I'm going to share some considerations about their usage as home servers.
 
-*Updated on Jun/26/2018: added benchmark.*
+*Updated on 13/Jul/2018: added Odroid-N2 informations in the `Alternatives` section.*
 
 Contents:
 
@@ -32,6 +32,7 @@ Contents:
     - [Base setup](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#base-setup)
     - [Solutions and references](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#solutions-and-references)
   - [Performance tweaking](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#performance-tweaking)
+- [Alternatives](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#alternatives)
 - [Benchmark](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#benchmark)
 - [Conclusions](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#conclusions)
 - [Footnotes](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#footnotes)
@@ -238,7 +239,11 @@ For power users, it's possible to "pin" demanding processes to the faster cores;
 
 The market is very quickly evolving, so new CPUs are introduced every year.
 
-A notable CPU is the relatively new RK3399; it has 2 high-power (A72) and 4 low-power (A53) cores, less but newer/faster than the Exynos-5422 (4\*A15 + 4\*A7). RK3399 SBCs are not distributed as much as the XU4, although Hardkernel is about to distribute an RK3399-based board.
+A notable CPU is the relatively new RK3399; it has 2 high-power (A72) and 4 low-power (A53) cores, less but newer/faster than the Exynos-5422 (4\*A15 + 4\*A7).
+
+RK3399 SBCs are not distributed as much as the Hardkernel XU4, and they're considerably more expensive (2.5/3 times as much).
+
+Interestingly, Hardkernel had in plan an RK3399 based product, the Odroid-N1, however, due to changes in the hardware landscape, they moved to a new project, the N2, with "faster CPU/GPU cores and native DDR4 support" (see [here](https://forum.odroid.com/viewtopic.php?f=149&t=31277)).  Informations will be available in the Q3 2018.
 
 ## Benchmark
 

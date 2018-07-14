@@ -5,9 +5,9 @@ tags: [linux,shell_scripting]
 last_modified_at: 2018-06-30 13:40:00
 ---
 
-I've recently moved from Bash to Zsh, and I needed to port my tab completion scripts. Zsh has a sophisticated built-in tab completion, however, the documentation is not very beginner-friendly; moreover, Bash scripts can be used without any change in Zsh. Therefore, I've opted for using them directly.
+I've recently moved from Bash to Zsh, and I needed to port my tab completion scripts. Zsh has a sophisticated built-in tab completion, however, the documentation is not very beginner-friendly; moreover, Bash scripts can be used with no or little change in Zsh. Therefore, I've opted for using them directly.
 
-This article will explain how to write tab-completion scripts (in any language) for Bash, and how to use them in both Bash and Zsh.
+This article will explain how to write tab-completion scripts in any language, with an example in Ruby, and how to use them in both Bash and Zsh.
 
 As typical of this blog, the script is also used as an exercise in shell scripting, therefore, it contains additional (arguably) useful/interesting commands/concepts.
 

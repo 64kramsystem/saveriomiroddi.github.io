@@ -2,7 +2,7 @@
 layout: post
 title: Using scripts in any language for Bash/Zsh tab completion
 tags: [linux,shell_scripting]
-last_modified_at: 2018-07-14 19:34:00
+last_modified_at: 2018-07-24 00:22:00
 ---
 
 I've recently moved from Bash to Zsh, and I needed to port my tab completion scripts. Zsh has a sophisticated built-in tab completion, however, the documentation is not very beginner-friendly; moreover, Bash scripts can be used with no or little change in Zsh. Therefore, I've opted for using them directly.
@@ -23,9 +23,7 @@ Contents:
 
 ## Ruby Library
 
-Due to the popularity of this article, following a suggestion from a reader, I'm writing a library for making tab completion scripts trivial.
-
-Check out my [SimpleScripting project](https://github.com/saveriomiroddi/simple_scripting) on or before Sat 21/Jul/2018 for the addition.
+Due to the popularity of this article, following a suggestion from a reader, I'm writing a library for making tab completion scripts trivial. It will be published in August as addition to my [SimpleScripting project](https://github.com/saveriomiroddi/simple_scripting).
 
 ## Writing a tab-completion script
 

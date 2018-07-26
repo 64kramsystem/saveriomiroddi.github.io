@@ -2,7 +2,7 @@
 layout: post
 title: Using scripts in any language for Bash/Zsh tab completion
 tags: [linux,shell_scripting]
-last_modified_at: 2018-07-24 00:22:00
+last_modified_at: 2018-07-26 11:21:00
 ---
 
 I've recently moved from Bash to Zsh, and I needed to port my tab completion scripts. Zsh has a sophisticated built-in tab completion, however, the documentation is not very beginner-friendly; moreover, Bash scripts can be used with no or little change in Zsh. Therefore, I've opted for using them directly.
@@ -13,6 +13,7 @@ As typical of this blog, the script is also used as an exercise in shell scripti
 
 Contents:
 
+- [General notes](/Using-scripts-in-any-language-for-bash-zsh-tab-completion#general-notes)
 - [Ruby Library](/Using-scripts-in-any-language-for-bash-zsh-tab-completion#ruby-library)
 - [Writing a tab-completion script](/Using-scripts-in-any-language-for-bash-zsh-tab-completion#writing-a-tab-completion-bash-script)
 - [Specification of the target program](/Using-scripts-in-any-language-for-bash-zsh-tab-completion#specification-of-the-target-program)
@@ -21,9 +22,17 @@ Contents:
 - [Debugging](/Using-scripts-in-any-language-for-bash-zsh-tab-completion#debugging)
 - [Conclusion](/Using-scripts-in-any-language-for-bash-zsh-tab-completion#conclusion)
 
+## General notes
+
+This post explains the very basics of tab completion.
+
+Sophisticated tab completion uses other parameters (primarily `COMP_POINT`), which are not explained here; for people intending to review the concepts more in depth, have a look at the source code of the Ruby library mentioned below.
+
 ## Ruby Library
 
-Due to the popularity of this article, following a suggestion from a reader, I'm writing a library for making tab completion scripts trivial. It will be published in August as addition to my [SimpleScripting project](https://github.com/saveriomiroddi/simple_scripting).
+Due to the popularity of this article, following a suggestion from a reader, I wrote a library for making tab completion scripts trivial.
+
+See [SimpleScripting::TabCompletion](https://github.com/saveriomiroddi/simple_scripting/#simplescriptingtabcompletion).
 
 ## Writing a tab-completion script
 

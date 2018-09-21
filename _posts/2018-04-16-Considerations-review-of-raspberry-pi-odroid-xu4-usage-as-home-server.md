@@ -2,7 +2,7 @@
 layout: post
 title: Considerations (review) of Raspberry Pi/Odroid XU4 usage as home server
 tags: [hardware]
-last_modified_at: 2018-07-13 13:35:00
+last_modified_at: 2018-09-21 10:45:00
 ---
 
 With the large diffusion of SBCs [Single Board Computers], and subsequent maturation of their ecosystem, it's now relatively easy to setup a home server.
@@ -11,7 +11,7 @@ I've had three SBCs until now; a Raspberry Pi 2 model B, a 3 model B, and recent
 
 In this post, I'm going to share some considerations about their usage as home servers.
 
-*Updated on 13/Jul/2018: added Odroid-N2 informations in the `Alternatives` section.*
+*Updated on 21/Sep/2018: added new RK3399 boards, and updated prices.*
 
 Contents:
 
@@ -127,12 +127,12 @@ When idle, the power draw is 2W. The RPi 3B can be used without any active, or e
 
 The Odroid XU4 is based an 8-core (4\*A15@2.1 GHz + 4\*A7@1.4 GHz) machine, with 2 GiB of memory; is uses eMMC and/or micro SD for storage.
 
-The XU4 is the top of the line Odroid, although it's in under development an RK3399-based product (2\*A72@2 GHz + 4\*A53@1.5 Ghz), which may become the next high-end SBC market reference.
+The XU4 is currently the top of the Odroid line; the next high-end model (Odroid-N2) will be released in 2019 (see [Alternatives](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#alternatives)).
 
 A crucial development in the Odroid business strategy has been the partnership with a network of world-wide distributors.  
 I advice not to buy an SBC from an overseas distributor/producer, for the high demand (time and money) in case of issues.
 
-I purchased (from the German distributor) an XU4 all-inclusive set (with 16 GB eMMC) for 140$.
+I purchased in April 2018 (from the German distributor) an XU4 all-inclusive set (with 16 GB eMMC, power supply and housing) for 135$ plus shipment, although now (September 2018), the board itself can be found for as low as 60$.
 
 ### Support and documentation
 
@@ -237,13 +237,18 @@ For power users, it's possible to "pin" demanding processes to the faster cores;
 
 ## Alternatives
 
-The market is very quickly evolving, so new CPUs are introduced every year.
+The market is quickly evolving; new CPUs/boards are introduced every year, and existing ones are proposed at lower prices.
 
-A notable CPU is the relatively new RK3399; it has 2 high-power (A72) and 4 low-power (A53) cores, less but newer/faster than the Exynos-5422 (4\*A15 + 4\*A7).
+A notable CPU is the RK3399; it has 2 high-power (A72) and 4 low-power (A53) cores, less but newer/faster than the Exynos-5422 (4\*A15 + 4\*A7). 
+While RK3399 SBCs are generally significantly more expensive than the XU4 (60+$ vs 150+$), some cheap models are surfacing:
 
-RK3399 SBCs are not distributed as much as the Hardkernel XU4, and they're considerably more expensive (2.5/3 times as much).
+- Friendly Elec NanoPC-T4 (110$; 4GB RAM, integrated 16 GB eMMC; worldwide distributors)
+- Orange Pi RK3399 (109$; 2GB RAM, integrated 16 GB eMMC; ships from China)
+- Libre Computer Renegade Elite (99$; 4GB RAM; release planned in October 2019)
 
-Interestingly, Hardkernel had in plan an RK3399 based product, the Odroid-N1, however, due to changes in the hardware landscape, they moved to a new project, the N2, with "faster CPU/GPU cores and native DDR4 support" (see [here](https://forum.odroid.com/viewtopic.php?f=149&t=31277)).  Informations will be available in the Q3 2018.
+Overall, the NanoPC-T4 is a very attractively priced board, however, a very careful analysis should be performed - primarily of software support and cooling.
+
+Interestingly, Hardkernel had in plan an RK3399 based product, the Odroid-N1, however, due to changes in the hardware landscape, they moved to a new project, the N2, with "faster CPU/GPU cores and native DDR4 support" (see [here](https://forum.odroid.com/viewtopic.php?f=149&t=31277)). This new SBC is planned to be released in early 2019.
 
 ## Benchmark
 

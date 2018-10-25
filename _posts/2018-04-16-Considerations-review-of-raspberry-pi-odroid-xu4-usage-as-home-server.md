@@ -2,7 +2,7 @@
 layout: post
 title: Considerations (review) of Raspberry Pi/Odroid XU4 usage as home server
 tags: [hardware]
-last_modified_at: 2018-09-21 10:45:00
+last_modified_at: 2018-10-25 16:10:00
 ---
 
 With the large diffusion of SBCs [Single Board Computers], and subsequent maturation of their ecosystem, it's now relatively easy to setup a home server.
@@ -11,7 +11,7 @@ I've had three SBCs until now; a Raspberry Pi 2 model B, a 3 model B, and recent
 
 In this post, I'm going to share some considerations about their usage as home servers.
 
-*Updated on 21/Sep/2018: added new RK3399 boards, and updated prices.*
+*Updated on 25/Oct/2018: added new RK3399 boards, and updated prices.*
 
 Contents:
 
@@ -79,11 +79,11 @@ The RPi 3B is a 4-core 1.4 GHz A53 machine, with 1 GiB of RAM; it uses micro SD 
 
 It's not very easy to assess the price; a standard configuration comprises:
 
-- board: 50$
+- board: 45$
 - sd card, 16 GB: 16$
 - power supply + cable: 18$
 
-For a very approximate amount of 85$.
+For a very approximate amount of 80$.
 
 It's possible to save 10 or more USD by buying an incendiary power supply from Amazon or any Chinese direct seller.
 
@@ -240,11 +240,12 @@ For power users, it's possible to "pin" demanding processes to the faster cores;
 The market is quickly evolving; new CPUs/boards are introduced every year, and existing ones are proposed at lower prices.
 
 A notable CPU is the RK3399; it has 2 high-power (A72) and 4 low-power (A53) cores, less but newer/faster than the Exynos-5422 (4\*A15 + 4\*A7). 
-While RK3399 SBCs are generally significantly more expensive than the XU4 (60+$ vs 150+$), some cheap models are surfacing:
+Recently, cheap RK3399 SBCs surfaced, with a base price just a bit more expensive than the XU4 (60+$ vs 70+$):
 
-- Friendly Elec NanoPC-T4 (110$; 4GB RAM, integrated 16 GB eMMC; worldwide distributors)
-- Orange Pi RK3399 (109$; 2GB RAM, integrated 16 GB eMMC; ships from China)
-- Libre Computer Renegade Elite (99$; 4GB RAM; release planned in October 2019)
+- Friendly Elec NanoPi M4: ~70$; 2GB RAM (options available); worldwide distributors
+- Vamrs Rock960: 79$; 2 GB RAM (options available); ships from China
+- Orange Pi RK3399: 109$; 2GB RAM/integrated 16 GB eMMC (options available); ships from China
+- Libre Computer Renegade Elite: 99$; 4GB RAM; release date unclear
 
 Overall, the NanoPC-T4 is a very attractively priced board, however, a very careful analysis should be performed - primarily of software support and cooling.
 

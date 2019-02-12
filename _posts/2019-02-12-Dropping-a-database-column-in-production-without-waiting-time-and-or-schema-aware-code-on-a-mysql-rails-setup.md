@@ -2,7 +2,6 @@
 layout: post
 title: Dropping a database column in production without waiting time and/or schema-aware code, on a MySQL/Rails setup
 tags: [ruby,rails,mysql,databases]
-last_modified_at: 2018-10-04 22:44:00
 ---
 
 We recently had to drop a column in production, from a relatively large (order of 10⁷ records) table.

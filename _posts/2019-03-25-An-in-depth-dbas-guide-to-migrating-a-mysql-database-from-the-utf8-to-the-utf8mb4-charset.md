@@ -1,7 +1,8 @@
 ---
 layout: post
-title: An in depth DBA's guide to migrating a MySQL database from the `utf8` to the `utf8mb4` charset
+title: An in depth DBA's guide to migrating a MySQL database from the &#96;utf8&#96; to the &#96;utf8mb4&#96; charset
 tags: [databases,mysql,sysadmin]
+last_modified_at: 2019-03-28 11:15:00
 ---
 
 We're in the process of upgrading our MySQL databases from v5.7 to v8.0; since one of the differences in v8.0 is that the default encoding changed from `utf8` to `utf8mb4`, and we had the conversion in plan anyway, we anticipated it and performed it as preliminary step for the upgrade.

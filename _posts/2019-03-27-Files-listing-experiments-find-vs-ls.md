@@ -10,9 +10,9 @@ This post is about the research I've done; as usual, it's an exercise in extensi
 
 Contents:
 
-- [Introduction to the problem, and the `find` tool](/Files-listing-experiments-find-vs-ls##introduction-to-the-problem-and-the-find-tool)
-- [Exploring `ls`](/Files-listing-experiments-find-vs-ls##exploring-ls)
-- [Conclusion](/Files-listing-experiments-find-vs-ls##conclusion)
+- [Introduction to the problem, and the `find` tool](/Files-listing-experiments-find-vs-ls#introduction-to-the-problem-and-the-find-tool)
+- [Exploring `ls`](/Files-listing-experiments-find-vs-ls#exploring-ls)
+- [Conclusion](/Files-listing-experiments-find-vs-ls#conclusion)
 
 ## Introduction to the problem, and the `find` tool
 

@@ -1,0 +1,92 @@
+/* From https://codepen.io/samurai-ka/pen/vEjJy */
+
+/*Bookshelf Bookelement*/
+.bookshelf-book {
+  list-style-type:none;
+  float:left;
+  margin:10px;
+
+  height:300px;
+  -webkit-box-shadow: 0px 0px 12px rgba(0,0,0,0.5);
+  -moz-box-shadow:    0px 0px 12px rgba(0,0,0,0.5);
+  box-shadow:         0px 0px 12px rgba(0,0,0,0.5);
+  position:relative;
+  overflow:hidden;
+  -webkit-animation: trans 2s;
+  animation: trans 2s;
+}
+.bookshelf-book img {
+  height:100%;
+}
+
+/*Bookshelf Bookelement ribbon*/
+.ribbon-new {
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+  position: absolute;
+}
+.ribbon-new > div {
+  font: bold 15px sans-serif;
+  color: #333;
+  text-align: center;
+  text-shadow: rgba(255,255,255,0.5) 0px 1px 0px;
+  -webkit-transform: rotate(-45deg);
+  -moz-transform:    rotate(-45deg);
+  -ms-transform:     rotate(-45deg);
+  -o-transform:      rotate(-45deg);
+  position: relative;
+  padding: 7px 0;
+  left: -30px;
+  top: 15px;
+  width: 120px;
+  background-color: #66BA59;
+  background: #c9de96;
+  background: -webkit-linear-gradient(top,  #c9de96 0%,#66ba59 100%);
+  background:        -webkit-gradient(linear, left top, left bottom, color-stop(0%,#c9de96), color-stop(100%,#66ba59));
+  background:    -moz-linear-gradient(top,  #c9de96 0%, #66ba59 100%);
+  background:      -o-linear-gradient(top,  #c9de96 0%,#66ba59 100%);
+  background:     -ms-linear-gradient(top,  #c9de96 0%,#66ba59 100%);
+  background:         linear-gradient(to bottom,  #c9de96 0%,#66ba59 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c9de96', endColorstr='#66ba59',GradientType=0 );
+  -webkit-box-shadow: 0px 0px 3px rgba(0,0,0,0.3);
+  -moz-box-shadow:    0px 0px 3px rgba(0,0,0,0.3);
+  box-shadow:         0px 0px 3px rgba(0,0,0,0.3);
+}
+
+/*Bookshelf Bookelement caption*/
+.bookshelf-caption {
+  background-color:#000;
+  color:#fff;
+  opacity: 0.8;
+  filter: alpha(opacity=80);
+  position:absolute;
+  height:300px;
+  padding:10px;
+}
+.bottom-to-top {
+  top:100%;
+ }
+.bookshelf-book:hover .bottom-to-top {
+  top:0%;
+  transition: all 0.5s ease;
+  -webkit-transition: all 0.5 ease;
+}
+
+/*Animation*/
+@-webkit-keyframes trans {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes trans {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

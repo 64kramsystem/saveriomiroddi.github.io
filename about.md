@@ -5,7 +5,7 @@ permalink: /about/
 last_modified_at: 2019-03-25 15:59:00
 ---
 
-I'm the tech/team systems lead, backend programmer, and data model reverse engineer at Ticketsolve.
+I'm the systems tech/team lead, backend programmer, and data model reverse engineer at Ticketsolve.
 
 Ticketsolve also sponsors a significant part of my open source development, including this blog.
 

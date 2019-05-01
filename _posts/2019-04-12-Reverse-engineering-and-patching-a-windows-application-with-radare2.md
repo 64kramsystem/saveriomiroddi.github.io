@@ -2,6 +2,7 @@
 layout: post
 title: Reverse engineering and patching a Windows application with Radare2
 tags: [assembler,reverse_engineering]
+last_modified_at: 2019-05-01 11:58:00
 ---
 
 Due to some constraints, at Ticketsolve we sometimes need to work with an ancient file format: the Paradox Database.
@@ -9,11 +10,11 @@ Due to some constraints, at Ticketsolve we sometimes need to work with an ancien
 This file format was in use between the 80s and 90s. In order to perform some operations on Paradox databases, nowadays, there are libraries based on the file format reverse engineering work by individual open source programmers, or ad hoc commercial programs.
 
 Additionally, one can use Paradox 7, the reference commercial software originally published in 1992, now abandoned.  
-This software works good enough in Wine, however, due to assumptions about the disk partitions structure, the installer generally raises an error on installation, complaining that there isn't enough disk space.
+This software works good enough in Wine, however, the installer generally raises an error on installation, complaining that there isn't enough disk space.
 
 In this post we'll use Radare2, one of the most powerful open source reverse engineering frameworks, in order to statically analyze and patch the installation binary, so that the pesky error is not triggered anymore.
 
-There are no requirements for the readers; knowing x86/32 assembler and the PE executable format will improve the understanding, but it's not a requirement by any means.
+There are no requirements for the reader; knowing x86/32 assembler and the PE executable format will improve the understanding, but it's not a requirement by any means.
 
 Contents:
 
@@ -34,17 +35,17 @@ The usual ethical hacking considerations apply. In this article we fix a bug in 
 
 ## Tools
 
-Besides the installation files, one needs Radare2; binaries are provided [here](https://rada.re/r/down.html), although it's generally recommended to install it from the [GitHub repository](https://github.com/radare/radare2).
+Besides the Paradox installation files, one needs Radare2; binaries are provided [here](https://rada.re/r/down.html), although it's generally recommended to install it from the [GitHub repository](https://github.com/radare/radare2).
 
 Since the analysis is static (the program is not run), this post applies to any operating system [supported by Radare2].
 
 ## Problem
 
-When starting the installer (`SETUP.EXE`), an error is generally raised, saying that `You need at least 1440 KB to copy the installation files [...]`.
+When starting the installer (`SETUP.EXE`), on some setups, an error is raised, reporting that `You need at least 1440 KB to copy the installation files [...]`.
 
-Paradoxically (no pun intended), one has to install it on a partition with less than 2 GB of space in order for the installation check to pass.
+Paradoxically (no pun intended), one has to install it on a partition with less than 2 GiB of space in order for the installation check to pass.
 
-This errors happens generally but not always. At this stage it's not clear why; possibly newer Wine versions add better API support, however, for the purpose of general use, we need to ensure that the error doesn't happen.
+An educated guess is that a signed 32-bit integer is used to compute the available disk space, which causes an overflow when the space is higher the largest positive number supported by such data type (2^32 - 1 ≈ 2 GiB). This would also explain why the error is not always raised: the wraparound can lead to an acceptable value.
 
 ## Finding a starting point
 
@@ -447,7 +448,176 @@ fcn.0040134c 0x401369 [CALL] call fcn.004052a8
 \           0x0040143e      c3             ret
 ```
 
-This is quite complex. Let's seek some help; maybe, the strings can help cross-referencing (`iz`: strings in data sections):
+We can display the helpful flow graph using `agf` (Analysis Graph Function):
+
+```
+[0x00401000]> agf @fcn.0040134c
+[0x0040134c]>  # fcn.0040134c (int32_t arg_8h, int32_t arg_ch, int32_t arg_10h);
+                                                                           .-------------------------------------------------------------------.
+                                                                           |  0x40134c                                                         |
+                                                                           | (fcn) fcn.0040134c 243                                            |
+                                                                           |   fcn.0040134c (int32_t arg_8h, int32_t arg_ch, int32_t arg_10h); |
+                                                                           | ; var int32_t var_14h @ ebp-0x14                                  |
+                                                                           | ; var signed int var_ch @ ebp-0xc                                 |
+                                                                           | ; var signed int var_8h @ ebp-0x8                                 |
+                                                                           | ; var int32_t var_4h @ ebp-0x4                                    |
+                                                                           | ; arg int32_t arg_8h @ ebp+0x8                                    |
+                                                                           | ; arg int32_t arg_ch @ ebp+0xc                                    |
+                                                                           | ; arg int32_t arg_10h @ ebp+0x10                                  |
+                                                                           | ; CALL XREF from fcn.0040143f (0x401543)                          |
+                                                                           | push ebp                                                          |
+                                                                           | mov ebp, esp                                                      |
+                                                                           | add esp, 0xffffffec                                               |
+                                                                           | push ebx                                                          |
+                                                                           | push esi                                                          |
+                                                                           | push edi                                                          |
+                                                                           | lea eax, [var_14h]                                                |
+                                                                           | push eax                                                          |
+                                                                           | ; [0x8:4]=-1                                                      |
+                                                                           | ; 8                                                               |
+                                                                           | mov eax, dword [arg_8h]                                           |
+                                                                           | movzx eax, byte [eax]                                             |
+                                                                           | push eax                                                          |
+                                                                           | call fcn.00405a58;[oa]                                            |
+                                                                           | pop ecx                                                           |
+                                                                           | add al, 0xc0                                                      |
+                                                                           | push eax                                                          |
+                                                                           | call fcn.004052a8;[ob]                                            |
+                                                                           | add esp, 8                                                        |
+                                                                           | cmp dword [var_8h], 0xffffffff                                    |
+                                                                           | jne 0x401381                                                      |
+                                                                           `-------------------------------------------------------------------'
+                                                                                   f t
+                                                                                   | |
+                                                                                   | '------------------------.
+                                                                                   '.                         |
+                                                                                    |                         |
+                                                                                .--------------------.    .------------------------------------------.
+                                                                                |  0x401377          |    |  0x401381                                |
+                                                                                | mov eax, 1         |    | ; CODE XREF from fcn.0040134c (0x401375) |
+                                                                                | jmp 0x401438       |    | mov eax, dword [var_14h]                 |
+                                                                                `--------------------'    | imul dword [var_ch]                      |
+                                                                                    v                     | imul dword [var_8h]                      |
+                                                                                    |                     | mov dword [var_4h], eax                  |
+                                                                                    |                     | xor ebx, ebx                             |
+                                                                                    |                     | jmp 0x40141b                             |
+                                                                                    |                     `------------------------------------------'
+                                                                                    |                         v
+                                                                                    |                         |
+                                                                                    '--.                      |
+                                                                                       |               .------'
+                                                                                       |               | .------------------------------------.
+                                                                                       |               | |                                    |
+                                                                                       |         .------------------------------------------. |
+                                                                                       |         |  0x40141b                                | |
+                                                                                       |         | ; CODE XREF from fcn.0040134c (0x40138f) | |
+                                                                                       |         | ; [0x4080bc:4]=5                         | |
+                                                                                       |         | cmp ebx, dword [0x4080bc]                | |
+                                                                                       |         | jl 0x401394                              | |
+                                                                                       |         `------------------------------------------' |
+                                                                                       |               t f                                    |
+                                                                                       |               | |                                    |
+                                  .----------------------------------------------------|---------------' |                                    |
+                                  |                                                    |                .'                                    |
+                                  |                                                    |                |                                     |
+                              .------------------------------------------.             |            .------------------------------.          |
+                              |  0x401394                                |             |            |  0x401427                    |          |
+                              | ; CODE XREF from fcn.0040134c (0x401421) |             |            | mov eax, 1                   |          |
+                              | push dword [ebx*4 + 0x408094]            |             |            | mov edx, dword [var_4h]      |          |
+                              | push dword [arg_10h]                     |             |            | ; [0x408090:4]=0             |          |
+                              | push dword [arg_ch]                      |             |            | cmp edx, dword [0x408090]    |          |
+                              | ; "%s%s%s"                               |             |            | jg 0x401438                  |          |
+                              | push 0x4081bd                            |             |            `------------------------------'          |
+                              | push 0x40aab4                            |             |                    f t                               |
+                              | call sub.USER32.DLL_wsprintfA;[oc]       |             |                    | |                               |
+                              | add esp, 0x14                            |             |                    | |                               |
+                              | push 0                                   |             |                    | |                               |
+                              | push 0x40aab4                            |             |                    | |                               |
+                              | call fcn.00403f94;[od]                   |             |                    | |                               |
+                              | add esp, 8                               |             |                    | |                               |
+                              | mov edi, eax                             |             |                    | |                               |
+                              | cmp edi, 0xffffffff                      |             |                    | |                               |
+                              | je 0x40141a                              |             |                    | |                               |
+                              `------------------------------------------'             |                    | |                               |
+                                      f t                                              |                    | |                               |
+                                      | |                                              |                    | |                               |
+                                      | '---------------------------------.            |                    | |                               |
+              .-----------------------'                                   |            |                    | |                               |
+              |                                                           |            |                    | '------------------.            |
+              |                                                           |            |          .---------'                    |            |
+              |                                                           |            |          |                              |            |
+          .--------------------------------------.                        |            |      .--------------------.             |            |
+          |  0x4013c9                            |                        |            |      |  0x401437          |             |            |
+          | mov esi, 1                           |                        |            |      | dec eax            |             |            |
+          | ; "instxtra.pak"                     |                        |            |      `--------------------'             |            |
+          | push 0x4080f2                        |                        |            |          v                              |            |
+          | push dword [ebx*4 + 0x408094]        |                        |            |          |                              |            |
+          | call sub.KERNEL32.DLL_lstrcmpiA;[oe] |                        |            |          |                              |            |
+          | test eax, eax                        |                        |            |          |                              |            |
+          | jne 0x4013ea                         |                        |            |          |                              |            |
+          `--------------------------------------'                        |            |          |                              |            |
+                  f t                                                     |            |          |                              |            |
+                  | |                                                     |            |          |                              |            |
+                  | '---------.                                           |            |          |                              |            |
+    .-------------'           |                                           |            |          |                              |            |
+    |                         |                                           |         .--|----------'                              |            |
+    |                         |                                           |         | .'                                         |            |
+    |                         |                                           |         | | .----------------------------------------'            |
+    |                         |                                           |         | | |                                                     |
+.--------------------.    .------------------------------------------.    |   .-----------------------------------------------------.         |
+|  0x4013e3          |    |  0x4013ea                                |    |   |  0x401438                                           |         |
+| mov esi, 3         |    | ; CODE XREF from fcn.0040134c (0x4013e1) |    |   | ; CODE XREFS from fcn.0040134c (0x40137c, 0x401435) |         |
+| jmp 0x401404       |    | ; "instrun.ex_"                          |    |   | pop edi                                             |         |
+`--------------------'    | push 0x408122                            |    |   | pop esi                                             |         |
+    v                     | push dword [ebx*4 + 0x408094]            |    |   | pop ebx                                             |         |
+    |                     | call sub.KERNEL32.DLL_lstrcmpiA;[oe]     |    |   | mov esp, ebp                                        |         |
+    |                     | test eax, eax                            |    |   | pop ebp                                             |         |
+    |                     | jne 0x401404                             |    |   | ret                                                 |         |
+    |                     `------------------------------------------'    |   `-----------------------------------------------------'         |
+    |                             f t                                     |                                                                   |
+    |                             | |                                     |                                                                   |
+    '-----------------------------|-|---.                                 |                                                                   |
+                                  | '---------------------------------.   |                                                                   |
+                                  '-------------.                     |   |                                                                   |
+                                        |       |                     |   |                                                                   |
+                                        |   .--------------------.    |   |                                                                   |
+                                        |   |  0x4013ff          |    |   |                                                                   |
+                                        |   | mov esi, 2         |    |   |                                                                   |
+                                        |   `--------------------'    |   |                                                                   |
+                                        |       v                     |   |                                                                   |
+                                        |       |                     |   |                                                                   |
+                      .-----------------|-------'                     |   |                                                                   |
+                      | .---------------'                             |   |                                                                   |
+                      | | .-------------------------------------------'   |                                                                   |
+                      | | |                                               |                                                                   |
+                .-----------------------------------------------------.   |                                                                   |
+                |  0x401404                                           |   |                                                                   |
+                | ; CODE XREFS from fcn.0040134c (0x4013e8, 0x4013fd) |   |                                                                   |
+                | push edi                                            |   |                                                                   |
+                | call fcn.00405268;[of]                              |   |                                                                   |
+                | pop ecx                                             |   |                                                                   |
+                | imul esi                                            |   |                                                                   |
+                | add dword [0x408090], eax                           |   |                                                                   |
+                | push edi                                            |   |                                                                   |
+                | call fcn.00403f7c;[og]                              |   |                                                                   |
+                | pop ecx                                             |   |                                                                   |
+                `-----------------------------------------------------'   |                                                                   |
+                    v                                                     |                                                                   |
+                    |                                                     |                                                                   |
+                    '----------------------.                              |                                                                   |
+                                           | .----------------------------'                                                                   |
+                                           | |                                                                                                |
+                                     .------------------------------------------.                                                             |
+                                     |  0x40141a                                |                                                             |
+                                     | ; CODE XREF from fcn.0040134c (0x4013c7) |                                                             |
+                                     | inc ebx                                  |                                                             |
+                                     `------------------------------------------'                                                             |
+                                         v                                                                                                    |
+                                         |                                                                                                    |
+                                         `----------------------------------------------------------------------------------------------------'
+```
+
+The logic is not trivial. Let's seek some help; maybe, the strings can help cross-referencing (`iz`: strings in data sections):
 
 ```
 [0x00401000]> iz

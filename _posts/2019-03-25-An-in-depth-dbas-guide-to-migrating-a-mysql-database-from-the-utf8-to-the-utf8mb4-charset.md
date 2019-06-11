@@ -76,20 +76,21 @@ SHOW VARIABLES WHERE Variable_name RLIKE '^(character_set|collation)_' AND Varia
 
 some settings are skipped, as they're unrelated or deprecated.
 
-This is a table of the relevant entries, with the respective values to set:
+This is a table of the relevant entries:
 
-| Setting                    | New value            | Notes                                                         | Set by `SET NAMES` |
-|----------------------------|----------------------|---------------------------------------------------------------|--------------------|
-| `character_set_client`     | `utf8mb4`            | data sent by the client                                       |         ✓          |
-| `character_set_connection` | `utf8mb4`            | server converts client data into this charset for processing  |         ✓          |
-| `collation_connection`     | `utf8mb4_general_ci` | server uses this collation for processing                     |         ✓          |
-| `character_set_results`    | `utf8mb4`            | data and metadata sent by the server                          |         ✓          |
-| `character_set_server`     | `utf8mb4`            | default (and fallback) charset for objects                    |                    |
-| `collation_server`         | `utf8mb4_general_ci` | default (and fallback) collation for objects                  |                    |
+| Setting                    | New value            | Notes                                                         | Server setting | Client setting |
+|----------------------------|----------------------|---------------------------------------------------------------|----------------|----------------|
+| `character_set_client`     | `utf8mb4`            | data sent by the client                                       |                |        ✓       |
+| `character_set_connection` | `utf8mb4`            | server converts client data into this charset for processing  |                |        ✓       |
+| `collation_connection`     | `utf8mb4_general_ci` | server uses this collation for processing                     |                |        ✓       |
+| `character_set_results`    | `utf8mb4`            | data and metadata sent by the server                          |                |        ✓       |
+| `character_set_server`     | `utf8mb4`            | default (and fallback) charset for objects                    |        ✓       |                |
+| `collation_server`         | `utf8mb4_general_ci` | default (and fallback) collation for objects                  |        ✓       |                |
 
-`SET NAMES <charset>` is a MySQL command that will set all the client-related charset and collation configuration values.
+Server settings are defined at the server level, and as such, they're typically set in the server configuration file - this is required if we're operating on MySQL 5.7 (since it uses `utf8` by default).
 
-This command is typically invoked when the encoding is configured by the application framework; in the case of Rails, we'll configure the `encoding` setting in `database.yml`:
+Client settings are specified by the client on connection; typically, they're set via the [`SET NAMES <charset>`](https://dev.mysql.com/doc/refman/8.0/en/set-names.html) statement.  
+This command is invoked when the encoding is configured by the application framework; in the case of Rails, we configure the `encoding` setting in `database.yml`:
 
 ```yml
 # Typical structure

@@ -2,7 +2,7 @@
 layout: post
 title: An in depth DBA's guide to migrating a MySQL database from the &#96;utf8&#96; to the &#96;utf8mb4&#96; charset
 tags: [databases,mysql,sysadmin]
-last_modified_at: 2019-03-28 11:15:00
+last_modified_at: 2019-06-11 09:15:00
 ---
 
 We're in the process of upgrading our MySQL databases from v5.7 to v8.0; since one of the differences in v8.0 is that the default encoding changed from `utf8` to `utf8mb4`, and we had the conversion in plan anyway, we anticipated it and performed it as preliminary step for the upgrade.
@@ -32,7 +32,7 @@ Contents:
 
 `utf8mb4` is the MySQL encoding that fully covers the UTF-8 standard. Up to MySQL 5.7, the default encoding is `utf8`; the name is somewhat misleading, as this is a variant with a maximum width of 3 bytes.
 
-Although there's no practical purpose nowadays in using 3-bytes rather than 4-bytes UTF-8, in old MySQL version, this choice was made [for performance reasons](https://mysqlserverteam.com/mysql-8-0-when-to-use-utf8mb3-over-utf8mb4).
+Although there's no practical purpose nowadays in using 3-bytes rather than 4-bytes UTF-8, this choice was originally made [for performance reasons](https://mysqlserverteam.com/mysql-8-0-when-to-use-utf8mb3-over-utf8mb4).
 
 From a practical perspective, not all the applications will benefit from the extra byte of width, whose most common use cases include [emojis and mathematical letters](https://stackoverflow.com/questions/5567249/what-are-the-most-common-non-bmp-unicode-characters-in-actual-use), however, conforming to standards is a routine task in software engineering.
 
@@ -46,7 +46,7 @@ However, I'll trace a granular set of steps that should cover the vast majority 
 
 The setup is assumed to be single-master; there are generally sophisticated multi-master strategies for schema updates, however, they are outside the scope of this article.
 
-The only migration constraint set is that until the end of the migration, the user should not allow 4-byte characters into the database; this will gives us the certainty that any implicit conversion performed between before the end of the migration will succeed.
+The only migration constraint set is that until the end of the migration, the user should not allow 4-byte characters into the database; this gives the certainty that any implicit conversion performed before the end of the migration will succeed.
 
 Users can certainly lift this constraint, however, they must thoroughly analyze the application data flows, in order to be 100% sure that `utf8mb4` strings including 4-byte characters won't mingle with `utf8` strings, as this will cause errors.
 

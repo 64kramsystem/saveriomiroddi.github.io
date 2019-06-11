@@ -2,7 +2,7 @@
 layout: post
 title: An in depth DBA's guide to migrating a MySQL database from the &#96;utf8&#96; to the &#96;utf8mb4&#96; charset
 tags: [databases,mysql,sysadmin]
-last_modified_at: 2019-06-11 12:00:00
+last_modified_at: 2019-06-11 12:39:00
 ---
 
 We're in the process of upgrading our MySQL databases from v5.7 to v8.0; since one of the differences in v8.0 is that the default encoding changed from `utf8` to `utf8mb4`, and we had the conversion in plan anyway, we anticipated it and performed it as preliminary step for the upgrade.
@@ -13,6 +13,7 @@ Contents:
 
 - [Introduction](/An-in-depth-dbas-guide-to-migrating-a-mysql-database-from-the-utf8-to-the-utf8mb4-charset#introduction)
 - [Migration plan: overview and considerations](/An-in-depth-dbas-guide-to-migrating-a-mysql-database-from-the-utf8-to-the-utf8mb4-charset#migration-plan-overview-and-considerations)
+  - [!! COLLATION WARNING !!](/An-in-depth-dbas-guide-to-migrating-a-mysql-database-from-the-utf8-to-the-utf8mb4-charset#-collation-warning-)
   - [Free step: connection configuration](/An-in-depth-dbas-guide-to-migrating-a-mysql-database-from-the-utf8-to-the-utf8mb4-charset#free-step-connection-configuration)
     - [How do charset settings affect database operations?](/An-in-depth-dbas-guide-to-migrating-a-mysql-database-from-the-utf8-to-the-utf8mb4-charset#how-do-charset-settings-affect-database-operations)
   - [Step 2: Preparing the the `ALTER` statements](/An-in-depth-dbas-guide-to-migrating-a-mysql-database-from-the-utf8-to-the-utf8mb4-charset#step-2-preparing-the-the-alter-statements)
@@ -50,6 +51,17 @@ The only migration constraint set is that until the end of the migration, the us
 
 Users can certainly lift this constraint, however, they must thoroughly analyze the application data flows, in order to be 100% sure that `utf8mb4` strings including 4-byte characters won't mingle with `utf8` strings, as this will cause errors.
 
+### !! COLLATION WARNING !!
+
+MySQL 8.0 changed the `utf8mb4` default collation from `utf8mb4_general_ci` to `utf8mb4_0900_ai_ci` (for details, see [here](https://mysqlserverteam.com/mysql-8-0-collations-the-devil-is-in-the-details) and [here](http://mysqlserverteam.com/new-collations-in-mysql-8-0-0)).
+
+This has a very significant impact - if the `utf8` update if performed on a MySQL 5.7 server, without specifying the collation, and then the server is upgraded to v8.0, the collation of all the data structures will not match the default.  
+Of course, in such case it's possible to leave the system as is, however, it won't be the standard (and the settings will need to be set accordingly, in order to ensure that new tables/columns will be created with the intended collation).
+
+It's crucial to be aware of this, because most of the online information about the `utf8` conversion has been written when MySQL 8.0 was not released yet, so it holds the outdated assumption that the default `utf8mb4` collation is `utf8mb4_general_ci`.
+
+In the following sections, I'll point out which configuration parameters are required, when performing the conversion on a 5.7 server.
+
 ### Free step: connection configuration
 
 The character set [from now on abbreviated as `charset`] and collation of a given string or database object (ultimately, a column), and the operation performed, are determined by one or more settings/properties at different levels:
@@ -82,20 +94,21 @@ This is a table of the relevant entries:
 |----------------------------|----------------------|---------------------------------------------------------------|----------------|----------------|
 | `character_set_client`     | `utf8mb4`            | data sent by the client                                       |                |        ✓       |
 | `character_set_connection` | `utf8mb4`            | server converts client data into this charset for processing  |                |        ✓       |
-| `collation_connection`     | `utf8mb4_general_ci` | server uses this collation for processing                     |                |        ✓       |
+| `collation_connection`     | `utf8mb4_0900_ai_ci` | server uses this collation for processing                     |                |        ✓       |
 | `character_set_results`    | `utf8mb4`            | data and metadata sent by the server                          |                |        ✓       |
 | `character_set_server`     | `utf8mb4`            | default (and fallback) charset for objects                    |        ✓       |                |
-| `collation_server`         | `utf8mb4_general_ci` | default (and fallback) collation for objects                  |        ✓       |                |
+| `collation_server`         | `utf8mb4_0900_ai_ci` | default (and fallback) collation for objects                  |        ✓       |                |
 
 Server settings are defined at the server level, and as such, they're typically set in the server configuration file - this is required if we're operating on MySQL 5.7 (since it uses `utf8` by default).
 
-Client settings are specified by the client on connection; typically, they're set via the [`SET NAMES <charset>`](https://dev.mysql.com/doc/refman/8.0/en/set-names.html) statement.  
-This command is invoked when the encoding is configured by the application framework; in the case of Rails, we configure the `encoding` setting in `database.yml`:
+Client settings are specified by the client on connection; typically, they're set via the [`SET NAMES <charset> [COLLATE <collation>]`](https://dev.mysql.com/doc/refman/8.0/en/set-names.html) statement.  
+This command is invoked when the encoding/collation are configured by the application framework; in the case of Rails, the parameters are in `database.yml`:
 
 ```yml
 # Typical structure
 login:
   encoding: utf8mb4
+  collation: utf8mb4_0900_ai_ci
   # ...
 ```
 
@@ -111,11 +124,13 @@ DATABASES = {
 }
 ```
 
-The change above will cause the following statement to be issued on the first connection:
+The changes above will cause the following statement to be issued on the first connection:
 
 ```sql
-SET NAMES utf8mb4 # Rails also sets other variables here.
+SET NAMES utf8mb4 COLLATE utf8mb4_0900_ai_ci # Rails also sets other variables here.
 ```
+
+Based on a brief look at the source code, there is not collation option in Django, so the `COLLATE utf8mb4_0900_ai_ci` won't be specified in the SQL statement.
 
 This step can be performed at the beginning or the end of the migration; the reason is explained in the next subsection.
 
@@ -141,7 +156,7 @@ When it comes to storage, the matter is pretty simple; MySQL will take care of "
 
 However, in this context, strings manipulation is not only about storage - comparison is the other aspect to consider. It's time to introduce the concept of collation and the related rules.
 
-Strings are compared according to a "collation", which defines how the data is sorted and compared. Each charset has a default collation, which in MySQL is the case-insensitive one (`utf8_general_ci` and `utf8mb4_general_ci`).
+Strings are compared according to a "collation", which defines how the data is sorted and compared. Each charset has a default collation, which in MySQL is the case-insensitive one (`utf8_general_ci` and `utf8mb4_general_ci`/`utf8mb4_0900_ai_ci`).
 
 Now, when collating strings of mixed type, will the operation succeed? The answer is... no, but yes!
 
@@ -226,7 +241,7 @@ CREATE TEMPORARY TABLE test_table (
 SELECT _utf8'ä' `utf8col`;
 
 SELECT utf8col < _utf8mb4'🍕' `result` FROM test_table;
-ERROR 1267 (HY000): Illegal mix of collations (utf8_bin,IMPLICIT) and (utf8mb4_general_ci,COERCIBLE) for operation '<'
+ERROR 1267 (HY000): Illegal mix of collations (utf8_bin,IMPLICIT) and (utf8mb4_0900_ai_ci,COERCIBLE) for operation '<'
 ```
 
 Error! What happened here?

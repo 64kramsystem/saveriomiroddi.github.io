@@ -2,7 +2,7 @@
 layout: post
 title: An in depth DBA's guide to migrating a MySQL database from the &#96;utf8&#96; to the &#96;utf8mb4&#96; charset
 tags: [databases,mysql,sysadmin]
-last_modified_at: 2019-06-11 09:15:00
+last_modified_at: 2019-06-11 09:38:00
 ---
 
 We're in the process of upgrading our MySQL databases from v5.7 to v8.0; since one of the differences in v8.0 is that the default encoding changed from `utf8` to `utf8mb4`, and we had the conversion in plan anyway, we anticipated it and performed it as preliminary step for the upgrade.
@@ -404,7 +404,7 @@ EXPLAIN SELECT COUNT(*) FROM utf8mb4_table WHERE mb4col = _utf8'n';
 
 SHOW WARNINGS\G
 # [...]
-# Message: /* select#1 */ select count(0) AS `COUNT(*)` from `ticketsolve_development`.`utf8mb4_table` where (`ticketsolve_development`.`utf8mb4_table`.`mb4col` = 'n')
+# Message: /* select#1 */ select count(0) AS `COUNT(*)` from `db`.`utf8mb4_table` where (`db`.`utf8mb4_table`.`mb4col` = 'n')
 ```
 
 Interestingly, it seems that MySQL converts the data before it reaches the optimizer; this is valuable knowledge, because with the current constraint(s), we can rely on the indexes as much as before the migration start.
@@ -425,7 +425,7 @@ What's `func`?
 
 ```sql
 SHOW WARNINGS\G
-# Message: /* select#1 */ select count(0) AS `COUNT(*)` from `ticketsolve_development`.`utf8_table` join `ticketsolve_development`.`utf8mb4_table` where (convert(`ticketsolve_development`.`utf8_table`.`mb3col` using utf8mb4) = `ticketsolve_development`.`utf8mb4_table`.`mb4col`)
+# Message: /* select#1 */ select count(0) AS `COUNT(*)` from `db`.`utf8_table` join `db`.`utf8mb4_table` where (convert(`db`.`utf8_table`.`mb3col` using utf8mb4) = `db`.`utf8mb4_table`.`mb4col`)
 ```
 
 Very interesting; we see what MySQL does in this case: it iterates `utf8_table.mb3col` (specifically, it iterates the index `mb3idx`), and for each value, it converts it to `utf8mb4`, so that it can be sought it in the `utf8mb4_table.mb4idx` index.

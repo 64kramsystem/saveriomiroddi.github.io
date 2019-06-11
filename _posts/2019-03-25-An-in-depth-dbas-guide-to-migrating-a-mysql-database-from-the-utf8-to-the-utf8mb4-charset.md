@@ -2,7 +2,7 @@
 layout: post
 title: An in depth DBA's guide to migrating a MySQL database from the &#96;utf8&#96; to the &#96;utf8mb4&#96; charset
 tags: [databases,mysql,sysadmin]
-last_modified_at: 2019-06-11 09:38:00
+last_modified_at: 2019-06-11 12:00:00
 ---
 
 We're in the process of upgrading our MySQL databases from v5.7 to v8.0; since one of the differences in v8.0 is that the default encoding changed from `utf8` to `utf8mb4`, and we had the conversion in plan anyway, we anticipated it and performed it as preliminary step for the upgrade.
@@ -13,7 +13,7 @@ Contents:
 
 - [Introduction](/An-in-depth-dbas-guide-to-migrating-a-mysql-database-from-the-utf8-to-the-utf8mb4-charset#introduction)
 - [Migration plan: overview and considerations](/An-in-depth-dbas-guide-to-migrating-a-mysql-database-from-the-utf8-to-the-utf8mb4-charset#migration-plan-overview-and-considerations)
-  - [Free step: connection configurations](/An-in-depth-dbas-guide-to-migrating-a-mysql-database-from-the-utf8-to-the-utf8mb4-charset#free-step-connection-configurations)
+  - [Free step: connection configuration](/An-in-depth-dbas-guide-to-migrating-a-mysql-database-from-the-utf8-to-the-utf8mb4-charset#free-step-connection-configuration)
     - [How do charset settings affect database operations?](/An-in-depth-dbas-guide-to-migrating-a-mysql-database-from-the-utf8-to-the-utf8mb4-charset#how-do-charset-settings-affect-database-operations)
   - [Step 2: Preparing the the `ALTER` statements](/An-in-depth-dbas-guide-to-migrating-a-mysql-database-from-the-utf8-to-the-utf8mb4-charset#step-2-preparing-the-the-alter-statements)
     - [Issue: Column/index size limits](/An-in-depth-dbas-guide-to-migrating-a-mysql-database-from-the-utf8-to-the-utf8mb4-charset#issue-columnindex-size-limits)
@@ -50,7 +50,7 @@ The only migration constraint set is that until the end of the migration, the us
 
 Users can certainly lift this constraint, however, they must thoroughly analyze the application data flows, in order to be 100% sure that `utf8mb4` strings including 4-byte characters won't mingle with `utf8` strings, as this will cause errors.
 
-### Free step: connection configurations
+### Free step: connection configuration
 
 The character set [from now on abbreviated as `charset`] and collation of a given string or database object (ultimately, a column), and the operation performed, are determined by one or more settings/properties at different levels:
 
@@ -89,7 +89,7 @@ This is a table of the relevant entries, with the respective values to set:
 
 `SET NAMES <charset>` is a MySQL command that will set all the client-related charset and collation configuration values.
 
-Such command is also typically invoked when the encoding is configured by the application framework; in the case of Rails, we'll configure the `encoding` setting in `database.yml`:
+This command is typically invoked when the encoding is configured by the application framework; in the case of Rails, we'll configure the `encoding` setting in `database.yml`:
 
 ```yml
 # Typical structure
@@ -110,7 +110,7 @@ DATABASES = {
 }
 ```
 
-The changes above will cause the following statement to be issued on the first connection:
+The change above will cause the following statement to be issued on the first connection:
 
 ```sql
 SET NAMES utf8mb4 # Rails also sets other variables here.
@@ -146,7 +146,7 @@ Now, when collating strings of mixed type, will the operation succeed? The answe
 
 The reason for the no is that, unlike storage, we can't use a collation for two different charsets. However, MySQL comes to the rescue.
 
-MySQL has a set of [coercibility rules](https://dev.mysql.com/doc/refman/5.7/en/charset-collation-coercibility.html)), which determine which collation to use in a given operation (or if an error should be raised).
+MySQL has a set of [coercibility rules](https://dev.mysql.com/doc/refman/5.7/en/charset-collation-coercibility.html), which determine which collation to use in a given operation (or if an error should be raised).
 
 The rules are quite a few, however, they're consistently defined, so they're easy to understand.
 

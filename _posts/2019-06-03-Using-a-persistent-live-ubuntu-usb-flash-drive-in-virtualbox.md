@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Using a persistent live Ubuntu USB flash drive in VirtualBox
-tags: [linux,sysadmin,small,ubuntu]
+tags: [linux,sysadmin,ubuntu]
 ---
 
 Recently, I needed to test some operations to be performed during the installation of Ubuntu on a system.

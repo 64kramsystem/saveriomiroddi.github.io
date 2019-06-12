@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Text processing experiments for finding the MySQL configuration files
-tags: [linux,sysadmin,small,mysql,awk,perl,text_processing]
+tags: [linux,sysadmin,mysql,awk,perl,text_processing]
 ---
 
 When it comes to configuring MySQL, a fundamental step is to find out which configuration files the MySQL server reads.

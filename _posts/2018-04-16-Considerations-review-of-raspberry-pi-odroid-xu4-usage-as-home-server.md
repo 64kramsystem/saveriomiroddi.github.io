@@ -2,7 +2,7 @@
 layout: post
 title: Considerations (review) of Raspberry Pi/Odroid XU4 usage as home server
 tags: [hardware]
-last_modified_at: 2018-10-25 16:10:00
+last_modified_at: 2019-07-03 09:05:00
 ---
 
 With the large diffusion of SBCs [Single Board Computers], and subsequent maturation of their ecosystem, it's now relatively easy to setup a home server.
@@ -11,10 +11,11 @@ I've had three SBCs until now; a Raspberry Pi 2 model B, a 3 model B, and recent
 
 In this post, I'm going to share some considerations about their usage as home servers.
 
-*Updated on 25/Oct/2018: added new RK3399 boards, and updated prices.*
+*Updated on 3/Jul/2019: added new generation boards section.*
 
 Contents:
 
+- [Considerations about new generation (A7x and Goldmont Plus) boards](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#considerations-about-new-generation-a7x-and-goldmont-plus-boards)
 - [General characteristics of an SBC/home server](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#general-characteristics-of-an-sbchome-server)
 - [Brief informations about ARM processors](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#brief-informations-about-arm-processors)
 - [Raspberry Pi 3 Model B](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#raspberry-pi-3-model-b)
@@ -36,6 +37,18 @@ Contents:
 - [Benchmark](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#benchmark)
 - [Conclusions](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#conclusions)
 - [Footnotes](/Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server#footnotes)
+
+## Considerations about new generation (A7x and Goldmont Plus) boards
+
+When I wrote this article, the XU4 was pretty much latest generation. A bit more than an year passed; new ARM architectures (A7x) were produced, and boards designed around them finally distributed.
+
+The landscape of SBCs has been further widened by Intel's entrance in the market, with the Goldmont Plus architecture (Celeron J4105 and others). Although this is technically not an ARM architecture, and the price range is different, the Odroid H2 is effectively a competitor.
+
+Both the ARM A7x and the Goldmont Plus architectures are unambiguously better than the XU4's (technical details are explained in the article): not only they're more powerful, but they run cooler - in fact, they're typically run with a heatsink instead of a fan.
+
+On top of this, the Raspberry Pi 4 shattered the market with an impressively low price: around 45$ for the 2 GiB board (without accessories). Although differences in the board details need to be considered (for example, the presence/lack of an eMMC port), this effectively made the XU4 obsolete - in fact, it's now being sold at discounted price.
+
+As a consequence of this, I'm not going to update the prices in this article anymore. While, for some people, prices are the main factor when choosing a board, the considerations that I expose in this post are still relevant when evaluating the purchase of an SBC, so, the content is still a useful read.
 
 ## General characteristics of an SBC/home server
 

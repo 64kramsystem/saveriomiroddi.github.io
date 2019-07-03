@@ -1,38 +1,37 @@
 ---
 layout: post
-title: Building a Debian (`.deb`) source package, and publishing it on an Ubuntu PPA (Part 1)
+title: Building a Debian (`.deb`) source package, and publishing it on an Ubuntu PPA
 tags: [c,distribution,linux,packaging,sysadmin,ubuntu]
+last_modified_at: 2019-07-03 12:03:00
 ---
 
 Although the concepts involved in preparing a Debian (`.deb`) source package and publishing it on an Ubuntu PPA are simple, due to the many moving parts involved, it's not easy to find a single source of information.
 
 This article provides all the information required to perform the process, using a trivial program as an example.
 
-A second article will introduce other concepts, using a Golang program as an example.
-
 Contents:
 
-- [About the approach and standards](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1#about-the-approach-and-standards)
-- [Conventions](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1#conventions)
-- [The procedure](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1#the-procedure)
-  - [Setup](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1#setup)
-    - [Preparing the system](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1#preparing-the-system)
-    - [Setting up and publishing the PGP key(s)](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1#setting-up-and-publishing-the-pgp-keys)
-    - [Setting up a Launchpad account](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1#setting-up-a-launchpad-account)
-    - [Creating the PPA](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1#creating-the-ppa)
-  - [Preparing the source package](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1#preparing-the-source-package)
-    - [Introduction to Debian packaging](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1#introduction-to-debian-packaging)
-    - [Preparing the source code](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1#preparing-the-source-code)
-    - [The makefile](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1#the-makefile)
-    - [Debian packaging metadata creation and core concepts](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1#debian-packaging-metadata-creation-and-core-concepts)
-    - [Updating `changelog`](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1#updating-changelog)
-    - [Updating `control`](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1#updating-control)
-    - [Updating `copyright`](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1#updating-copyright)
-  - [Building the source package](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1#building-the-source-package)
-  - [Uploading the package](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1#uploading-the-package)
-  - [Deleting a package](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1#deleting-a-package)
-- [Using the PPA](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1#using-the-ppa)
-- [Conclusion](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1#conclusion)
+- [About the approach and standards](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa#about-the-approach-and-standards)
+- [Conventions](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa#conventions)
+- [The procedure](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa#the-procedure)
+  - [Setup](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa#setup)
+    - [Preparing the system](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa#preparing-the-system)
+    - [Setting up and publishing the PGP key(s)](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa#setting-up-and-publishing-the-pgp-keys)
+    - [Setting up a Launchpad account](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa#setting-up-a-launchpad-account)
+    - [Creating the PPA](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa#creating-the-ppa)
+  - [Preparing the source package](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa#preparing-the-source-package)
+    - [Introduction to Debian packaging](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa#introduction-to-debian-packaging)
+    - [Preparing the source code](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa#preparing-the-source-code)
+    - [The makefile](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa#the-makefile)
+    - [Debian packaging metadata creation and core concepts](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa#debian-packaging-metadata-creation-and-core-concepts)
+    - [Updating `changelog`](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa#updating-changelog)
+    - [Updating `control`](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa#updating-control)
+    - [Updating `copyright`](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa#updating-copyright)
+  - [Building the source package](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa#building-the-source-package)
+  - [Uploading the package](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa#uploading-the-package)
+  - [Deleting a package](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa#deleting-a-package)
+- [Using the PPA](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa#using-the-ppa)
+- [Conclusion](/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa#conclusion)
 
 ## About the approach and standards
 

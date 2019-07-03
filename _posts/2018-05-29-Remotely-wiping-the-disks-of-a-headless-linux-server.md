@@ -2,6 +2,7 @@
 layout: post
 title: Remotely wiping the disk(s) of a headless linux server
 tags: [linux,shell_scripting,sysadmin,ubuntu]
+last_modified_at: 2019-07-03 12:22:00
 ---
 
 Seldom, the subject of how to wipe the disk(s) of a headliness linux server comes up; there are a few resources online about it. This blog summarizes all the information around into a clean, stable and generic script that can be used in order to perform this task.
@@ -67,10 +68,21 @@ mount --bind /sys /mnt/sys      #
 mount --bind /proc /mnt/proc    # if /proc is not mirrored, after wiping, the system will crash
 ```
 
-The `xenial` Ubuntu version is required for the `status=progress` dd option.  
-The package `bsdmainutils` includes hexdump, used later for inspection.
+The `xenial` Ubuntu version is required for the `status=progress` dd option; the package `bsdmainutils` includes `hexdump`, used later for inspection.
 
-Switch to it!:
+A reader kindly reported an error (that I can't reproduce on my system):
+
+```sh
+# If, when running the `debootstrap` command, you get:
+#
+#     E: Failed getting release file https://deb.debian.org/debian/dists/xenial/Release
+#
+# replace it with:
+#
+debootstrap --variant=minbase --include=bsdmainutils --arch=amd64 xenial /mnt http://archive.ubuntu.com/ubuntu/
+```
+
+Now, switch to the temporary environment!:
 
 ```sh
 chroot /mnt

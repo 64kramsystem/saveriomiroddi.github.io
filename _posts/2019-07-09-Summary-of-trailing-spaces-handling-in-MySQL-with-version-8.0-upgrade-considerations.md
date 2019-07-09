@@ -1,7 +1,8 @@
 ---
 layout: post
 title: Summary of trailing spaces handling in MySQL, with version 8.0 upgrade considerations
-tags: [databases,mysql]
+tags: [data_types,databases,mysql]
+last_modified_at: 2019-07-09 20:40:00
 ---
 
 Fairly recently, we've upgraded to MySQL 8; it's been a relatively smooth transition, however, some minor differences needed to be handled. One of them is the behavior of trailing spaces.

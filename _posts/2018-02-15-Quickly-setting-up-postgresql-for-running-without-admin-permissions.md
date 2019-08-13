@@ -134,14 +134,14 @@ Also note that the following commands use the previously set environment variabl
 The env variable `$PGDATA` tells PGSQL where the data resides:
 
 ```sh
-echo "export PGDATA=$(printf "%q" "$PGDATA")" >> "$HOME/.bashrc"
+$ echo "export PGDATA=$(printf "%q" "$PGDATA")" >> "$HOME/.bashrc"
 ```
 
 It's convenient to have the PGSQL binaries in the path as well, in order to avoid having to write the full path each time:
 
 ```sh
 # For apt package installations
-echo "export PATH=/usr/lib/postgresql/$PGSQL_VERSION/bin:\$PATH" >> "$HOME/.bashrc"
+$ echo "export PATH=/usr/lib/postgresql/$PGSQL_VERSION/bin:\$PATH" >> "$HOME/.bashrc"
 
 # For binary tarball installations
 $ echo "export PATH=$LOCAL_LIB:\$PATH" >> "$HOME/.bashrc"

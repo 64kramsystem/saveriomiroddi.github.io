@@ -2,6 +2,7 @@
 layout: post
 title: Quickly setting up PostgreSQL for running without admin permissions
 tags: [databases,postgresql,sysadmin]
+last_modified_at: 2019-08-13 12:21:00
 ---
 
 It's very convenient to run service processes (for development purposes!) without admin permissions, rather starting it as system service.
@@ -29,8 +30,8 @@ The `$PGDATA` directory name must not contain quotes (which would complicate the
 First, set a few variables, for convenience:
 
 ```sh
-$ export PGSQL_VERSION=10
-$ export PGDATA="$HOME/databases/pgsql_data"
+$ PGSQL_VERSION=10
+$ PGDATA="$HOME/databases/pgsql_data"
 ```
 
 Both can be adjusted to the user preference.
@@ -85,10 +86,9 @@ Check out the [last section](#persisting-the-pgsql-data-location-and-adding-the-
 First, variables setup:
 
 ```sh
-$ export PGDATA="$HOME/databases/pgsql_data"
-$ export LOCAL_LIB="$HOME/local"
-$ export PGSQL_VERSION=10
-$ export PGSQL_TARBALL_LINK="https://get.enterprisedb.com/postgresql/postgresql-10.2-1-linux-x64-binaries.tar.gz"
+$ PGSQL_TARBALL_LINK="https://get.enterprisedb.com/postgresql/postgresql-10.10-1-linux-x64-binaries.tar.gz"
+$ PGDATA="$HOME/databases/pgsql_data"
+$ LOCAL_LIB="$HOME/local"
 ```
 
 The `$LOCAL_LIB` path is the preferred location for software used by the current user only.
@@ -128,23 +128,22 @@ Check out the [last section](#persisting-the-pgsql-data-location-and-adding-the-
 
 In order to persist the PGSQL data location, and add the binaries to the `$PATH` for convenience, we need to extend the shell init scripts.
 
-Shell init scripts vary slightly dependign on the login conditions/configuration. For simplicity, extend `$HOME/.bashrc`.
+Shell init scripts vary slightly depending on the login conditions/configuration. For simplicity, extend `$HOME/.bashrc`.  
+Also note that the following commands use the previously set environment variables.
 
 The env variable `$PGDATA` tells PGSQL where the data resides:
 
 ```sh
-echo 'export PGDATA="$HOME/databases/pgsql_data"' >> "$HOME/.bashrc"
+echo "export PGDATA=$(printf "%q" "$PGDATA")" >> "$HOME/.bashrc"
 ```
 
-It's convenient to have the PGSQL binaries in the path as well, in order to avoid having to write the full path:
+It's convenient to have the PGSQL binaries in the path as well, in order to avoid having to write the full path each time:
 
 ```sh
 # For apt package installations
-export PGSQL_VERSION=10
 echo "export PATH=/usr/lib/postgresql/$PGSQL_VERSION/bin:\$PATH" >> "$HOME/.bashrc"
 
 # For binary tarball installations
-$ export LOCAL_LIB="$HOME/local"
 $ echo "export PATH=$LOCAL_LIB:\$PATH" >> "$HOME/.bashrc"
 ```
 

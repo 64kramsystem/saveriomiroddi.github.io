@@ -12,7 +12,7 @@ I'll also give an introduction about the concepts involved, so that one has bett
 
 Note that this guide is stable, but I'll keep adding a few more sections and content in general.
 
-Context:
+Contents:
 
 - [An introduction to the concepts involved](/Installing-Ubuntu-on-a-ZFS-root-with-encryption-and-mirroring#an-introduction-to-the-concepts-involved)
   - [The boot process: BIOS and EFI](/Installing-Ubuntu-on-a-ZFS-root-with-encryption-and-mirroring#the-boot-process-bios-and-efi)

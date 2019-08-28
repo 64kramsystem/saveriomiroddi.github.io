@@ -1,7 +1,8 @@
 ---
 layout: post
 title: Converting/processing a video using FFmpeg, for viewing on an old digital media player
-tags: [linux,ffmpeg,media_processing,shell_scripting]
+tags: [linux,ffmpeg,media_processing]
+last_modified_at: 2019-08-28 16:47:00
 ---
 
 During my last vacation, I wanted to watch some very old cartoons, during the daily break, on the digital media player that the apartment provided.

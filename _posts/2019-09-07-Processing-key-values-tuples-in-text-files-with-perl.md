@@ -2,6 +2,7 @@
 layout: post
 title: Processing key/values tuples in text files with Perl (how to enable unattended upgrades for PPAs)
 tags: [linux,perl,shell_scripting,sysadmin,text_processing,ubuntu]
+last_modified_at: 2019-09-19 20:08:00
 ---
 
 In my latest sysadmin experimentations, I've configured the unattended upgrades on my new server (an Odroid H2 😍).
@@ -12,6 +13,7 @@ This post describes how to enable unattended upgrades for a PPA, while explainin
 
 Contents:
 
+- [Update](/Processing-key-values-tuples-in-text-files-with-perl#update)
 - [A high level overview of how to enable unattended upgrades for a PPA](/Processing-key-values-tuples-in-text-files-with-perl#a-high-level-overview-of-how-to-enable-unattended-upgrades-for-a-ppa)
 - [Premises, and structuring the procedure](/Processing-key-values-tuples-in-text-files-with-perl#premises-and-structuring-the-procedure)
   - [Capturing groups](/Processing-key-values-tuples-in-text-files-with-perl#capturing-groups)
@@ -22,6 +24,12 @@ Contents:
   - [Adding a line to an input, after a match](/Processing-key-values-tuples-in-text-files-with-perl#adding-a-line-to-an-input-after-a-match)
 - [The final commands](/Processing-key-values-tuples-in-text-files-with-perl#the-final-commands)
 - [Conclusion](/Processing-key-values-tuples-in-text-files-with-perl#conclusion)
+
+## Update
+
+A colleague of mine found out that a simpler procedure is to use `apt-cache policy <package_name>`, followed by `apt-cache`.
+
+Although that's a preferable solution, the subject of this article is investigating Perl's capabilities, so I've left the article unchanged.
 
 ## A high level overview of how to enable unattended upgrades for a PPA
 

@@ -2,6 +2,7 @@
 layout: post
 title: How to print the last N fields (or slice an array) with awk
 tags: [awk,perl,shell_scripting,text_processing]
+last_modified_at: 2019-09-09 13:22:00
 ---
 
 A functionality that I require, relatively frequently, when scripting, is to print the last N fields of a stream, with awk.
@@ -137,7 +138,7 @@ and lo and behold, this is going to be the content of the clipboard:
 
 As an engineer, I'm not really concerned with what I use, rather, with what's the best[²](#footnote02) approach to a given job; in this case, I require compactness, as long as readability is sacrificed, at most, only a little.
 
-Personally, I consider consolidating as many use cases/requirements as possible into a single tool/service, a significant engineering principle. In this area, I found Perl a very successful tool[³](#footnote03)).
+Personally, I consider consolidating as many use cases/requirements as possible into a single tool/service, a significant engineering principle. In this area, I found Perl a very successful tool.
 
 Enjoy effective and efficient text processing!
 
@@ -145,4 +146,3 @@ Enjoy effective and efficient text processing!
 
 <a name="footnote01">¹</a>: `-1` actually addresses the last field, but only when the first parameter in the range is also negative, e.g. `[-3..-1]`.<br/>
 <a name="footnote02">²</a>: "Best" of course, has a different meaning based on the context.<br/>
-<a name="footnote03">³</a>: with the notable exception of `getline()`; this is quite irritating.<br/>

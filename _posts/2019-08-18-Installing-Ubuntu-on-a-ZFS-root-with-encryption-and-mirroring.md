@@ -2,6 +2,7 @@
 layout: post
 title: Installing Ubuntu on a ZFS root, with encryption and mirroring
 tags: [filesystems,linux,storage,sysadmin,ubuntu]
+last_modified_at: 2019-10-01 01:16:00
 ---
 
 2019 is a very exciting year for people with at least a minor interest in storage. First, in May, the ZFS support for encryption and trimming has been added, with the release 0.8; then, in August, Canonical has officially announced the plan to add ZFS support to the installer[¹](#footnote01) in the next Ubuntu release.
@@ -14,6 +15,7 @@ Note that this guide is stable, but I'll keep adding a few more sections and con
 
 Contents:
 
+- [Update](/Installing-Ubuntu-on-a-ZFS-root-with-encryption-and-mirroring#update)
 - [An introduction to the concepts involved](/Installing-Ubuntu-on-a-ZFS-root-with-encryption-and-mirroring#an-introduction-to-the-concepts-involved)
   - [The boot process: BIOS and EFI](/Installing-Ubuntu-on-a-ZFS-root-with-encryption-and-mirroring#the-boot-process-bios-and-efi)
   - [GRUB](/Installing-Ubuntu-on-a-ZFS-root-with-encryption-and-mirroring#grub)
@@ -28,6 +30,12 @@ Contents:
 - [Tweaks](/Installing-Ubuntu-on-a-ZFS-root-with-encryption-and-mirroring#tweaks)
 - [Conclusion](/Installing-Ubuntu-on-a-ZFS-root-with-encryption-and-mirroring#databases)
 - [Footnotes](/Installing-Ubuntu-on-a-ZFS-root-with-encryption-and-mirroring#footnotes)
+
+## Update
+
+I've decide to turn this article to a program that simplifies and automates the entire procedure. The projected date for the first release is during the first week of October 2019.
+
+The repository is on [GitHub](https://github.com/saveriomiroddi/zfs-installer), and the work in progress script can be checked out [in a branch](https://github.com/saveriomiroddi/zfs-installer/blob/first_release/install-zfs.sh).
 
 ## An introduction to the concepts involved
 

@@ -2,6 +2,7 @@
 layout: post
 title: Bash&#58; Print variables using indirect references, with introduction to array data types
 tags: [linux,shell_scripting]
+last_modified_at: 2019-10-01 20:08:00
 ---
 
 Although there is a complexity threshold for the convenience of shell scripting, there is still plenty that (in my opinion) can be done before hitting such ceiling.
@@ -95,6 +96,8 @@ for entry in "${myarray[@]}"; do echo "$entry"; done
 # "myentry3"
 ```
 
+Bash doesn't offer any functionality to test the inclusion of items in standard arrays. Where this functionality is required, the simplest solution is to use an associative array (see next section) with phony values.
+
 ### Associative arrays
 
 Arrays can be declared in the following forms:
@@ -117,6 +120,9 @@ myarray[mykey3]="my value 3"
 
 # Access
 echo ${myarray[my key 2]}  # "my value 2"
+
+# Key test
+[[ -v myarray["my key 2"] ]] && echo "found!" # "found!"
 
 # Delete an entry
 unset 'myarray[mykey3]'

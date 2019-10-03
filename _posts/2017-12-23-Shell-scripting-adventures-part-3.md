@@ -2,14 +2,17 @@
 layout: post
 title: Shell scripting adventures (Part 3, Terminal-based dialog boxes&colon; Whiptail)
 tags: [gui,shell_scripting,sysadmin]
-last_modified_at: 2018-03-09 18:15:00
+last_modified_at: 2019-10-03 10:33:00
 ---
 
 This is the Part 3 (of 3) of the shell scripting adventures.
 
+*Updated on 03/Oct/2019: Added section about redirections.*
+
 The following subjects are described in this part:
 
 - [Introduction to Whiptail](/Shell-scripting-adventures-part-3#introduction-to-whiptail)
+- [The mysterious redirections (`3>&1 1>&2 2>&3`)](/Shell-scripting-adventures-part-3#the-mysterious-redirections-31-12-23)
 - [Widgets, with snippets](/Shell-scripting-adventures-part-3#widgets-with-snippets)
   - [Message box](/Shell-scripting-adventures-part-3#message-box)
   - [Yes/no box](/Shell-scripting-adventures-part-3#yesno-box)
@@ -35,6 +38,44 @@ Previous chapters:
 ## Introduction to Whiptail
 
 Whiptail is a dialog boxes program, with some useful widgets, which makes shell scripting more user-friendly; it's included in all the Debian-based distributions.
+
+## The mysterious redirections (`3>&1 1>&2 2>&3`)
+
+First, we start by explaining a related subject: the mysterious `3>&1 1>&2 2>&3`. Why is this typically used with Whiptail?
+
+When we expect a "return value" from a command, we invoke a subshell (`$(...)`) and assign the output to a variable:
+
+```sh
+user_answer=$(whitptail ...)
+```
+
+But there's something important to be aware of: technically speaking, there is no "return value" (which is an improper definition) - what is assigned to the variable is the *stdout* output (*stderr* is not assigned!).
+
+See this example:
+
+```sh
+$ result=$(echo value)               # `echo` defaults to stdout; nothing is printed, because stdout is captured!
+$ echo $result
+value
+$ result=$(echo value > /dev/stderr) # this is printed, as it's stderr!
+value
+$ echo $result                       # empty!
+
+```
+
+Now, the way whiptail works is that the widgets are printed to stdout, while the return value is printed to stderr. We can capture only from stdout though, so what do we do?
+
+Simple! We swap stdout and stderr! Printing the widgets to stderr is perfectly valid, and we get the "return value" in stdout.
+
+The formal expression of that is `3>&1 1>&2 2>&3`, which means:
+
+- we create a temporary file descriptor (#3) and point it to stdout (1)
+- we redirect stdout (1) to stderr (2)
+- we redirect stderr (2) to the temporary file descriptor (3), which points to stdout (due to the first step)
+
+Result: stdout and stderr are switched 😉
+
+For some more details, there is a good [Stackoverflow explanation](https://unix.stackexchange.com/questions/42728/what-does-31-12-23-do-in-a-script)).
 
 ## Widgets, with snippets
 
@@ -140,8 +181,6 @@ The general format of this widget parameters is:
 ```sh
 whiptail --radiolist [--title mytitle] <body_message_header> <width> <height> <entries_count> <entry_1_key> <entry_1_description> <entry_1_state> [<other entry params>...]
 ```
-
-Note how we add `3>&1 1>&2 2>&3` at the end; they swap stdout and stderr, since whiptail's output goes to stderr, while we want it to go to stdout, so that we can capture it in the variable (see a detailed [Stackoverflow explanation](https://unix.stackexchange.com/questions/42728/what-does-31-12-23-do-in-a-script)).
 
 Setting up the list definition parameters (key, description, state) is a bit convoluted, that's where using an associative array comes to help:
 

@@ -2,12 +2,12 @@
 layout: post
 title: Shell scripting adventures (Part 3, Terminal-based dialog boxes&colon; Whiptail)
 tags: [gui,shell_scripting,sysadmin]
-last_modified_at: 2019-10-03 11:03:00
+last_modified_at: 2019-10-03 11:11:00
 ---
 
 This is the Part 3 (of 3) of the shell scripting adventures.
 
-*Updated on 03/Oct/2019: Added section about redirections; improved radio list example; added dedicated section for check list.*
+*Updated on 03/Oct/2019: Added section about redirections; improved radio list example; added dedicated sections for check list and password box.*
 
 The following subjects are described in this part:
 
@@ -19,10 +19,10 @@ The following subjects are described in this part:
   - [Gauge](/Shell-scripting-adventures-part-3#gauge)
   - [Radio list](/Shell-scripting-adventures-part-3#radio-list)
   - [Check list](/Shell-scripting-adventures-part-3#check-list)
+  - [Password box](/Shell-scripting-adventures-part-3#password-box)
 - [Other widgets](/Shell-scripting-adventures-part-3#other-widgets)
   - [Input box](/Shell-scripting-adventures-part-3#input-box)
   - [Text box](/Shell-scripting-adventures-part-3#text-box)
-  - [Password box](/Shell-scripting-adventures-part-3#password-box)
   - [Menus](/Shell-scripting-adventures-part-3#menus)
 
 Since Whiptail is simple to use, the objective of this post is rather to show some useful code snippets/patterns.
@@ -249,6 +249,25 @@ $ echo "$selected_device_descriptions" | while read -r device_description; do
 
 this will run the `while` cycle in a subshell, which will cause the `selected_device_names+=...` assignment not to have effect on the outer `$selected_device_names` variable. The `<<<` runs the cycle in the same shell, making sure the assignment works as expected.
 
+### Password box
+
+A way to get a hidden password from the user is via an password box. This displays a dialog with two buttons labeled Ok and Cancel.
+
+This widget is worth mentioning because in real world implementations, one wants the user to repeat the password.
+
+This is a ready-made example:
+
+```sh
+while [[ "$passphrase" != "$passphrase_repeat" || ${#passphrase} -lt 8 ]]; do
+  passphrase=$(whiptail --passwordbox "${passphrase_invalid_message}Please enter the passphrase (8 chars min.):" 20 78 3>&1 1>&2 2>&3)
+  passphrase_repeat=$(whiptail --passwordbox "Please repeat the passphrase:" 20 78 3>&1 1>&2 2>&3)
+
+  passphrase_invalid_message="Passphrase too short, or not matching! "
+done
+```
+
+we use an initially empty variable (`passphrase_invalid_message`) for storing the error message, and we also count the password characters to enforce a minimum length of 8.
+
 ## Other widgets
 
 This is a brief list of other widgets with their description; the examples can be found in the [Whiptail chapter of the Bash shell scripting Wikibook](https://en.wikibooks.org/wiki/Bash_Shell_Scripting/Whiptail).
@@ -260,10 +279,6 @@ A way to get free-form input from the user is via an input box. This displays a 
 ### Text box
 
 A text box with contents of the given file inside. Add --scrolltext if the file is longer than the window.
-
-### Password box
-
-A way to get a hidden password from the user is via an password box. This displays a dialog with two buttons labeled Ok and Cancel.
 
 ### Menus
 

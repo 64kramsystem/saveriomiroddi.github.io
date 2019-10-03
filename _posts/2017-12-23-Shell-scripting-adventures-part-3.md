@@ -2,12 +2,12 @@
 layout: post
 title: Shell scripting adventures (Part 3, Terminal-based dialog boxes&colon; Whiptail)
 tags: [gui,shell_scripting,sysadmin]
-last_modified_at: 2019-10-03 10:49:00
+last_modified_at: 2019-10-03 11:03:00
 ---
 
 This is the Part 3 (of 3) of the shell scripting adventures.
 
-*Updated on 03/Oct/2019: Added section about redirections; improved radio list example.*
+*Updated on 03/Oct/2019: Added section about redirections; improved radio list example; added dedicated section for check list.*
 
 The following subjects are described in this part:
 
@@ -18,12 +18,12 @@ The following subjects are described in this part:
   - [Yes/no box](/Shell-scripting-adventures-part-3#yesno-box)
   - [Gauge](/Shell-scripting-adventures-part-3#gauge)
   - [Radio list](/Shell-scripting-adventures-part-3#radio-list)
+  - [Check list](/Shell-scripting-adventures-part-3#check-list)
 - [Other widgets](/Shell-scripting-adventures-part-3#other-widgets)
   - [Input box](/Shell-scripting-adventures-part-3#input-box)
   - [Text box](/Shell-scripting-adventures-part-3#text-box)
   - [Password box](/Shell-scripting-adventures-part-3#password-box)
   - [Menus](/Shell-scripting-adventures-part-3#menus)
-  - [Check list](/Shell-scripting-adventures-part-3#check-list)
 
 Since Whiptail is simple to use, the objective of this post is rather to show some useful code snippets/patterns.
 
@@ -202,6 +202,53 @@ I'm specifying equivalent because quoting is taken care of by using a quoted arr
 
 In one of the next posts of the series, I will show how to use udev to find external USB devices.
 
+### Check list
+
+The Check list is the same as the Radio list, except that it allows the user to select more values.
+
+From a scripting perspective, the problem is to split the user selections, since we get a single string.
+
+I'll use the same example as the Check list section, and I'll assume that both entries are selected:
+
+```sh
+$ declare -A usb_storage_devices=([/dev/sdb]="My USB Key" [/dev/sdc]="My external HDD")
+
+$ entry_options=()
+$ entries_count=${#usb_storage_devices[@]}
+$ message=$'Choose an external device. THE DEVICE WILL BE COMPLETELY ERASED.\n\nAvailable (USB) devices:\n\n'
+$ selected_device_names=()
+
+$ for dev in "${!usb_storage_devices[@]}"; do
+>   entry_options+=("$dev")
+>   entry_options+=("${usb_storage_devices[$dev]}")
+>   entry_options+=("OFF")
+> done
+
+$ selected_device_descriptions=$(whiptail --checklist --separate-output --title "Device choice" "$message" 20 78 $entries_count -- "${entry_options[@]}" 3>&1 1>&2 2>&3)
+
+$ while read -r device_description; do
+>   selected_device_names+=("${usb_storage_devices[$device_description]}")
+> done <<< "$selected_device_descriptions"
+
+$ for device_name in "${selected_device_names[@]}"; do
+>   echo "Device name: $device_name"
+> done
+Device name: My USB Key
+Device name: My external HDD
+```
+
+By using the `--separate-output` options, Whiptail returns one line per selected entry, so that we can use `read` to read each line separately (and append it to an array).
+
+For people not acquainted with Bash, the most notable concept is the `while` cycle; a typical beginner's mistake is to (intuitively) pipe to `while`:
+
+```sh
+$ echo "$selected_device_descriptions" | while read -r device_description; do
+>   selected_device_names+=("${usb_storage_devices[$device_description]}")
+> done
+```
+
+this will run the `while` cycle in a subshell, which will cause the `selected_device_names+=...` assignment not to have effect on the outer `$selected_device_names` variable. The `<<<` runs the cycle in the same shell, making sure the assignment works as expected.
+
 ## Other widgets
 
 This is a brief list of other widgets with their description; the examples can be found in the [Whiptail chapter of the Bash shell scripting Wikibook](https://en.wikibooks.org/wiki/Bash_Shell_Scripting/Whiptail).
@@ -221,7 +268,3 @@ A way to get a hidden password from the user is via an password box. This displa
 ### Menus
 
 A menu should be used when you want the user to select one option from a list, such as for navigating a program.
-
-### Check list
-
-A check list allows a user to select one or more options from a list.

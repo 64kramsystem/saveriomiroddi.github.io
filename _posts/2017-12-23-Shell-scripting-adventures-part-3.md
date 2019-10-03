@@ -2,12 +2,12 @@
 layout: post
 title: Shell scripting adventures (Part 3, Terminal-based dialog boxes&colon; Whiptail)
 tags: [gui,shell_scripting,sysadmin]
-last_modified_at: 2019-10-03 10:33:00
+last_modified_at: 2019-10-03 10:49:00
 ---
 
 This is the Part 3 (of 3) of the shell scripting adventures.
 
-*Updated on 03/Oct/2019: Added section about redirections.*
+*Updated on 03/Oct/2019: Added section about redirections; improved radio list example.*
 
 The following subjects are described in this part:
 
@@ -27,7 +27,7 @@ The following subjects are described in this part:
 
 Since Whiptail is simple to use, the objective of this post is rather to show some useful code snippets/patterns.
 
-The examples are taken from my [RPi VPN Router project installation script](https://github.com/saveriomiroddi/rpi_vpn_router/blob/master/install_vpn_router.sh).
+The examples are taken from my [ZFS installer project](https://github.com/saveriomiroddi/zfs-installer) and [RPi VPN Router project](https://github.com/saveriomiroddi/rpi_vpn_router/blob/master/install_vpn_router.sh) installation scripts.
 
 Previous chapters:
 
@@ -153,62 +153,54 @@ The radio list provides a list of entries, for choosing one:
 
  ![Radio list]({{ "/images/2017-12-23-Shell-scripting-adventures-part-3/radio_list.png" }})
 
-An interesting way of implementing this functionality is to use a Bash associative array:
+An interesting way of implementing this functionality is to use a Bash arrays and associative arrays:
 
 ```sh
-$ declare -A v_usb_storage_devices
+$ declare -A v_usb_storage_devices=([/dev/sdb]="My USB Key" [/dev/sdc]="My external HDD")
 
-$ v_usb_storage_devices[/dev/sdb]="My USB Key"
-$ v_usb_storage_devices[/dev/sdc]="My external HDD"
-
-$ entries_option=""
-$ entries_count=0
+$ entry_options=()
+$ entries_count=${#v_usb_storage_devices[@]}
 $ message=$'Choose an external device. THE DEVICE WILL BE COMPLETELY ERASED.\n\nAvailable (USB) devices:\n\n'
 
 $ for dev in "${!v_usb_storage_devices[@]}"; do
->   entries_option+=" $dev "
->   entries_option+=$(printf "%q" ${v_usb_storage_devices[$dev]})
->   entries_option+=" OFF"
->
->   let entries_count+=1
+>   entry_options+=("$dev")
+>   entry_options+=("${v_usb_storage_devices[$dev]}")
+>   entry_options+=("OFF")
 > done
 
-$ v_sdcard_device=$(whiptail --radiolist --title "Device choice" "$message" 20 78 $entries_count $entries_option 3>&1 1>&2 2>&3);
+$ v_sdcard_device=$(whiptail --radiolist --title "Device choice" "$message" 20 78 $entries_count -- "${entry_options[@]}" 3>&1 1>&2 2>&3)
+$ echo "$v_sdcard_device" # let's say the first was chosen
+/dev/sdb
 ```
+
+We use `--` in case any of the `entry_options` started with `-`; if we don't do this, `whiptail` will think it's a commandline parameter.
+
+Note that due to associative arrays not being ordered, the display order may not reflect the tuple insert ordering. In order to workaround this, one can manually order the keys (this is out of scope, unless readers will ask for it).
 
 The general format of this widget parameters is:
 
 ```sh
-whiptail --radiolist [--title mytitle] <body_message_header> <width> <height> <entries_count> <entry_1_key> <entry_1_description> <entry_1_state> [<other entry params>...]
+whiptail --radiolist [--title mytitle] <body_message_header> <width> <height> <entries_count> -- <entry_1_key> <entry_1_description> <entry_1_state> [<other entry params>...]
 ```
 
-Setting up the list definition parameters (key, description, state) is a bit convoluted, that's where using an associative array comes to help:
+In order to store the list definition parameters (key, description, state), we use an array:
 
-- we cycle the array (`for dev in "${!v_usb_storage_devices[@]}"`)
-- for each cycle:
-  - we append to `$entries_option` the key (device path), the description, and the default state (`OFF` for all, in this case)
-  - we increment the counter (`$entries_count`)
+- we cycle the definitions associative array (`for dev in "${!v_usb_storage_devices[@]}"`)
+- for each cycle we append to the `$entry_options` array the key (device path), the description, and the default state (`OFF` for all, in this case)
 
-This way, we can neatly prepare `$entries_count` and `$entries_option`.
-
-There are two subtleties:
-
-1. we don't quote `$entries_option`, since each individual token (each key/description/state) is an individual whiptail parameter;
-2. because of that, we need to escape each individual entry option (in particular, the descriptions), otherwise each word would be interpreted as an individual whiptail parameter; for this purpose, we use `$(printf "%q" variable_to_escape)`.
-
-Both are explained in the [part 1 of the series]({% post_url 2017-11-08-Shell-scripting-adventures-part-1 %}).
-
-The result is:
+The result is equivalent to:
 
 ```sh
-whiptail --radiolist --title Device choice Choose an external device. THE DEVICE WILL BE COMPLETELY ERASED.
+whiptail --radiolist --title "Device choice" "Choose an external device. THE DEVICE WILL BE COMPLETELY ERASED.
 
 Available (USB) devices:
 
- 20 78 2 /dev/sdb My\ USB\ Key OFF /dev/sdc My\ external\ HDD OFF
+" 20 78 2 -- /dev/sdb "My USB Key OFF" /dev/sdc "My external HDD OFF" 3>&1 1>&2 2>&3
 ```
 
-In one of the next posts of the series, I will show how to use udev to find the external USB devices.
+I'm specifying equivalent because quoting is taken care of by using a quoted array for `entry_options` (`${entry_options[@]}`), so we don't have to worry about the content of the entries.
+
+In one of the next posts of the series, I will show how to use udev to find external USB devices.
 
 ## Other widgets
 

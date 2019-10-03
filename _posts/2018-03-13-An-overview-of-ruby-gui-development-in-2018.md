@@ -2,7 +2,7 @@
 layout: post
 title: An overview of Desktop Ruby GUI development in 2018
 tags: [gui,ruby]
-last_modified_at: 2018-07-01 15:28:00
+last_modified_at: 2019-10-03 16:58:00
 ---
 
 Ruby GUI development is a seldom mentioned subject, but it has value. Probably after some Rails development (cough...), developing a desktop tool may be an interesting diversion (or even a requirement).
@@ -11,8 +11,11 @@ During the development of my [PM-Spotlight](https://github.com/saveriomiroddi/pm
 
 This article presents a summary of what I've experienced (or gathered) while I was "Developing GUI applications with Ruby"!
 
+*Updated on 03/Oct/2019: Added update section about the article archival.*
+
 Contents:
 
+- [Update](/An-overview-of-ruby-gui-development-in-2018#update)
 - [TL;DR: The summary](/An-overview-of-ruby-gui-development-in-2018#tldr-the-summary)
 - [Extension/mistakes](/An-overview-of-ruby-gui-development-in-2018#extensionmistakes)
 - [Frameworks](/An-overview-of-ruby-gui-development-in-2018#frameworks)
@@ -25,6 +28,24 @@ Contents:
 - [Conclusion](/An-overview-of-ruby-gui-development-in-2018#conclusion)
 - [Some references](/An-overview-of-ruby-gui-development-in-2018#some-references)
 - [Footnotes](/An-overview-of-ruby-gui-development-in-2018#footnotes)
+
+## Update
+
+This article is officially archived (I won't update it any more).
+
+In a somewhat paradoxical way, I expect its contents to remain valid for a long time, since the main (not all!) Ruby GUI binding libraries are developed slowly/very slowly - if ever developed.
+
+After the experience on my project, my personal conclusion is that the use cases for Ruby GUI development are increasingly smaller; these are the issues I've experienced:
+
+- the slow startup time (with the Ruby "pseudo-standard" Tk library) forced me to develop a client/server architecture, which is necessary overengineering;
+- having a CPU-intensive background task hurts significantly the GUI responsiveness due to the Ruby GIL;
+- using forking as a parallelization remedy caused unexpected behavior of the forked processes (likely, GUI processes don't play well with forking).
+
+The focus on GUI development nowadays has been eclipsed by web development; therefore, developing a GUI application, independently of the programming language, is a sort of bet - any GUI binding library could cease development at any time, or have too much of a slow development pace.
+
+In general terms, if a project is small, there's little advantage in using Ruby rather than a more "complex" language. As a project grows in size, Ruby's simplicity loses over the problems that its GUI development suffers. Distribution also becomes a factor: statically-linked languages like Golang greatly simplify it.
+
+Therefore, nowadays, based on very generic (and underinformed) considerations, I'd suggest people to try Golang+Qt, with the disclaimer that the stability of the library needs to be carefully evaluated.
 
 ## TL;DR: The summary
 

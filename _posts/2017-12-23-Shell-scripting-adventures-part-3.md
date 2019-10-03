@@ -2,29 +2,32 @@
 layout: post
 title: Shell scripting adventures (Part 3, Terminal-based dialog boxes&colon; Whiptail)
 tags: [gui,shell_scripting,sysadmin]
-last_modified_at: 2018-03-09 18:15:00
+last_modified_at: 2019-10-03 11:11:00
 ---
 
 This is the Part 3 (of 3) of the shell scripting adventures.
 
+*Updated on 03/Oct/2019: Added section about redirections; improved radio list example; added dedicated sections for check list and password box.*
+
 The following subjects are described in this part:
 
 - [Introduction to Whiptail](/Shell-scripting-adventures-part-3#introduction-to-whiptail)
+- [The mysterious redirections (`3>&1 1>&2 2>&3`)](/Shell-scripting-adventures-part-3#the-mysterious-redirections-31-12-23)
 - [Widgets, with snippets](/Shell-scripting-adventures-part-3#widgets-with-snippets)
   - [Message box](/Shell-scripting-adventures-part-3#message-box)
   - [Yes/no box](/Shell-scripting-adventures-part-3#yesno-box)
   - [Gauge](/Shell-scripting-adventures-part-3#gauge)
   - [Radio list](/Shell-scripting-adventures-part-3#radio-list)
+  - [Check list](/Shell-scripting-adventures-part-3#check-list)
+  - [Password box](/Shell-scripting-adventures-part-3#password-box)
 - [Other widgets](/Shell-scripting-adventures-part-3#other-widgets)
   - [Input box](/Shell-scripting-adventures-part-3#input-box)
   - [Text box](/Shell-scripting-adventures-part-3#text-box)
-  - [Password box](/Shell-scripting-adventures-part-3#password-box)
   - [Menus](/Shell-scripting-adventures-part-3#menus)
-  - [Check list](/Shell-scripting-adventures-part-3#check-list)
 
 Since Whiptail is simple to use, the objective of this post is rather to show some useful code snippets/patterns.
 
-The examples are taken from my [RPi VPN Router project installation script](https://github.com/saveriomiroddi/rpi_vpn_router/blob/master/install_vpn_router.sh).
+The examples are taken from my [ZFS installer project](https://github.com/saveriomiroddi/zfs-installer) and [RPi VPN Router project](https://github.com/saveriomiroddi/rpi_vpn_router/blob/master/install_vpn_router.sh) installation scripts.
 
 Previous chapters:
 
@@ -35,6 +38,44 @@ Previous chapters:
 ## Introduction to Whiptail
 
 Whiptail is a dialog boxes program, with some useful widgets, which makes shell scripting more user-friendly; it's included in all the Debian-based distributions.
+
+## The mysterious redirections (`3>&1 1>&2 2>&3`)
+
+First, we start by explaining a related subject: the mysterious `3>&1 1>&2 2>&3`. Why is this typically used with Whiptail?
+
+When we expect a "return value" from a command, we invoke a subshell (`$(...)`) and assign the output to a variable:
+
+```sh
+user_answer=$(whitptail ...)
+```
+
+But there's something important to be aware of: technically speaking, there is no "return value" (which is an improper definition) - what is assigned to the variable is the *stdout* output (*stderr* is not assigned!).
+
+See this example:
+
+```sh
+$ result=$(echo value)               # `echo` defaults to stdout; nothing is printed, because stdout is captured!
+$ echo $result
+value
+$ result=$(echo value > /dev/stderr) # this is printed, as it's stderr!
+value
+$ echo $result                       # empty!
+
+```
+
+Now, the way whiptail works is that the widgets are printed to stdout, while the return value is printed to stderr. We can capture only from stdout though, so what do we do?
+
+Simple! We swap stdout and stderr! Printing the widgets to stderr is perfectly valid, and we get the "return value" in stdout.
+
+The formal expression of that is `3>&1 1>&2 2>&3`, which means:
+
+- we create a temporary file descriptor (#3) and point it to stdout (1)
+- we redirect stdout (1) to stderr (2)
+- we redirect stderr (2) to the temporary file descriptor (3), which points to stdout (due to the first step)
+
+Result: stdout and stderr are switched 😉
+
+For some more details, there is a good [Stackoverflow explanation](https://unix.stackexchange.com/questions/42728/what-does-31-12-23-do-in-a-script)).
 
 ## Widgets, with snippets
 
@@ -112,64 +153,120 @@ The radio list provides a list of entries, for choosing one:
 
  ![Radio list]({{ "/images/2017-12-23-Shell-scripting-adventures-part-3/radio_list.png" }})
 
-An interesting way of implementing this functionality is to use a Bash associative array:
+An interesting way of implementing this functionality is to use a Bash arrays and associative arrays:
 
 ```sh
-$ declare -A v_usb_storage_devices
+$ declare -A v_usb_storage_devices=([/dev/sdb]="My USB Key" [/dev/sdc]="My external HDD")
 
-$ v_usb_storage_devices[/dev/sdb]="My USB Key"
-$ v_usb_storage_devices[/dev/sdc]="My external HDD"
-
-$ entries_option=""
-$ entries_count=0
+$ entry_options=()
+$ entries_count=${#v_usb_storage_devices[@]}
 $ message=$'Choose an external device. THE DEVICE WILL BE COMPLETELY ERASED.\n\nAvailable (USB) devices:\n\n'
 
 $ for dev in "${!v_usb_storage_devices[@]}"; do
->   entries_option+=" $dev "
->   entries_option+=$(printf "%q" ${v_usb_storage_devices[$dev]})
->   entries_option+=" OFF"
->
->   let entries_count+=1
+>   entry_options+=("$dev")
+>   entry_options+=("${v_usb_storage_devices[$dev]}")
+>   entry_options+=("OFF")
 > done
 
-$ v_sdcard_device=$(whiptail --radiolist --title "Device choice" "$message" 20 78 $entries_count $entries_option 3>&1 1>&2 2>&3);
+$ v_sdcard_device=$(whiptail --radiolist --title "Device choice" "$message" 20 78 $entries_count -- "${entry_options[@]}" 3>&1 1>&2 2>&3)
+$ echo "$v_sdcard_device" # let's say the first was chosen
+/dev/sdb
 ```
+
+We use `--` in case any of the `entry_options` started with `-`; if we don't do this, `whiptail` will think it's a commandline parameter.
+
+Note that due to associative arrays not being ordered, the display order may not reflect the tuple insert ordering. In order to workaround this, one can manually order the keys (this is out of scope, unless readers will ask for it).
 
 The general format of this widget parameters is:
 
 ```sh
-whiptail --radiolist [--title mytitle] <body_message_header> <width> <height> <entries_count> <entry_1_key> <entry_1_description> <entry_1_state> [<other entry params>...]
+whiptail --radiolist [--title mytitle] <body_message_header> <width> <height> <entries_count> -- <entry_1_key> <entry_1_description> <entry_1_state> [<other entry params>...]
 ```
 
-Note how we add `3>&1 1>&2 2>&3` at the end; they swap stdout and stderr, since whiptail's output goes to stderr, while we want it to go to stdout, so that we can capture it in the variable (see a detailed [Stackoverflow explanation](https://unix.stackexchange.com/questions/42728/what-does-31-12-23-do-in-a-script)).
+In order to store the list definition parameters (key, description, state), we use an array:
 
-Setting up the list definition parameters (key, description, state) is a bit convoluted, that's where using an associative array comes to help:
+- we cycle the definitions associative array (`for dev in "${!v_usb_storage_devices[@]}"`)
+- for each cycle we append to the `$entry_options` array the key (device path), the description, and the default state (`OFF` for all, in this case)
 
-- we cycle the array (`for dev in "${!v_usb_storage_devices[@]}"`)
-- for each cycle:
-  - we append to `$entries_option` the key (device path), the description, and the default state (`OFF` for all, in this case)
-  - we increment the counter (`$entries_count`)
-
-This way, we can neatly prepare `$entries_count` and `$entries_option`.
-
-There are two subtleties:
-
-1. we don't quote `$entries_option`, since each individual token (each key/description/state) is an individual whiptail parameter;
-2. because of that, we need to escape each individual entry option (in particular, the descriptions), otherwise each word would be interpreted as an individual whiptail parameter; for this purpose, we use `$(printf "%q" variable_to_escape)`.
-
-Both are explained in the [part 1 of the series]({% post_url 2017-11-08-Shell-scripting-adventures-part-1 %}).
-
-The result is:
+The result is equivalent to:
 
 ```sh
-whiptail --radiolist --title Device choice Choose an external device. THE DEVICE WILL BE COMPLETELY ERASED.
+whiptail --radiolist --title "Device choice" "Choose an external device. THE DEVICE WILL BE COMPLETELY ERASED.
 
 Available (USB) devices:
 
- 20 78 2 /dev/sdb My\ USB\ Key OFF /dev/sdc My\ external\ HDD OFF
+" 20 78 2 -- /dev/sdb "My USB Key OFF" /dev/sdc "My external HDD OFF" 3>&1 1>&2 2>&3
 ```
 
-In one of the next posts of the series, I will show how to use udev to find the external USB devices.
+I'm specifying equivalent because quoting is taken care of by using a quoted array for `entry_options` (`${entry_options[@]}`), so we don't have to worry about the content of the entries.
+
+In one of the next posts of the series, I will show how to use udev to find external USB devices.
+
+### Check list
+
+The Check list is the same as the Radio list, except that it allows the user to select more values.
+
+From a scripting perspective, the problem is to split the user selections, since we get a single string.
+
+I'll use the same example as the Check list section, and I'll assume that both entries are selected:
+
+```sh
+$ declare -A usb_storage_devices=([/dev/sdb]="My USB Key" [/dev/sdc]="My external HDD")
+
+$ entry_options=()
+$ entries_count=${#usb_storage_devices[@]}
+$ message=$'Choose an external device. THE DEVICE WILL BE COMPLETELY ERASED.\n\nAvailable (USB) devices:\n\n'
+$ selected_device_names=()
+
+$ for dev in "${!usb_storage_devices[@]}"; do
+>   entry_options+=("$dev")
+>   entry_options+=("${usb_storage_devices[$dev]}")
+>   entry_options+=("OFF")
+> done
+
+$ selected_device_descriptions=$(whiptail --checklist --separate-output --title "Device choice" "$message" 20 78 $entries_count -- "${entry_options[@]}" 3>&1 1>&2 2>&3)
+
+$ while read -r device_description; do
+>   selected_device_names+=("${usb_storage_devices[$device_description]}")
+> done <<< "$selected_device_descriptions"
+
+$ for device_name in "${selected_device_names[@]}"; do
+>   echo "Device name: $device_name"
+> done
+Device name: My USB Key
+Device name: My external HDD
+```
+
+By using the `--separate-output` options, Whiptail returns one line per selected entry, so that we can use `read` to read each line separately (and append it to an array).
+
+For people not acquainted with Bash, the most notable concept is the `while` cycle; a typical beginner's mistake is to (intuitively) pipe to `while`:
+
+```sh
+$ echo "$selected_device_descriptions" | while read -r device_description; do
+>   selected_device_names+=("${usb_storage_devices[$device_description]}")
+> done
+```
+
+this will run the `while` cycle in a subshell, which will cause the `selected_device_names+=...` assignment not to have effect on the outer `$selected_device_names` variable. The `<<<` runs the cycle in the same shell, making sure the assignment works as expected.
+
+### Password box
+
+A way to get a hidden password from the user is via an password box. This displays a dialog with two buttons labeled Ok and Cancel.
+
+This widget is worth mentioning because in real world implementations, one wants the user to repeat the password.
+
+This is a ready-made example:
+
+```sh
+while [[ "$passphrase" != "$passphrase_repeat" || ${#passphrase} -lt 8 ]]; do
+  passphrase=$(whiptail --passwordbox "${passphrase_invalid_message}Please enter the passphrase (8 chars min.):" 20 78 3>&1 1>&2 2>&3)
+  passphrase_repeat=$(whiptail --passwordbox "Please repeat the passphrase:" 20 78 3>&1 1>&2 2>&3)
+
+  passphrase_invalid_message="Passphrase too short, or not matching! "
+done
+```
+
+we use an initially empty variable (`passphrase_invalid_message`) for storing the error message, and we also count the password characters to enforce a minimum length of 8.
 
 ## Other widgets
 
@@ -183,14 +280,6 @@ A way to get free-form input from the user is via an input box. This displays a 
 
 A text box with contents of the given file inside. Add --scrolltext if the file is longer than the window.
 
-### Password box
-
-A way to get a hidden password from the user is via an password box. This displays a dialog with two buttons labeled Ok and Cancel.
-
 ### Menus
 
 A menu should be used when you want the user to select one option from a list, such as for navigating a program.
-
-### Check list
-
-A check list allows a user to select one or more options from a list.

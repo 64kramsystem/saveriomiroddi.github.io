@@ -2,7 +2,7 @@
 layout: post
 title: Installing Ubuntu on a ZFS root, with encryption and mirroring
 tags: [filesystems,linux,storage,sysadmin,ubuntu]
-last_modified_at: 2019-10-01 01:16:00
+last_modified_at: 2019-10-11 12:47:00
 ---
 
 2019 is a very exciting year for people with at least a minor interest in storage. First, in May, the ZFS support for encryption and trimming has been added, with the release 0.8; then, in August, Canonical has officially announced the plan to add ZFS support to the installer[¹](#footnote01) in the next Ubuntu release.
@@ -33,9 +33,9 @@ Contents:
 
 ## Update
 
-I've decide to turn this article to a program that simplifies and automates the entire procedure. The projected date for the first release is during the first week of October 2019.
+I've turned this article into a program that simplifies and automates the entire procedure, so check it out [on GitHub](https://github.com/saveriomiroddi/zfs-installer)!
 
-The repository is on [GitHub](https://github.com/saveriomiroddi/zfs-installer), and the work in progress script can be checked out [in a branch](https://github.com/saveriomiroddi/zfs-installer/blob/first_release/install-zfs.sh).
+For this reason, I'm not going to update and extend this article any more, although, the content may still be of general interest.
 
 ## An introduction to the concepts involved
 

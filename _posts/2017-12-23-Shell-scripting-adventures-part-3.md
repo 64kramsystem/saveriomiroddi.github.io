@@ -2,12 +2,12 @@
 layout: post
 title: Shell scripting adventures (Part 3, Terminal-based dialog boxes&colon; Whiptail)
 tags: [gui,shell_scripting,sysadmin]
-last_modified_at: 2019-10-03 11:11:00
+last_modified_at: 2019-10-11 19:16:00
 ---
 
 This is the Part 3 (of 3) of the shell scripting adventures.
 
-*Updated on 03/Oct/2019: Added section about redirections; improved radio list example; added dedicated sections for check list and password box.*
+*Updated on 11/Oct/2019: Use `mapfile` for the check list widget returned entries.*
 
 The following subjects are described in this part:
 
@@ -226,9 +226,7 @@ $ for dev in "${!usb_storage_devices[@]}"; do
 
 $ selected_device_descriptions=$(whiptail --checklist --separate-output --title "Device choice" "$message" 20 78 $entries_count -- "${entry_options[@]}" 3>&1 1>&2 2>&3)
 
-$ while read -r device_description; do
->   selected_device_names+=("${usb_storage_devices[$device_description]}")
-> done <<< "$selected_device_descriptions"
+$ mapfile -t selected_device_names <<< "$selected_device_descriptions"
 
 $ for device_name in "${selected_device_names[@]}"; do
 >   echo "Device name: $device_name"
@@ -237,17 +235,18 @@ Device name: My USB Key
 Device name: My external HDD
 ```
 
-By using the `--separate-output` options, Whiptail returns one line per selected entry, so that we can use `read` to read each line separately (and append it to an array).
+By using the `--separate-output` options, Whiptail returns one line per selected entry, so that we easily parse the result.
 
-For people not acquainted with Bash, the most notable concept is the `while` cycle; a typical beginner's mistake is to (intuitively) pipe to `while`:
+For people not acquainted with Bash, the most notable concept is `mapfile` (sometimes used via the alias `readarray`):
 
-```sh
-$ echo "$selected_device_descriptions" | while read -r device_description; do
->   selected_device_names+=("${usb_storage_devices[$device_description]}")
-> done
-```
+- it reads a string (`$selected_device_descriptions`),
+- splits it via separator (default: `\n`),
+- removes the trailing separator from each entry (`-t`),
+- and stores the result in the named array (`selected_device_names` - the `$` symbol is implied).
 
-this will run the `while` cycle in a subshell, which will cause the `selected_device_names+=...` assignment not to have effect on the outer `$selected_device_names` variable. The `<<<` runs the cycle in the same shell, making sure the assignment works as expected.
+Note that `mapfile` requires the input to be in the same shell, therefore, `echo "$selected_device_descriptions" | mapfile ...` won't work, since the pipe operator (`|`) causes `mapfile` to run in a subshell.
+
+A curiosity: `mapfile` is not an executable file - it's a built-in bash command, therefore, `man mapfile` won't work; instead, check out the Bash manual (`man bash-builtins`).
 
 ### Password box
 

@@ -13,15 +13,15 @@ In this small article, I'll explain some concepts involved, most notably, workin
 Contents:
 
 - [The base structure](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#the-base-structure)
-  - [Writing safer Bash scripts](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#writing-safer-bash-scripts)
-    - [`errexit`](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#errexit)
-    - [`nounset`, with pattern](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#nounset-with-pattern)
-    - [`pipefail`](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#pipefail)
-      - [`pipefail` versus `grep -q`](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#pipefail-versus-grep--q)
-  - [First step: Handling dates, cycling the data](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#first-step-handling-dates-cycling-the-data)
-  - [Splitting a string via Perl](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#splitting-a-string-via-perl)
-  - [Splitting a string via `cut`](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#splitting-a-string-via-cut)
-  - [Dates, arithmetic, and putting all together](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#dates-arithmetic-and-putting-all-together)
+- [Writing safer Bash scripts](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#writing-safer-bash-scripts)
+  - [`errexit`](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#errexit)
+  - [`nounset`, with pattern](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#nounset-with-pattern)
+  - [`pipefail`](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#pipefail)
+    - [`pipefail` versus `grep -q`](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#pipefail-versus-grep--q)
+- [First step: Handling dates, cycling the data](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#first-step-handling-dates-cycling-the-data)
+- [Splitting a string via Perl](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#splitting-a-string-via-perl)
+- [Splitting a string via `cut`](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#splitting-a-string-via-cut)
+- [Dates, arithmetic, and putting all together](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#dates-arithmetic-and-putting-all-together)
 - [Conclusion](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#conclusion)
 - [Footnotes](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#footnotes)
 
@@ -35,7 +35,7 @@ The [`purge_trash`](https://github.com/saveriomiroddi/openscripts/blob/master/pu
 
 Readers can check the source; here, I'll explain the most interesting parts.
 
-### Writing safer Bash scripts
+## Writing safer Bash scripts
 
 Bash provides a set of options, some of whom make scripts more solid, and that should always be used.
 
@@ -43,7 +43,7 @@ The extended syntax for setting an option is `set -o <extended_option_name>`. Ge
 
 The next sections will explain the relevant options.
 
-#### `errexit`
+### `errexit`
 
 The option `errexit` causes the script to terminate when there is an error.
 
@@ -64,7 +64,7 @@ The "Extensive error message!" will be printed; Bash will not terminate after ex
 
 A real-world, typical example, is `grep` filtering; a subsection below is dedicated to this.
 
-#### `nounset`, with pattern
+### `nounset`, with pattern
 
 The option `nounset` treats as an error referencing a variable that hasn't been initialized.
 
@@ -105,7 +105,7 @@ $ echo $myvar
 myvalue
 ```
 
-#### `pipefail`
+### `pipefail`
 
 The option `pipefail` treats as an error a pipeline (a sequence of commands chained via pipe (`|`)) whose any of the commands fails.
 
@@ -139,7 +139,7 @@ The "following command" is not executed; the script exited.
 
 Note how `set -o errexit` is required; `pipefail` will mark the pipeline as errored, but that alone doesn't imply that an error will cause an exit.
 
-##### `pipefail` versus `grep -q`
+#### `pipefail` versus `grep -q`
 
 A **very** headscratching behavior is `grep -q` causing an exit with error when `pipefail` (with `errexit`) is enabled.
 
@@ -207,7 +207,7 @@ fi
 
 All good! No more pipe, no more problems, and smartpants are satisfied 😄
 
-### First step: Handling dates, cycling the data
+## First step: Handling dates, cycling the data
 
 One may occasionally want to process timestamps.
 
@@ -259,7 +259,7 @@ The two technicalities above are *not* required for this dataset, but I write th
 
 Next bit: extracting a filename. We have several options!
 
-### Splitting a string via Perl
+## Splitting a string via Perl
 
 We want the tokens from index 2 (base 0) to the last; Awk doesn't have nice syntax for this, so we use Perl (❤️):
 
@@ -270,7 +270,7 @@ $ echo "2019-12-19 22:06:09 /path/to/test abc.png" | perl -lane 'print "@F[2..$#
 
 This reads "print the entries of the array `@F`, from the index 2 to the size of the array", in other words, "read from index 2 to the end"[³](#footnote03).
 
-### Splitting a string via `cut`
+## Splitting a string via `cut`
 
 We can also use `cut`:
 
@@ -292,7 +292,7 @@ $ echo "2019-12-19 22:06:09 /path/to/test abc.png" | cut -c 21-
 
 Read as: index by `c`haracters, from the number 21 onwards (`-c 21-`).
 
-### Dates, arithmetic, and putting all together
+## Dates, arithmetic, and putting all together
 
 The last bit is the arithmetic:
 

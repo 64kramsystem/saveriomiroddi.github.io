@@ -149,7 +149,7 @@ I purchased in April 2018 (from the German distributor) an XU4 all-inclusive set
 
 ### Support and documentation
 
-Hardkernel is a Chinese company, historical competitor of the RPi foundation (the other being Banana Pis; nowadays, the market is crowded).
+Hardkernel is a South Korean company, historical competitor of the RPi foundation (the other being Banana Pis; nowadays, the market is crowded).
 
 I've been very impressed by the dedication put by Hardkernel to the documentation and support of their products.
 

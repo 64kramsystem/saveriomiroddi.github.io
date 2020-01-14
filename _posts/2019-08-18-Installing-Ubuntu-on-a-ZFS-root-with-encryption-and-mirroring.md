@@ -2,7 +2,7 @@
 layout: post
 title: Installing Ubuntu on a ZFS root, with encryption and mirroring
 tags: [filesystems,linux,storage,sysadmin,ubuntu]
-last_modified_at: 2019-10-11 12:47:00
+last_modified_at: 2010-01-14 11:23:00
 ---
 
 2019 is a very exciting year for people with at least a minor interest in storage. First, in May, the ZFS support for encryption and trimming has been added, with the release 0.8; then, in August, Canonical has officially announced the plan to add ZFS support to the installer[¹](#footnote01) in the next Ubuntu release.
@@ -399,6 +399,37 @@ update-grub
 
 umount /boot/efi
 ```
+
+#### Cloning the EFI partition
+
+On a mirrored setup, we want to make sure that the loss of any disk doesn't prevent the system from working regularly.
+
+In this case, there is a problem though: while the mirroring of boot and root pools is handled by ZFS, the EFI partition is FAT32, which doesn't support mirroring itself (remember: the first stage of boot is running the bootloader from the EFI partition; the kernel is loaded after, from the boot pool).
+
+As a consequence of this, we can't have a 100% mirror that is managed automatically. We can still get a functional mirror by cloning the EFI partition through all the disks:
+
+```sh
+dd if="$first_disk_id-part1" of="$second_disk_id-part1"
+efibootmgr --create --disk "$second_disk_id" --label "ubuntu-2" --loader '\EFI\ubuntu\grubx64.efi'
+```
+
+What we're doing here is very simple:
+
+- we clone the EFI partition from the first disk to the second;
+- we add the partition to the list of UEFI boot entries (`--create`: "create new variable bootnum and add to bootorder").
+
+If, say, the first disk is now pulled off the system, the firmware will not find the EFI partition on the first disk, and will try (and succeed) to boot from the EFI partition on the second disk.
+
+There are two concepts to be aware of.
+
+First, the EFI partitions are not automatically synced. If the user makes a breaking change to the system (say, rename the root pool), and consequently make a change in the bootloader configuration, **and** the disk with the updated EFI partition breaks, the system won't load.  
+Generally speaking, this is unlikely to happen in real world, since, outside test/experimental setups, this type of change is atypical.  
+Regardless, a solution to this problem is to write a package manager hook, so that after the grub configuration changes, the partitions are synced (at a quick glance, dpkg triggers should be the appropriate solution).
+
+Second, important!, this is a perfectly working solution, but it's also very cheap. Since the EFI partitions are clones, the Linux system won't be able to discern them, therefore, the partition to be mounted on `/boot/efi` will be randomly chosen between the disks.
+This is not a problem, however, a better solution (not explained here; currently to be implemented in the `zfs-installer` project), is to clone the content rather than the partition.
+
+All in all, this strategy works in real life, but of course, users need to be aware of the consequences.
 
 #### Configure the boot pool import, and remaining settings
 

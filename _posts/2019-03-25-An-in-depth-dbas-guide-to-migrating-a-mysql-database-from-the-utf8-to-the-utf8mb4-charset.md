@@ -2,7 +2,7 @@
 layout: post
 title: An in depth DBA's guide to migrating a MySQL database from the &#96;utf8&#96; to the &#96;utf8mb4&#96; charset
 tags: [databases,mysql,sysadmin]
-last_modified_at: 2019-06-11 12:39:00
+last_modified_at: 2020-01-25 21:31:00
 ---
 
 We're in the process of upgrading our MySQL databases from v5.7 to v8.0; since one of the differences in v8.0 is that the default encoding changed from `utf8` to `utf8mb4`, and we had the conversion in plan anyway, we anticipated it and performed it as preliminary step for the upgrade.
@@ -130,7 +130,7 @@ The changes above will cause the following statement to be issued on the first c
 SET NAMES utf8mb4 COLLATE utf8mb4_0900_ai_ci # Rails also sets other variables here.
 ```
 
-Based on a brief look at the source code, there is not collation option in Django, so the `COLLATE utf8mb4_0900_ai_ci` won't be specified in the SQL statement.
+Based on a brief look at the source code, there is no collation option in Django, so the `COLLATE utf8mb4_0900_ai_ci` won't be specified in the SQL statement.
 
 This step can be performed at the beginning or the end of the migration; the reason is explained in the next subsection.
 
@@ -143,7 +143,7 @@ First, an introduction to the the [charset/collation settings](https://dev.mysql
 Over the course of a database connection, the data (flow) is processed in several steps:
 
 - client data sent: it's assumed to be in the format defined by `character_set_client`
-- server processing: converted to the format defined by `character_set_connection` (and compared using the `character_set_connection`)
+- server processing: converted to the format defined by `character_set_connection` (and compared using the `collation_connection`)
 - server results: sent in the format defined by `character_set_results`
 
 All the above settings (unless explicitly set) are set automatically, according to the `character_set_client` settings, so we can really think of all of them as a single entity.

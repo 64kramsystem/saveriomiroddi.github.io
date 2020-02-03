@@ -2,7 +2,7 @@
 layout: post
 title: An in depth DBA's guide to migrating a MySQL database from the &#96;utf8&#96; to the &#96;utf8mb4&#96; charset
 tags: [databases,mysql,sysadmin]
-last_modified_at: 2020-01-25 21:31:00
+last_modified_at: 2020-02-03 10:29:00
 ---
 
 We're in the process of upgrading our MySQL databases from v5.7 to v8.0; since one of the differences in v8.0 is that the default encoding changed from `utf8` to `utf8mb4`, and we had the conversion in plan anyway, we anticipated it and performed it as preliminary step for the upgrade.
@@ -19,7 +19,7 @@ Contents:
   - [Step 2: Preparing the the `ALTER` statements](/An-in-depth-dbas-guide-to-migrating-a-mysql-database-from-the-utf8-to-the-utf8mb4-charset#step-2-preparing-the-the-alter-statements)
     - [Issue: Column/index size limits](/An-in-depth-dbas-guide-to-migrating-a-mysql-database-from-the-utf8-to-the-utf8mb4-charset#issue-columnindex-size-limits)
     - [Issue: Triggers/Functions](/An-in-depth-dbas-guide-to-migrating-a-mysql-database-from-the-utf8-to-the-utf8mb4-charset#issue-triggersfunctions)
-    - [Issue: Optimization problems with joins between columns with heterogeneous charsets](/An-in-depth-dbas-guide-to-migrating-a-mysql-database-from-the-utf8-to-the-utf8mb4-charset#issue-optimization-problems-with-joins-between-columns-with-heterogeneous-charsets)
+    - [Issue: Joins between columns with heterogeneous charsets](/An-in-depth-dbas-guide-to-migrating-a-mysql-database-from-the-utf8-to-the-utf8mb4-charset#issue-joins-between-columns-with-heterogeneous-charsets)
   - [Step 3: Altering the schema and tables](/An-in-depth-dbas-guide-to-migrating-a-mysql-database-from-the-utf8-to-the-utf8mb4-charset#step-3-altering-the-schema-and-tables)
   - [Warnings](/An-in-depth-dbas-guide-to-migrating-a-mysql-database-from-the-utf8-to-the-utf8mb4-charset#warnings)
     - [Other schemas](/An-in-depth-dbas-guide-to-migrating-a-mysql-database-from-the-utf8-to-the-utf8mb4-charset#other-schemas)
@@ -379,7 +379,7 @@ If we migrate the column to `utf8`, as soon as the `ALTER TABLE` completes, any 
 
 The solution is fairly simple - the trigger needs to be dropped before the `ALTER TABLE`, and recreated after. This of course, can be a serious challenge for high-traffic websites.
 
-#### Issue: Optimization problems with joins between columns with heterogeneous charsets
+#### Issue: Joins between columns with heterogeneous charsets
 
 Inevitably, some tables will be converted before others; even assuming parallel conversion, it's not possible (without locking) to synchronize the end of the conversion of a set of given tables.
 
@@ -425,7 +425,7 @@ SHOW WARNINGS\G
 
 Interestingly, it seems that MySQL converts the data before it reaches the optimizer; this is valuable knowledge, because with the current constraint(s), we can rely on the indexes as much as before the migration start.
 
-What happens with JOINs? In theory, everything should be fine:
+What happens with JOINs?
 
 ```sql
 EXPLAIN SELECT COUNT(*) FROM utf8_table JOIN utf8mb4_table ON mb3col = mb4col;
@@ -446,132 +446,7 @@ SHOW WARNINGS\G
 
 Very interesting; we see what MySQL does in this case: it iterates `utf8_table.mb3col` (specifically, it iterates the index `mb3idx`), and for each value, it converts it to `utf8mb4`, so that it can be sought it in the `utf8mb4_table.mb4idx` index.
 
-This works perfectly fine; unfortunately, this condition troubled the query optimizer in our production systems. Specifically, the optimizer did not use the index of the right table. The analysis follows.
-
-Existing data structures, and the query:
-
-```sql
-CREATE TABLE b (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `lock_uuid` char(36) DEFAULT NULL CHARACTER SET utf8mb4 DEFAULT NULL,
-  -- other columns and indexes
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `index_table_b_on_lock_uuid` (`lock_uuid`)
-);
-
-CREATE TABLE sa (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `b_id` int(11) DEFAULT NULL,
-  `lock_uuid` char(36) CHARACTER SET utf8 DEFAULT NULL,
-  -- other columns and indexes
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `index_table_sa_on_lock_uuid` (`lock_uuid`),
-  KEY `index_table_sa_on_b_id` (`b_id`)
-);
-
-UPDATE b JOIN sa USING (lock_uuid)
-SET sa.lock_uuid = NULL, sa.b_id = b.id --, other column updates
-WHERE b.lock_uuid IN (
-  '8329cedc-6b33-4789-8716-0e689f11e7e4' -- 400 UUIDs in total
-);
-```
-
-These are two query explanations:
-
-```
-# Healthy
-+----+-------------+-------+------------+-------+-----------------------------------------+-----------------------------------------+---------+----------------------------------------+-------+----------+--------------------------+
-| id | select_type | table | partitions | type  | possible_keys                           | key                                     | key_len | ref                                    | rows  | filtered | Extra                    |
-+----+-------------+-------+------------+-------+-----------------------------------------+-----------------------------------------+---------+----------------------------------------+-------+----------+--------------------------+
-|  1 | SIMPLE      | b     | NULL       | range | index_table_b_on_lock_uuid              | index_table_b_on_lock_uuid              | 109     | NULL                                   |   400 |   100.00 | Using where; Using index |
-|  1 | UPDATE      | sa    | NULL       | ref   | index_table_sa_on_lock_uuid             | index_table_sa_on_lock_uuid             | 109     | production_db.b.lock_uuid              | 14622 |   100.00 | NULL                     |
-+----+-------------+-------+------------+-------+-----------------------------------------+-----------------------------------------+---------+----------------------------------------+-------+----------+--------------------------+
-
-# Unhealthy
-+----+-------------+-------+------------+-------+---------------------------------+---------------------------------+---------+------+---------+----------+--------------------------+
-| id | select_type | table | partitions | type  | possible_keys                   | key                             | key_len | ref  | rows    | filtered | Extra                    |
-+----+-------------+-------+------------+-------+---------------------------------+---------------------------------+---------+------+---------+----------+--------------------------+
-|  1 | SIMPLE      | b     | NULL       | range | index_table_b_on_lock_uuid      | index_table_b_on_lock_uuid      | 145     | NULL |     400 |   100.00 | Using where; Using index |
-|  1 | UPDATE      | sa    | NULL       | ALL   | NULL                            | NULL                            | NULL    | NULL | 1672654 |   100.00 | Using where              |
-+----+-------------+-------+------------+-------+---------------------------------+---------------------------------+---------+------+---------+----------+--------------------------+
-```
-
-as you can see, the index on the right table (`sa`) is not used, requiring a full table scan for each iteration of the left table.
-
-MySQL's behavior has also been confusing. On one instance, the queries weren't optimized for around a minute, then they started to be properly optimized; on the other instance though, the poor optimization has been stable (until we patched the app, to use a different query).
-
-There are different approaches to this problem. `FORCE INDEX` is a very typical one:
-
-```sql
-EXPLAIN
-UPDATE b JOIN sa FORCE INDEX (index_table_sa_on_lock_uuid) USING (lock_uuid)
-SET sa.lock_uuid = NULL, sa.b_id = b.id --, other column updates
-WHERE sa.lock_uuid IN (
-  '8329cedc-6b33-4789-8716-0e689f11e7e4' -- 400 UUIDs in total
-);
-
-+----+-------------+-------+------------+-------+-----------------------------------------+-----------------------------------------+---------+------+---------+----------+--------------------------+
-| id | select_type | table | partitions | type  | possible_keys                           | key                                     | key_len | ref  | rows    | filtered | Extra                    |
-+----+-------------+-------+------------+-------+-----------------------------------------+-----------------------------------------+---------+------+---------+----------+--------------------------+
-|  1 | UPDATE      | sa    | NULL       | range | index_table_sa_on_lock_uuid             | index_table_sa_on_lock_uuid             | 109     | NULL |     400 |   100.00 | Using where              |
-|  1 | SIMPLE      | b     | NULL       | ref   | index_table_b_on_lock_uuid              | index_table_b_on_lock_uuid              | 145     | func | 3217879 |   100.00 | Using where; Using index |
-+----+-------------+-------+------------+-------+-----------------------------------------+-----------------------------------------+---------+------+---------+----------+--------------------------+
-```
-
-the result is somewhat unexpected, as `sa` is placed by the query optimizer as left table, while the reference, healthy, query plan, would place it as right table.  
-This is fine, though: the indexes are correctly used, leading to an efficient query plan.
-
-Another alternative is to force the reversal of the tables sides via `STRAIGHT_JOIN`:
-
-```sql
-EXPLAIN
-UPDATE sa
-       STRAIGHT_JOIN b ON b.lock_uuid = sa.lock_uuid
-SET sa.lock_uuid = NULL, sa.b_id = b.id, --, other columns updates
-WHERE b.lock_uuid IN (
-  '8329cedc-6b33-4789-8716-0e689f11e7e4' -- 400 UUIDs in total
-);
-
-# +----+-------------+-------+------------+------+---------------------------------+---------------------------------+---------+------+---------+----------+--------------------------+
-# | id | select_type | table | partitions | type | possible_keys                   | key                             | key_len | ref  | rows    | filtered | Extra                    |
-# +----+-------------+-------+------------+------+---------------------------------+---------------------------------+---------+------+---------+----------+--------------------------+
-# |  1 | UPDATE      | sa    | NULL       | ALL  | NULL                            | NULL                            | NULL    | NULL | 1672654 |   100.00 | NULL                     |
-# |  1 | SIMPLE      | b     | NULL       | ref  | index_table_b_on_lock_uuid      | index_table_b_on_lock_uuid      | 145     | func | 2776589 |   100.00 | Using where; Using index |
-# +----+-------------+-------+------------+------+---------------------------------+---------------------------------+---------+------+---------+----------+--------------------------+
-```
-
-this was mostly an experiment, to see how MySQL would react. The query plan is indeed better - considerably - than the unhealthy one, as the index on right table is used; however, a full table scan is performed on the left table, which is quite suboptimal, although, again, not catastrophically so.
-
-Another experiment was to force the expected charset conversion:
-
-```sql
-EXPLAIN
-UPDATE sa
-       JOIN b ON sa.lock_uuid = CONVERT(b.lock_uuid USING utf8)
-SET sa.lock_uuid = NULL, sa.b_id = b.id, --, other columns updates
-WHERE b.lock_uuid IN (
-  '8329cedc-6b33-4789-8716-0e689f11e7e4' -- 400 UUIDs in total
-);
-
-+----+-------------+-------+------------+-------+-----------------------------------------+-----------------------------------------+---------+------+--------+----------+-------------+
-| id | select_type | table | partitions | type  | possible_keys                           | key                                     | key_len | ref  | rows   | filtered | Extra       |
-+----+-------------+-------+------------+-------+-----------------------------------------+-----------------------------------------+---------+------+--------+----------+-------------+
-|  1 | SIMPLE      | b     | NULL       | range | index_table_b_on_lock_uuid              | index_table_b_on_lock_uuid              | 145     | NULL |    400 |   100.00 | Using where |
-|  1 | UPDATE      | sa    | NULL       | ref   | index_table_sa_on_lock_uuid             | index_table_sa_on_lock_uuid             | 109     | func | 451013 |   100.00 | Using where |
-+----+-------------+-------+------------+-------+-----------------------------------------+-----------------------------------------+---------+------+--------+----------+-------------+
-```
-
-this worked as well; the query plan is equal to the healthy one, although the optimizer has difficulties predicting the number of rows matching in the right table index.
-
-It's not 100% clear at this stage what caused the problem - the accident involved specific conditions and a certain load, which we couldn't reproduce exactly.
-
-There are a few theories (the experiments are tests themselves), however, none of them would give an exact explanation; causes that likely concurred are:
-
-- data (charset/type) conversion in JOINs (`func` ref) makes difficult (or impossible) for the optimizer to estimate the right table matching rows;
-- the particular data distribution of the columns: a few non-NULL values in between millions of NULL values; this is formally a high cardinality, but it proved problematic in out experience already, possibly because the InnoDB random dives may not find the non-NULL values[1](#footnote01);
-- queries sneaking in between the end of a data table conversion and the ANALYZE TABLE execution.
-
-This section does not intend to suggest a specific strategy; rather, the takeaway if an app performs JOINs in cross-charset conditions, the queries will need to be reworked and tested extremely carefully.
+Note that this is a simple case; more complex JOINs in the app should still be carefully reviewed.
 
 ### Step 3: Altering the schema and tables
 

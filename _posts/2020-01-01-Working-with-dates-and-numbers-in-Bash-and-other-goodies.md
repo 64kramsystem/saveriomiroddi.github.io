@@ -12,18 +12,19 @@ In this small article, I'll explain some concepts involved, most notably, workin
 
 Contents:
 
-- [The base structure](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#the-base-structure)
-- [Writing safer Bash scripts](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#writing-safer-bash-scripts)
-  - [`errexit`](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#errexit)
-  - [`nounset`, with pattern](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#nounset-with-pattern)
-  - [`pipefail`](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#pipefail)
-    - [`pipefail` versus `grep -q`](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#pipefail-versus-grep--q)
-- [First step: Handling dates, cycling the data](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#first-step-handling-dates-cycling-the-data)
-- [Splitting a string via Perl](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#splitting-a-string-via-perl)
-- [Splitting a string via `cut`](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#splitting-a-string-via-cut)
-- [Dates, arithmetic, and putting all together](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#dates-arithmetic-and-putting-all-together)
-- [Conclusion](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#conclusion)
-- [Footnotes](/Working-with-dates-and-numbers-in-Bash-and-other-goodies#footnotes)
+- [The general setup](/2020-02-18-Handling-the-apt-lock-on-ubuntu-server-installations.md#the-general-setup)
+- [Assumptions](/2020-02-18-Handling-the-apt-lock-on-ubuntu-server-installations.md#assumptions)
+- [The problem](/2020-02-18-Handling-the-apt-lock-on-ubuntu-server-installations.md#the-problem)
+- [Attempted solutions](/2020-02-18-Handling-the-apt-lock-on-ubuntu-server-installations.md#attempted-solutions)
+  - [Retrying in case of errors](/2020-02-18-Handling-the-apt-lock-on-ubuntu-server-installations.md#retrying-in-case-of-errors)
+  - [Inspecting the running processes](/2020-02-18-Handling-the-apt-lock-on-ubuntu-server-installations.md#inspecting-the-running-processes)
+  - [Disabling the services](/2020-02-18-Handling-the-apt-lock-on-ubuntu-server-installations.md#disabling-the-services)
+  - [Waiting on `cloud-init` to complete](/2020-02-18-Handling-the-apt-lock-on-ubuntu-server-installations.md#waiting-on-cloud-init-to-complete)
+  - [Using flock](/2020-02-18-Handling-the-apt-lock-on-ubuntu-server-installations.md#using-flock)
+  - [Using fnctl](/2020-02-18-Handling-the-apt-lock-on-ubuntu-server-installations.md#using-fnctl)
+  - [The "screw it" solution: replace `/usr/lib/apt/apt.systemd.daily`](/2020-02-18-Handling-the-apt-lock-on-ubuntu-server-installations.md#the-screw-it-solution-replace-usrlibaptaptsystemddaily)
+- [The Final solution™](/2020-02-18-Handling-the-apt-lock-on-ubuntu-server-installations.md#the-final-solution)
+- [Conclusion](/2020-02-18-Handling-the-apt-lock-on-ubuntu-server-installations.md#conclusion)
 
 ## The base structure
 

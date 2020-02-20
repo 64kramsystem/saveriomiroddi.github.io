@@ -12,7 +12,7 @@ In order to get an idea of the confusion about the subject, check out the number
 
 In this post I'll talk about a few approaches, and the stable solution I've implemented.
 
-Readers interested in just solving the problem can skip to [The Final Solution™](#the-final-solution) section.
+Readers interested in just solving the problem can skip to the [Eureka™](#section) section.
 
 Contents:
 
@@ -27,7 +27,7 @@ Contents:
   - [Using flock](/Handling-the-apt-lock-on-ubuntu-server-installations#using-flock)
   - [Using fnctl](/Handling-the-apt-lock-on-ubuntu-server-installations#using-fnctl)
   - [The "screw it" solution: replace `/usr/lib/apt/apt.systemd.daily`](/Handling-the-apt-lock-on-ubuntu-server-installations#the-screw-it-solution-replace-usrlibaptaptsystemddaily)
-- [The Final solution™](/Handling-the-apt-lock-on-ubuntu-server-installations#the-final-solution)
+- [Eureka™](/Handling-the-apt-lock-on-ubuntu-server-installations#eureka)
 - [Conclusion](/Handling-the-apt-lock-on-ubuntu-server-installations#conclusion)
 
 ## The general setup
@@ -69,7 +69,7 @@ There are a couple of (cheap) solutions to this, for example, retrying in case o
 
 Another solution is to simply isolate the processes invoking an update and stopping or disabling them.
 
-I'll go through each solution, and explain why it it's not good enough or doesn't not work, and the process that lead to The Final Solution™.
+I'll go through each solution, and explain why it it's not good enough or doesn't not work, and the process that lead to the Eureka™.
 
 ## Potential solutions
 
@@ -481,7 +481,7 @@ This officially certifies that apt is cursed.
 
 Some `cat`ing reveals that the `dist-upgrade` updates the script, overwriting the hack. It's not clear which package updates the file, but as a matter of fact it happens, excluding also this approach from the candidates.
 
-## The Final solution™
+## Eureka™
 
 While punching the screen, I noticed, for a fraction of a second, that the `cat` output had something interesting: the "lock" word.
 

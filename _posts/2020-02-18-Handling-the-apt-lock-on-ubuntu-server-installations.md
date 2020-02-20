@@ -2,6 +2,7 @@
 layout: post
 title: Handling the apt lock on Ubuntu Server installations (the infamous &quot;Could not get lock /var/lib/apt/lists/lock&quot;)
 tags: [concurrency,linux,sysadmin,ubuntu]
+last_modified_at: 2020-02-20 08:55:00
 ---
 
 When managing Ubuntu Server installations, for example image templates in the cloud, one of the main issues one comes across is apt locking, which causes the the annoying error `Could not get lock /var/lib/apt/lists/lock`, typically "at the worst times".
@@ -12,7 +13,7 @@ In order to get an idea of the confusion about the subject, check out the number
 
 In this post I'll talk about a few approaches, and the stable solution I've implemented.
 
-Readers interested in just solving the problem can skip to [The Final Solution™](#the-final-solution) section.
+Readers interested in just solving the problem can skip to the [Eureka™](#section) section.
 
 Contents:
 
@@ -27,7 +28,7 @@ Contents:
   - [Using flock](/Handling-the-apt-lock-on-ubuntu-server-installations#using-flock)
   - [Using fnctl](/Handling-the-apt-lock-on-ubuntu-server-installations#using-fnctl)
   - [The "screw it" solution: replace `/usr/lib/apt/apt.systemd.daily`](/Handling-the-apt-lock-on-ubuntu-server-installations#the-screw-it-solution-replace-usrlibaptaptsystemddaily)
-- [The Final solution™](/Handling-the-apt-lock-on-ubuntu-server-installations#the-final-solution)
+- [Eureka™](/Handling-the-apt-lock-on-ubuntu-server-installations#eureka)
 - [Conclusion](/Handling-the-apt-lock-on-ubuntu-server-installations#conclusion)
 
 ## The general setup
@@ -69,7 +70,7 @@ There are a couple of (cheap) solutions to this, for example, retrying in case o
 
 Another solution is to simply isolate the processes invoking an update and stopping or disabling them.
 
-I'll go through each solution, and explain why it it's not good enough or doesn't not work, and the process that lead to The Final Solution™.
+I'll go through each solution, and explain why it it's not good enough or doesn't not work, and the process that lead to the Eureka™.
 
 ## Potential solutions
 
@@ -481,7 +482,7 @@ This officially certifies that apt is cursed.
 
 Some `cat`ing reveals that the `dist-upgrade` updates the script, overwriting the hack. It's not clear which package updates the file, but as a matter of fact it happens, excluding also this approach from the candidates.
 
-## The Final solution™
+## Eureka™
 
 While punching the screen, I noticed, for a fraction of a second, that the `cat` output had something interesting: the "lock" word.
 
@@ -510,17 +511,20 @@ StateDir='/var/lib/apt/'
 # Now that we know the format, we can either hardcode the value, or gather it dynamically, which is
 # more complex.
 # Of course we do the latter, with Perl 😬. We assume that the trailing slash is there; if something
-# changes in the future, flock will fail.
+# changes in the future, flock will fail fast.
 #
 # Regex explanation:
 #
 # - "capture"               -> `(` and `)` (round brackets)
 # - "anything"              -> `.*`
-# - "followed by a slash`   -> `/`
+# - "followed by a slash`   -> `\/`
 # - "between single quotes" -> `'`
 #
 # Anything outside the capturing group is not included (and printed). The slash needs to be escaped,
 # since it's the Perl character for regex delimiter.
+#
+# If, for robustness purposes, one wants to assume that the trailing slash may be absent, they can
+# add a question mark after it: `\/?`.
 #
 $ flock "$(apt-config shell StateDir Dir::State/d | perl -ne "print /'(.*)\/'/")"/daily_lock apt update
 Hit:1 http://apt.llvm.org/bionic llvm-toolchain-bionic-9 InReleas

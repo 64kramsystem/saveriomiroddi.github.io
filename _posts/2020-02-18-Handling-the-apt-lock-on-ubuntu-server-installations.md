@@ -2,6 +2,7 @@
 layout: post
 title: Handling the apt lock on Ubuntu Server installations (the infamous &quot;Could not get lock /var/lib/apt/lists/lock&quot;)
 tags: [concurrency,linux,sysadmin,ubuntu]
+last_modified_at: 2020-02-20 08:55:00
 ---
 
 When managing Ubuntu Server installations, for example image templates in the cloud, one of the main issues one comes across is apt locking, which causes the the annoying error `Could not get lock /var/lib/apt/lists/lock`, typically "at the worst times".
@@ -510,17 +511,20 @@ StateDir='/var/lib/apt/'
 # Now that we know the format, we can either hardcode the value, or gather it dynamically, which is
 # more complex.
 # Of course we do the latter, with Perl 😬. We assume that the trailing slash is there; if something
-# changes in the future, flock will fail.
+# changes in the future, flock will fail fast.
 #
 # Regex explanation:
 #
 # - "capture"               -> `(` and `)` (round brackets)
 # - "anything"              -> `.*`
-# - "followed by a slash`   -> `/`
+# - "followed by a slash`   -> `\/`
 # - "between single quotes" -> `'`
 #
 # Anything outside the capturing group is not included (and printed). The slash needs to be escaped,
 # since it's the Perl character for regex delimiter.
+#
+# If, for robustness purposes, one wants to assume that the trailing slash may be absent, they can
+# add a question mark after it: `\/?`.
 #
 $ flock "$(apt-config shell StateDir Dir::State/d | perl -ne "print /'(.*)\/'/")"/daily_lock apt update
 Hit:1 http://apt.llvm.org/bionic llvm-toolchain-bionic-9 InReleas

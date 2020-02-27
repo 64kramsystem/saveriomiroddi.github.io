@@ -40,6 +40,8 @@ Contents:
 
 ## Considerations about new generation (A7x and Goldmont Plus) boards
 
+\[Note: I've published a [new article]({% post_url _posts/2020-02-27-Considerations-review-of-h2-n2-rpi4-in-particular-as-home-server %}) about the new SBC generations: ODROID H2, ODROID N2, and Raspberry Pi 4\]
+
 When I wrote this article, the XU4 was pretty much latest generation. A bit more than an year passed; new ARM architectures (A7x) were produced, and boards designed around them finally distributed.
 
 The landscape of SBCs has been further widened by Intel's entrance in the market, with the Goldmont Plus architecture (Celeron J4105 and others). Although this is technically not an ARM architecture, and the price range is different, the Odroid H2 is effectively a competitor.

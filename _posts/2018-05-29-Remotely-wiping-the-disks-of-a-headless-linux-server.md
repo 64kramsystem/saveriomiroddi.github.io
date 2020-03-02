@@ -114,7 +114,7 @@ while read -r disk_device; do
 
   # `conv`: sync on completion; `bs`: improve speed.
   #
-  dd if=/dev/zero of="/dev/$disk_device" status=progress conv=fdatasync bs=4096
+  dd if=/dev/zero of="/dev/$disk_device" status=progress conv=fdatasync bs=64k
 done <<< "$disk_devices"
 ```
 

@@ -2,7 +2,7 @@
 layout: post
 title: Remotely wiping the disk(s) of a headless linux server
 tags: [linux,shell_scripting,sysadmin,ubuntu]
-last_modified_at: 2019-07-03 12:22:00
+last_modified_at: 2020-03-02 23:03:00
 ---
 
 Seldom, the subject of how to wipe the disk(s) of a headliness linux server comes up; there are a few resources online about it. This blog summarizes all the information around into a clean, stable and generic script that can be used in order to perform this task.
@@ -114,9 +114,11 @@ while read -r disk_device; do
 
   # `conv`: sync on completion; `bs`: improve speed.
   #
-  dd if=/dev/zero of="/dev/$disk_device" status=progress conv=fdatasync bs=4096
+  dd if=/dev/zero of="/dev/$disk_device" status=progress conv=fdatasync bs=64k
 done <<< "$disk_devices"
 ```
+
+(as an alternative to `status=progress`, the `pv` tool can be used; see comment thread at the end of the page)
 
 With the hexdump tool, we can now inspect, for fun, what's remaining in the disk(s):
 

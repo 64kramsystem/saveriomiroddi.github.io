@@ -1,17 +1,24 @@
 ---
 layout: post
 title: Files listing experiments&#58; &#96;find&#96; vs. &#96;ls&#96;
-tags: [shell_scripting,linux]
+tags: [shell_scripting,sysadmin,linux]
+last_modified_at: 2020-03-03 12:13:00
 ---
 
 I wanted to tweak a script of mine; it included the conventional `find </path> -maxdepth 1 -type f`. I wasn't fully convinced it was the best choice, so I checked out what's the `ls` equivalent.
 
 This post is about the research I've done; as usual, it's an exercise in extensive usage of the available tools.
 
+Note that I've been notified by a reader of the `ls` parameter `-A`, which simplifies the logic. I've kept both sections, for two reasons:
+
+- the concepts not needed with the new approach are interesting to know regardless;
+- in the new section I don't explain in detail the concepts already explained in the old one.
+
 Contents:
 
 - [Introduction to the problem, and the `find` tool](/Files-listing-experiments-find-vs-ls#introduction-to-the-problem-and-the-find-tool)
 - [Exploring `ls`](/Files-listing-experiments-find-vs-ls#exploring-ls)
+- [A better approach, via `ls -A`](/Files-listing-experiments-find-vs-ls#a-better-approach-via-ls--a)
 - [Conclusion](/Files-listing-experiments-find-vs-ls#conclusion)
 
 ## Introduction to the problem, and the `find` tool
@@ -91,7 +98,8 @@ file_f.src
 
 Now we have the full path: when `ls -1` receives full paths as parameters, it also prints the files with a full path (like `find`).
 
-We still don't have the hidden file in the list, and following this path, `-a` won't work, since the wildcard explicitly selects the files to be listed, and filters out the hidden ones (more on this later).
+We still don't have the hidden file in the list, and following this path, `-a` won't work, since the wildcard explicitly selects the files to be listed, and filters out the hidden ones (more on this later).  
+EDIT: While `-a` is not fit for the purposes, `-A` does - see the following section for an approach that uses it.
 
 Let's avoid descending into the subdirectory, using `-d`:
 
@@ -165,8 +173,41 @@ for f in $(ls -1dp /tmp/source/{,.}* 2> /dev/null | grep -v '/$'); do
 done
 ```
 
+## A better approach, via `ls -A`
+
+A better approach exists, which uses the `-A` option of `ls`; it includes the hidden files, with the exclusion of `.` and `..`.
+
+We can therefore list all the children of `/tmp/source` easily, without further descending the tree:
+
+```sh
+$ ls -1A /tmp/source
+dir_d
+file_a.src
+file_b.src
+.file_c.src
+```
+
+There is one difference to take into account with the previous approach: the parent directory is not included in the output, so we'll need to specify it.
+
+Now, let's exclude the directories, via `ls -p` and grep:
+
+```sh
+$ ls -1Ap /tmp/source | grep -v '/$'
+file_a.src
+file_b.src
+.file_c.src
+```
+
+With this approach, the final version is considerably cleaner:
+
+```sh
+for f in $(ls -1Ap /tmp/source | grep -v '/$'); do
+  cp /tmp/source/$f /tmp/dest/$(basename ${f%.src})
+done
+```
+
 ## Conclusion
 
-The experiment failed, quite miserably: using `find` is significantly cleaner.
+While the mixed `ls` version works in a relatively simple fashion, the `find` options are more intuitive, and there is no subshell clutter.
 
 However, we've discovered interesting `ls` options, and dusted the `find` functionalities.

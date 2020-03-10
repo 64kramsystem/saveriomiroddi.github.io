@@ -28,7 +28,7 @@ Contents:
 
 ## Terminology
 
-In this article I'll use the term "Functional index" to the refer to indexes with (8.0) and without (5.7) underlying generated columns.
+In this article I'll use the term "Functional index" to the refer to indexes both with (8.0) and without (5.7) underlying generated columns.
 
 Where I need to refer to the 8.0 version, I'll use the term "Functional key part" (even if it may not be entirely appropriate).
 

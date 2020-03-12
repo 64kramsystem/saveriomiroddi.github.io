@@ -61,8 +61,7 @@ INSERT INTO t_generated_column (parameters)
 VALUES
   ('{"serial": "foo0", "reserved": true}'),
   ('{"serial": "bar1", "reserved": false}'),
-  ('{"serial": "baz2", "reserved": false}')
-;
+  ('{"serial": "baz2", "reserved": false}');
 ```
 
 There are a few interesting concepts here.
@@ -299,8 +298,8 @@ WITH RECURSIVE sequence (n) AS
   UNION ALL
   SELECT n + 1 FROM sequence WHERE n + 1 < 100000
 )
-SELECT /*+ SET_VAR(cte_max_recursion_depth = 1M) */
-  NOW() - INTERVAL DAYOFMONTH(CURDATE()) DAY - INTERVAL (100 * RAND()) DAY `created_at`
+SELECT /*+ SET_VAR(cte_max_recursion_depth = 100K) */
+  NOW() - INTERVAL (90 * RAND()) DAY `created_at`
 FROM sequence;
 
 ANALYZE TABLE date_functional_index;
@@ -313,8 +312,8 @@ Let's test the index access:
 ```sql
 EXPLAIN FORMAT=TREE SELECT COUNT(*) FROM date_functional_index WHERE DATE(created_at) = CURDATE();
 
--- Aggregate: count(0)
---     -> Index lookup on date_functional_index using functional_index (cast(date_functional_index.created_at as date)=curdate())  (cost=1.10 rows=1)
+-- -> Aggregate: count(0)
+--     -> Index lookup on date_functional_index using functional_index (cast(date_functional_index.created_at as date)=curdate())  (cost=668.80 rows=608)
 ```
 
 Works as expected; with this data type, we don't need to deal with BLOBs and/or collations.
@@ -327,31 +326,28 @@ How about joins?
 EXPLAIN FORMAT=TREE
 WITH RECURSIVE dates_range (d) AS
 (
-  SELECT CURDATE() - INTERVAL 3 DAY
+  SELECT CURDATE() - INTERVAL 90 DAY
   UNION ALL
   SELECT d + INTERVAL 1 DAY FROM dates_range WHERE d + INTERVAL 1 day <= CURDATE()
 )
-SELECT COUNT(*)
+SELECT d, COUNT(id)
 FROM
   dates_range
   LEFT JOIN date_functional_index ON d = DATE(created_at)
-;
+GROUP BY d;
 
--- Aggregate: count(0)
---     -> Nested loop left join
---         -> Table scan on dates_range
---             -> Materialize recursive CTE dates_range
---                 -> Rows fetched before execution
---                 -> Repeat until convergence
---                     -> Filter: ((dates_range.d + interval 1 day) <= <cache>(curdate()))  (cost=2.73 rows=2)
---                         -> Scan new records on dates_range  (cost=2.73 rows=2)
---         -> Filter: (dates_range.d = cast(date_functional_index.created_at as date))  (cost=3429.97 rows=100649)
---             -> Table scan on date_functional_index  (cost=3429.97 rows=100649)
+-- -> Table scan on <temporary>
+--     -> Aggregate using temporary table
+--         -> Nested loop left join
+--             -> Table scan on dates_range
+--                 -> [...]
+--             -> Filter: (dates_range.d = cast(date_functional_index.created_at as date))  (cost=3429.97 rows=100649)
+--                 -> Table scan on date_functional_index  (cost=3429.97 rows=100649)
 ```
 
 Ouch! The index is not used; this is definitely something that needs to be considered.
 
-Using an indexed generated column works:
+Indexes on generated columns exhibit the same behavior, however, we can perform the join against the generated column, whose index is then used by the optimizer:
 
 ```sql
 CREATE TEMPORARY TABLE date_generated_column_functional_index
@@ -367,8 +363,8 @@ WITH RECURSIVE sequence (n) AS
   UNION ALL
   SELECT n + 1 FROM sequence WHERE n + 1 < 100000
 )
-SELECT /*+ SET_VAR(cte_max_recursion_depth = 1M) */
-  NOW() - INTERVAL DAYOFMONTH(CURDATE()) DAY - INTERVAL (100 * RAND()) DAY `created_at`
+SELECT /*+ SET_VAR(cte_max_recursion_depth = 100K) */
+  NOW() - INTERVAL (90 * RAND()) DAY `created_at`
 FROM sequence;
 
 ANALYZE TABLE date_generated_column_functional_index;
@@ -376,28 +372,27 @@ ANALYZE TABLE date_generated_column_functional_index;
 EXPLAIN FORMAT=TREE
 WITH RECURSIVE dates_range (d) AS
 (
-  SELECT CURDATE() - INTERVAL 3 DAY
+  SELECT CURDATE() - INTERVAL 90 DAY
   UNION ALL
   SELECT d + INTERVAL 1 DAY FROM dates_range WHERE d + INTERVAL 1 day <= CURDATE()
 )
-SELECT COUNT(*)
+SELECT d, COUNT(id)
 FROM
   dates_range
   LEFT JOIN date_generated_column_functional_index ON d = created_at_date
-;
+GROUP BY d;
 
--- Aggregate: count(0)
---     -> Nested loop left join
---         -> Table scan on dates_range
---             -> Materialize recursive CTE dates_range
---                 -> Rows fetched before execution
---                 -> Repeat until convergence
---                     -> Filter: ((dates_range.d + interval 1 day) <= <cache>(curdate()))  (cost=2.73 rows=2)
---                         -> Scan new records on dates_range  (cost=2.73 rows=2)
---         -> Index lookup on date_generated_column_functional_index using created_at_date (created_at_date=dates_range.d)  (cost=43.11 rows=1227)
+-- -> Table scan on <temporary>
+--     -> Aggregate using temporary table
+--         -> Nested loop left join
+--             -> Table scan on dates_range
+--                 -> [...]
+--             -> Index lookup on date_generated_column_functional_index using created_at_date (created_at_date=dates_range.d)  (cost=36.18 rows=1026)
 ```
 
-Again, this is a discrepancy that doesn't give much confidence in the overall maturity of the functionality.
+Therefore, it's not possible to use functional key parts with JOINs at all, while it's possible with indexed generated columns. This makes functional key parts less appealing, when considering the overall design.
+
+I've filed this as [feature request](https://bugs.mysql.com/bug.php?id=98937).
 
 ## Bugs
 

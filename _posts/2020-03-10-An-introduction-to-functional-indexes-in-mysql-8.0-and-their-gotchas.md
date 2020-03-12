@@ -10,7 +10,7 @@ Although this is not a strictly new concept in the MySQL world (indexed generate
 
 All in all, I'm not 100% bought into functional indexes (as opposed to indexed generated columns); I'll elaborate on this over the course of the article.
 
-Generated columns are naturally included in the article; additionally, some constructs are built on top of [my previous article]({% post_url _posts/2020-03-09-Generating-sequences-ranges-via-mysql-8.0-ctes %}), in relation to the subject of CTEs.
+As a natural fit, generated columns are included in the article; additionally, some constructs are built on top of [my previous article]({% post_url _posts/2020-03-09-Generating-sequences-ranges-via-mysql-8.0-ctes %}), in relation to the subject of CTEs.
 
 Contents:
 
@@ -429,7 +429,7 @@ I've [reported this](https://bugs.mysql.com/bug.php?id=98896) to the MySQL bug t
 
 I'm not bought into functional key parts.
 
-While I find functional indexes an important functionality of solid, modern, RDBMSs, I think that the functional key parts feature needs some time to mature, especially considering that indexed generated columns can do the same work (at least, for the use cases specified).
+While I find functional indexes an important functionality of solid, modern, RDBMSs, I think that the functional key parts feature itself needs some time to mature, especially considering that indexed generated columns can do the same work (with some exceptions, e.g. multi-valued indexing).
 
 Now moving on to another new 8.0 interesting feature (window functions!) 😄
 

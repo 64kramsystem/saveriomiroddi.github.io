@@ -2,6 +2,7 @@
 layout: post
 title: An introduction to Functional indexes in MySQL 8.0, and their gotchas
 tags: [databases,indexes,mysql]
+last_modified_at: 2020-03-12 12:33:00
 ---
 
 Another interesting feature released with MySQL 8.0 is full support for functional indexes.
@@ -10,7 +11,9 @@ Although this is not a strictly new concept in the MySQL world (indexed generate
 
 All in all, I'm not 100% bought into functional indexes (as opposed to indexed generated columns); I'll elaborate on this over the course of the article.
 
-Generated columns are naturally included in the article; additionally, some constructs are built on top of [my previous article]({% post_url _posts/2020-03-09-Generating-sequences-ranges-via-mysql-8.0-ctes %}), in relation to the subject of CTEs.
+As a natural fit, generated columns are included in the article; additionally, some constructs are built on top of [my previous article]({% post_url _posts/2020-03-09-Generating-sequences-ranges-via-mysql-8.0-ctes %}), in relation to the subject of CTEs.
+
+*Updated on 12/Mar/2020: Found another bug.*
 
 Contents:
 
@@ -23,7 +26,9 @@ Contents:
   - [Encoding inconsistency based on the index usage](/An-introduction-to-functional-indexes-in-mysql-8.0-and-their-gotchas#encoding-inconsistency-based-on-the-index-usage)
 - [An example of functional index with dates](/An-introduction-to-functional-indexes-in-mysql-8.0-and-their-gotchas#an-example-of-functional-index-with-dates)
   - [Gotcha: JOINs don't use functional key parts](/An-introduction-to-functional-indexes-in-mysql-8.0-and-their-gotchas#gotcha-joins-dont-use-functional-key-parts)
-- [Functional indexes bug on `CREATE TABLE ... SELECT`](/An-introduction-to-functional-indexes-in-mysql-8.0-and-their-gotchas#functional-indexes-bug-on-create-table--select)
+- [Bugs](/An-introduction-to-functional-indexes-in-mysql-8.0-and-their-gotchas#bugs)
+  - [Bug on `CREATE TABLE ... SELECT`](/An-introduction-to-functional-indexes-in-mysql-8.0-and-their-gotchas#bug-on-create-table--select)
+  - [Bug on `LOAD DATA INFILE`](/An-introduction-to-functional-indexes-in-mysql-8.0-and-their-gotchas#bug-on-load-data-infile)
 - [Conclusion](/An-introduction-to-functional-indexes-in-mysql-8.0-and-their-gotchas#conclusion)
 
 ## Terminology
@@ -394,7 +399,9 @@ FROM
 
 Again, this is a discrepancy that doesn't give much confidence in the overall maturity of the functionality.
 
-## Functional indexes bug on `CREATE TABLE ... SELECT`
+## Bugs
+
+### Bug on `CREATE TABLE ... SELECT`
 
 In some of the previous queries I've used `CREATE TABLE` + `INSERT` instead of `CREATE TABLE ... SELECT`. Why?
 
@@ -425,11 +432,41 @@ INSERT INTO bug_functional_index VALUES (NOW());
 
 I've [reported this](https://bugs.mysql.com/bug.php?id=98896) to the MySQL bug tracker.
 
+### Bug on `LOAD DATA INFILE`
+
+There is also an additional bug: `LOAD DATA INFILE` statements will fail, if the columns are not explicitly specified:
+
+```bash
+echo '[]' > /tmp/test_data.csv
+
+mysql <<'SQL'
+  CREATE SCHEMA IF NOT EXISTS tmp;
+
+  CREATE TEMPORARY TABLE tmp.issue_load_data_on_functional_index
+  (
+    json_col JSON,
+    KEY json_col ( (CAST(json_col -> '$' AS UNSIGNED ARRAY)) )
+  );
+
+  LOAD DATA INFILE '/tmp/test_data.csv' INTO TABLE tmp.issue_load_data_on_functional_index;
+SQL
+
+# ERROR 1261 (01000) at line 9: Row 1 doesn't contain data for all columns
+```
+
+The workaround is to explicitly specify the columns:
+
+```sql
+LOAD DATA INFILE '/tmp/test_data.csv' INTO TABLE tmp.issue_load_data_on_functional_index (json_col);
+```
+
+I've [reported this bug](https://bugs.mysql.com/bug.php?id=98925) as well.
+
 ## Conclusion
 
 I'm not bought into functional key parts.
 
-While I find functional indexes an important functionality of solid, modern, RDBMSs, I think that the functional key parts feature needs some time to mature, especially considering that indexed generated columns can do the same work (at least, for the use cases specified).
+While I find functional indexes an important functionality of solid, modern, RDBMSs, I think that the functional key parts feature itself needs some time to mature, especially considering that indexed generated columns can do the same work (with some exceptions, e.g. multi-valued indexing).
 
 Now moving on to another new 8.0 interesting feature (window functions!) 😄
 

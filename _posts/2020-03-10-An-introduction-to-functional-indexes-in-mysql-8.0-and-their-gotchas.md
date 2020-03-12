@@ -61,8 +61,7 @@ INSERT INTO t_generated_column (parameters)
 VALUES
   ('{"serial": "foo0", "reserved": true}'),
   ('{"serial": "bar1", "reserved": false}'),
-  ('{"serial": "baz2", "reserved": false}')
-;
+  ('{"serial": "baz2", "reserved": false}');
 ```
 
 There are a few interesting concepts here.

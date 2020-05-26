@@ -6,7 +6,7 @@ tags: [hardware]
 
 I've been a long time user of SBCs; as part of my equipment, I've always had the need for a small home server, which they fit increasingly well.
 
-My previous SBC has been an ODROID XU4, which I've covered [in a previous article]({% post_url _posts/2018-04-16-Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server %}).
+My previous SBC has been an ODROID XU4, which I've covered [in a previous article]({% post_url 2018-04-16-Considerations-review-of-raspberry-pi-odroid-xu4-usage-as-home-server %}).
 
 I've been reasonably happy of it, however, my requirements overgrew its limitations, therefore, as soon as the second batch of ODROID H2 was available, I jumped at the chance to switch.
 

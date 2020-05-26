@@ -11,7 +11,7 @@ Although this is not a strictly new concept in the MySQL world (indexed generate
 
 All in all, I'm not 100% bought into functional indexes (as opposed to indexed generated columns); I'll elaborate on this over the course of the article.
 
-As a natural fit, generated columns are included in the article; additionally, some constructs build on [my previous article]({% post_url _posts/2020-03-09-Generating-sequences-ranges-via-mysql-8.0-ctes %}), in relation to the subject of CTEs.
+As a natural fit, generated columns are included in the article; additionally, some constructs build on [my previous article]({% post_url 2020-03-09-Generating-sequences-ranges-via-mysql-8.0-ctes %}), in relation to the subject of CTEs.
 
 *Updated on 12/Mar/2020: Found another bug.*
 

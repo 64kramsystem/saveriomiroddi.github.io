@@ -2,10 +2,12 @@
 layout: post
 title: Building a Debian (`.deb`) source package, and publishing it on an Ubuntu PPA
 tags: [c,distribution,linux,packaging,sysadmin,ubuntu]
-last_modified_at: 2019-07-04 13:54:00
+last_modified_at: 2020-06-10 23:29:00
 redirect_from:
 - /Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa-part-1/
 ---
+
+Important! I've published an [updated and extended guide]({% post_url 2020-05-26-Learn-to-prepare-PPA-packages-by-setting-up-a-Ruby-PPA %}) on the same subject; check that out before reading this one!
 
 Although the concepts involved in preparing a Debian (`.deb`) source package and publishing it on an Ubuntu PPA are simple, due to the many moving parts involved, it's not easy to find a single source of information.
 

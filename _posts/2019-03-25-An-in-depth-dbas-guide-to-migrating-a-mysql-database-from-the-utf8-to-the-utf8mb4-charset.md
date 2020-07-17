@@ -2,6 +2,7 @@
 layout: post
 title: An in depth DBA's guide to migrating a MySQL database from the &#96;utf8&#96; to the &#96;utf8mb4&#96; charset
 tags: [databases,mysql,sysadmin]
+category: mysql
 last_modified_at: 2020-02-03 10:29:00
 ---
 

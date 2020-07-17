@@ -2,6 +2,7 @@
 layout: post
 title: PreFOSDEM talk&#58; Upgrading from MySQL 5.7 to MySQL 8.0
 tags: [databases,innodb,linux,mysql,shell_scripting,sysadmin]
+category: mysql
 ---
 
 In this post I'll expand on the subject of my MySQL pre-FOSDEM talk: what dbadmins need to know and do, when upgrading from MySQL 5.7 to 8.0.

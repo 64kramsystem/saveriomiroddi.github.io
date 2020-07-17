@@ -2,6 +2,7 @@
 layout: post
 title: Summary of trailing spaces handling in MySQL, with version 8.0 upgrade considerations
 tags: [data_types,databases,mysql]
+category: mysql
 last_modified_at: 2019-07-09 20:40:00
 ---
 

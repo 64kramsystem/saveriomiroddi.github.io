@@ -102,3 +102,8 @@ exclude:
   - LICENSE
   - README.md
   - CNAME
+
+# Customization: add a mysql feed (see https://git.io/JJZNQ and https://git.io/JJZNH)
+feed:
+  categories:
+    - mysql

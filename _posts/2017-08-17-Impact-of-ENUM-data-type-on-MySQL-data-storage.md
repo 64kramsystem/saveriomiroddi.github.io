@@ -2,6 +2,7 @@
 layout: post
 title: Impact of ENUM data type on MySQL data storage
 tags: [mysql, data_types, indexes, storage, performance, databases]
+category: mysql
 ---
 
 In the vein of the [previous article][Previous article], we'll examine here the impact of using the [ENUM][ENUM type] data type.

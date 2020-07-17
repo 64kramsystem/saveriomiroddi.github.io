@@ -2,6 +2,7 @@
 layout: post
 title: An introduction to Functional indexes in MySQL 8.0, and their gotchas
 tags: [databases,indexes,mysql]
+category: mysql
 last_modified_at: 2020-03-25 15:31:00
 ---
 

@@ -2,6 +2,7 @@
 layout: post
 title: Generating sequences/ranges, via MySQL 8.0's Common Table Expressions (CTEs)
 tags: [databases,mysql]
+category: mysql
 ---
 
 A long-time missing (and missed) functionality in MySQL, is sequences/ranges.

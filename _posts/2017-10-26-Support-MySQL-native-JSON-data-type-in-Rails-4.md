@@ -2,6 +2,7 @@
 layout: post
 title: Support MySQL native JSON data type in ActiveRecord (Rails) 4
 tags: [mysql, data_types, rails]
+category: mysql
 last_modified_at: 2018-03-09 19:00:00
 ---
 

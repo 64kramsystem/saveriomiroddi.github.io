@@ -2,6 +2,7 @@
 layout: post
 title: Modern approaches to replacing accumulation user-defined variable hacks, via MySQL 8.0 Window functions and CTEs
 tags: [databases,indexes,innodb,mysql]
+category: mysql
 ---
 
 A common MySQL strategy to perform updates with accumulating functions is to employ user-defined variables, using the `UPDATE [...] SET mycol = (@myvar := EXPRESSION(@myvar, mycol))` pattern.

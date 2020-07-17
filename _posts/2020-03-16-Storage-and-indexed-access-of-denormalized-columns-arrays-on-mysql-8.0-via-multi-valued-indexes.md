@@ -2,6 +2,7 @@
 layout: post
 title: Storage and Indexed access of denormalized columns (arrays) on MySQL 8.0, via multi-valued indexes
 tags: [databases,data_types,indexes,innodb,mysql]
+category: mysql
 ---
 
 Another "missing and missed" functionality in MySQL is a data type for arrays.

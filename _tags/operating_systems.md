@@ -1,3 +1,0 @@
----
-slug: operating_systems
----

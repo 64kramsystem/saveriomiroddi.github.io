@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Debugging a live/stuck Ruby process with GDB, fully explained, plus many goodies!
-tags: [c,debugging,linux,operating_systems,ruby,sysadmin]
+tags: [c,debugging,linux,ruby,sysadmin]
 ---
 
 Debugging a live/stuck Ruby process is a well-known subject.

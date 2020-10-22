@@ -2,10 +2,12 @@
 layout: post
 title: Installing Ruby Tk bindings/gem on Ubuntu
 tags: [gui,ruby,ubuntu]
-last_modified_at: 2018-10-04 22:44:00
+last_modified_at: 2020-10-22 21:52:00
 ---
 
 The bindings for the standard Ruby GUI toolkit, Tk, need some trickery in order to be installed on Ubuntu. This article shows how to do it.
+
+*Updated on 22/Oct/2020: Use v8.6 for Ubuntu 20.04, which has been tested and works.*
 
 Contents:
 

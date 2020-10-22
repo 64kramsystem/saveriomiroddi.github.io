@@ -65,10 +65,10 @@ The gem provides many switches for specifying the configuration parameters, howe
 The workaround, originally found in [a Ruby forum](https://www.ruby-forum.com/t/building-ext-tk-on-ubuntu-14-04/231470/5) is to symlink the libraries to the paths where the extension expects them to be:
 
 ```sh
-sudo ln -s /usr/lib/x86_64-linux-gnu/tcl8.5/tclConfig.sh /usr/lib/tclConfig.sh
-sudo ln -s /usr/lib/x86_64-linux-gnu/tk8.5/tkConfig.sh /usr/lib/tkConfig.sh
-sudo ln -s /usr/lib/x86_64-linux-gnu/libtcl8.5.so.0 /usr/lib/libtcl8.5.so.0
-sudo ln -s /usr/lib/x86_64-linux-gnu/libtk8.5.so.0 /usr/lib/libtk8.5.so.0
+sudo ln -s /usr/lib/x86_64-linux-gnu/tcl8.5/tclConfig.sh /usr/lib/
+sudo ln -s /usr/lib/x86_64-linux-gnu/tk8.5/tkConfig.sh /usr/lib/
+sudo ln -s /usr/lib/x86_64-linux-gnu/libtcl8.5.so.0 /usr/lib/
+sudo ln -s /usr/lib/x86_64-linux-gnu/libtk8.5.so.0 /usr/lib/
 ```
 
 After this, the gem will install without any problem!:

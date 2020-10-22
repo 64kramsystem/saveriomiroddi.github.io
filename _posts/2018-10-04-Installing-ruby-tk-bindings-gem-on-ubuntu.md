@@ -21,13 +21,20 @@ The extraction actually made the setup easier, as (not considering the workaroun
 
 ## Prerequisites
 
-The Tcl/Tk libraries and development files need to be installed:
+The Tcl/Tk libraries and development files need to be installed; the version depends on the O/S:
+
+- on Ubuntu 18.04, install 8.5;
+- on Ubuntu 20.04, install 8.6.
+
+In this guide I'll use v8.5; Ubuntu 20.04 users can perform a simple textual search/replace in the commands provided.
+
+Both versions have been verified on Ruby 2.5, 2.6 and 2.7. If v8.6 happened not to work on your (20.04) system, please leave a comment at the bottom, and in the meanwhile, try the v8.5 packages from the Ubuntu Bionic repository.
+
+Install the required version of the (development) libraries:
 
 ```sh
 $ sudo apt-get install tcl8.5-dev tk8.5-dev
 ```
-
-Note that the version 8.5 needs to be necessarily installed, as version 8.6 is not supported.
 
 ## Workaround and installation
 
@@ -58,10 +65,10 @@ The gem provides many switches for specifying the configuration parameters, howe
 The workaround, originally found in [a Ruby forum](https://www.ruby-forum.com/t/building-ext-tk-on-ubuntu-14-04/231470/5) is to symlink the libraries to the paths where the extension expects them to be:
 
 ```sh
-sudo ln -s /usr/lib/x86_64-linux-gnu/tcl8.5/tclConfig.sh /usr/lib/tclConfig.sh
-sudo ln -s /usr/lib/x86_64-linux-gnu/tk8.5/tkConfig.sh /usr/lib/tkConfig.sh
-sudo ln -s /usr/lib/x86_64-linux-gnu/libtcl8.5.so.0 /usr/lib/libtcl8.5.so.0
-sudo ln -s /usr/lib/x86_64-linux-gnu/libtk8.5.so.0 /usr/lib/libtk8.5.so.0
+sudo ln -s /usr/lib/x86_64-linux-gnu/tcl8.5/tclConfig.sh /usr/lib/
+sudo ln -s /usr/lib/x86_64-linux-gnu/tk8.5/tkConfig.sh /usr/lib/
+sudo ln -s /usr/lib/x86_64-linux-gnu/libtcl8.5.so.0 /usr/lib/
+sudo ln -s /usr/lib/x86_64-linux-gnu/libtk8.5.so.0 /usr/lib/
 ```
 
 After this, the gem will install without any problem!:

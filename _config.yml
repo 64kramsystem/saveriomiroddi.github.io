@@ -15,7 +15,7 @@ collections:
   tags:
     output: true
     permalink: /tag/:name/
-  books: {}
+  bookshelf: {}
 
 defaults:
   -

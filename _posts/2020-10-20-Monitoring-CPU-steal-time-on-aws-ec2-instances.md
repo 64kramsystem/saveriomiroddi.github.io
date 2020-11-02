@@ -2,11 +2,14 @@
 layout: post
 title: Monitoring the CPU steal time on AWS EC2 instances
 tags: [aws,cloud,linux,monitoring,sysadmin]
+last_modified_at: 2020-11-02 15:01:00
 ---
 
 The "CPU Steal time" issue is a well known phenomenon in the cloud area. We've been recently hard hit by this problem, so we've decided to start monitoring it.
 
 In this article I'll explain how to easily configure an AWS CloudWatch metric in order to report it.
+
+*Updated on 02/Nov/2020: Fixed reload (restart) logic.*
 
 Content:
 
@@ -164,7 +167,6 @@ StandardError=syslog
 SyslogIdentifier=nmon
 
 ExecStart=$nmon_location -F $stats_path -s $stats_interval -c 2147483647
-ExecReload=/bin/kill -HUP \$MAINPID
 
 Restart=always
 
@@ -176,17 +178,17 @@ systemctl enable nmon
 systemctl start nmon
 ```
 
-The configuration is fairly simple. The major tweak is that we send stdout and stderr to the syslog, and we assign a program name (`Syslogidentifier`). This is just good practice in terms of system logging; using a program name allows sysadmins to separate a program's logs, if required.
+The most important thing to consider is that nmon doesn't support the `HUP` signal, which is a common way to restart a program; for this reason, we don't specify the `ExecReload` parameter, and we'll rely on the `reload-or-restart` systemctl command when we need to perform a reload.
 
-There are alternative, valid, options for the `Restart` parameter. `on-failure` is also appropriate; for conceptual consistency with the fact that nmon will necessarily [stop at some point](#nmon-and-its-output), `always` is used, although, (2**32 - 1) cycles, even with one run per second, take almost a lifetime.
+Regarding the `Restart` parameter, there are alternative, valid, options; for example, `on-failure` is also appropriate. For conceptual consistency with the fact that nmon will necessarily [stop at some point](#nmon-and-its-output), `always` is used, although the specified (2**32 - 1) cycles, even with one run per second, take almost a lifetime.
 
-Note that, in case of restart, nmon will overwrite the existing log. Given the (supposed) rarity of the event, and the fact that the loss is minimal (the processing scripts sends the result every minute, so the past can be discarded), we don't need to handle this occurrence.
+Note that, in case of restart, nmon will overwrite the existing log. Given the (supposed) rarity of the event, and the fact that the loss is minimal (the processing scripts sends the result every minute, so the previous log records can be discarded), we don't need to handle this occurrence.
+
+A tweak is that we send stdout and stderr to the syslog, and we assign a program name (`Syslogidentifier`). This is just good practice in terms of system logging; using a program name allows sysadmins to separate a program's logs, if required.
 
 ### Log rotation
 
-Since this monitoring is assumed to be permanent, we need to manage the logs. The logrotate standard tool will take care of this.
-
-Note that, for simplicity, we don't care about race conditions; after each rotation, the processing script can find an empty file, and miss one stat. My personal approach is that one missed stat on 1440 is not worth increasing complexity.
+Since this monitoring is assumed to be permanent, we need to manage the logs; the logrotate standard tool will take care of this.
 
 ```sh
 cat > /etc/logrotate.d/nmon <<LOGROTATE
@@ -196,11 +198,15 @@ $stats_path {
   compress
   missingok
   notifempty
+  sharedscripts
+  postrotate
+      systemctl reload-or-restart nmon
+  endscript
 }
 LOGROTATE
 ```
 
-This is a 100% standard logrotate configuration file, so there's nothing notable.
+Due to the mentioned lack of handling of the `HUP` signal by nmon, we need to manually restart the process, by invoking the `systemctl reload-or-start` command.
 
 ### Processing script
 

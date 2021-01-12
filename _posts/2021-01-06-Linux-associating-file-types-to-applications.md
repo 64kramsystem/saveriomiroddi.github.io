@@ -10,13 +10,13 @@ Some people may still have a troubled experiences while doing so; some others ma
 
 Content:
 
-- [Introduction](/Linux-associating_file_types_to_applications#introduction)
-- [Procedure](/Linux-associating_file_types_to_applications#procedure)
-  - [Finding the desktop file](/Linux-associating_file_types_to_applications#finding-the-desktop-file)
-  - [Finding the MIME type](/Linux-associating_file_types_to_applications#finding-the-mime-type)
-  - [Registering the association](/Linux-associating_file_types_to_applications#registering-the-association)
-- [Association by extension](/Linux-associating_file_types_to_applications#association-by-extension)
-- [Conclusion](/Linux-associating_file_types_to_applications#conclusion)
+- [Introduction](/Linux-associating-file-types-to-applications#introduction)
+- [Procedure](/Linux-associating-file-types-to-applications#procedure)
+  - [Finding the desktop file](/Linux-associating-file-types-to-applications#finding-the-desktop-file)
+  - [Finding the MIME type](/Linux-associating-file-types-to-applications#finding-the-mime-type)
+  - [Registering the association](/Linux-associating-file-types-to-applications#registering-the-association)
+- [Association by extension](/Linux-associating-file-types-to-applications#association-by-extension)
+- [Conclusion](/Linux-associating-file-types-to-applications#conclusion)
 
 ## Introduction
 

@@ -2,6 +2,8 @@
 layout: post
 title: Small&#58; Sending the display to standby on MATE (GNOME 2) desktops
 tags: [linux,shell_scripting,small,sysadmin,ubuntu]
+redirect_from:
+- Small_sending_the_display_to_standby_on_mate_gnome_2_desktops
 ---
 
 Sometimes, I want to send my display to standby, rather than the entire system. Long ago, the `xset` tool alone would do the trick, but nowadays, it doesn't.

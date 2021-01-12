@@ -2,6 +2,8 @@
 layout: post
 title: Quick RISC-V cross compilation and emulation
 tags: [hardware,linux,sysadmin,ubuntu,virtualization]
+redirect_from:
+- Quick_riscv_cross_compilation_and_emulation
 ---
 
 RISC-V is a hot topic lately. There's lots of talk, and experimentation/research.

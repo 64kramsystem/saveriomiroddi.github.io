@@ -2,6 +2,8 @@
 layout: post
 title: Linux&#58; Associating file types to applications
 tags: [linux,sysadmin,ubuntu]
+redirect_from:
+- Linux-associating_file_types_to_applications
 ---
 
 Associating file types (extensions, in Windows) to applications is a fundamental functionality of desktop environments.

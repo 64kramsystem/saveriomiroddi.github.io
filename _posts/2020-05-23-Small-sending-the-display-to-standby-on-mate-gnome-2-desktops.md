@@ -9,8 +9,8 @@ Sometimes, I want to send my display to standby, rather than the entire system. 
 This short article describes how to accomplish this task.
 
 Content:
-- [Sending the screen to standby via commandline, and the problems](/Small_sending_the_display_to_standby_on_mate_gnome_2_desktops#sending-the-screen-to-standby-via-commandline-and-the-problems)
-- [The solution](/Small_sending_the_display_to_standby_on_mate_gnome_2_desktops#the-solution)
+- [Sending the screen to standby via commandline, and the problems](/Small-sending-the-display-to-standby-on-mate-gnome-2-desktops#sending-the-screen-to-standby-via-commandline-and-the-problems)
+- [The solution](/Small-sending-the-display-to-standby-on-mate-gnome-2-desktops#the-solution)
 
 ## Sending the screen to standby via commandline, and the problems
 

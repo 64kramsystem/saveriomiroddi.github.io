@@ -12,16 +12,16 @@ I'll also show how to configure the QEMU disk image, and a few useful related fu
 
 Content:
 
-- [Introduction to the tooling options](/Quick_riscv_cross_compilation_and_emulation#introduction-to-the-tooling-options)
-- [Setup](/Quick_riscv_cross_compilation_and_emulation#setup)
-  - [Preliminary steps](/Quick_riscv_cross_compilation_and_emulation#preliminary-steps)
-  - [Building the toolchain](/Quick_riscv_cross_compilation_and_emulation#building-the-toolchain)
-  - [Building zlib and pigz](/Quick_riscv_cross_compilation_and_emulation#building-zlib-and-pigz)
-  - [Downloading and preparing the Fedora RISC-V image](/Quick_riscv_cross_compilation_and_emulation#downloading-and-preparing-the-fedora-risc-v-image)
-  - [Installing QEMU](/Quick_riscv_cross_compilation_and_emulation#installing-qemu)
-- [Execution!](/Quick_riscv_cross_compilation_and_emulation#execution)
-- [Conclusion](/Quick_riscv_cross_compilation_and_emulation#conclusion)
-- [Footnotes](/Quick_riscv_cross_compilation_and_emulation#footnotes)
+- [Introduction to the tooling options](/Quick-riscv-cross-compilation-and-emulation#introduction-to-the-tooling-options)
+- [Setup](/Quick-riscv-cross-compilation-and-emulation#setup)
+  - [Preliminary steps](/Quick-riscv-cross-compilation-and-emulation#preliminary-steps)
+  - [Building the toolchain](/Quick-riscv-cross-compilation-and-emulation#building-the-toolchain)
+  - [Building zlib and pigz](/Quick-riscv-cross-compilation-and-emulation#building-zlib-and-pigz)
+  - [Downloading and preparing the Fedora RISC-V image](/Quick-riscv-cross-compilation-and-emulation#downloading-and-preparing-the-fedora-risc-v-image)
+  - [Installing QEMU](/Quick-riscv-cross-compilation-and-emulation#installing-qemu)
+- [Execution!](/Quick-riscv-cross-compilation-and-emulation#execution)
+- [Conclusion](/Quick-riscv-cross-compilation-and-emulation#conclusion)
+- [Footnotes](/Quick-riscv-cross-compilation-and-emulation#footnotes)
 
 ## Introduction to the tooling options
 

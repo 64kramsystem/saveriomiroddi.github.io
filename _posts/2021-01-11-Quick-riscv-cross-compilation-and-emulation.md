@@ -4,6 +4,7 @@ title: Quick RISC-V cross compilation and emulation
 tags: [hardware,linux,sysadmin,ubuntu,virtualization]
 redirect_from:
 - Quick_riscv_cross_compilation_and_emulation
+last_modified_at: 2020-01-18 11:56:00
 ---
 
 RISC-V is a hot topic lately. There's lots of talk, and experimentation/research.
@@ -27,17 +28,22 @@ Content:
 
 ## Introduction to the tooling options
 
-There are a couple of approaches to prepare and use a RISC-V development environment, that could be described as "lightweight" and "heavyweight".
+There are a few ways to prepare a RISC-V development environment, and emulate the platform binaries.
 
-With the lightweight approach, one could use the (Debian/Ubuntu) prepackaged toolchains (`gcc-riscv64-unknown-elf`/`gcc-riscv64-linux-gnu`) to compile, and the [`riscv-tools`](https://github.com/riscv/riscv-tools) tool to directly invoke programs from the host.
+In this post, I'll use:
 
-On the other side, with the heavyweight approach, one uses the [toolchain project](https://github.com/riscv/riscv-gnu-toolchain), which requires compilation, and QEMU, which works as a traditional host/guest system/interface.
+- the official [RISC-V toolchain project](https://github.com/riscv/riscv-gnu-toolchain);
+- the prepackaged QEMU, in [system emulation (SoftMMU) mode](https://wiki.qemu.org/Features/SoftMMU).
 
-The problem with the former approach is that, while it's straightforward for trivial projects, it ends causing a variety of errors on more complex ones. Although they can probably solved by (more) experienced lower-level programmers, other audiences may prefer hassle-free setups.
+Alternatives are:
 
-For this reason, in this context I've chosen the "heavyweight" approach. It's important to know that this doesn't imply a lack of convenience; there are many ways to make the workflow immediate (e.g. working on a directory shared via SMB, rather than scp'ing the files).
+- use the prepackaged RISC-V toolchain;
+- compile QEMU from source;
+- use the [`riscv-tools` project](https://github.com/riscv/riscv-tools).
 
-The setup in intended to be run on Debian-based (including Ubuntu) distributions, but can be easily adapted to other ones.
+Over the next few days, I'll update the post with more details about the alternatives (the prepackaged toolchain makes for an even simpler setup).
+
+The setup is intended to be run on Debian-based (including Ubuntu) distributions, but the concepts can be adapted to other ones.
 
 ## Setup
 

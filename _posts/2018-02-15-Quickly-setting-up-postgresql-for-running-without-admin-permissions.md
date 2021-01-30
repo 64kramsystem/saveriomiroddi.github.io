@@ -1,8 +1,8 @@
 ---
 layout: post
 title: Quickly setting up PostgreSQL for running without admin permissions
-tags: [databases,postgresql,sysadmin]
-last_modified_at: 2019-08-13 12:21:00
+tags: [databases,postgresql,small,sysadmin]
+last_modified_at: 2020-01-30 22:19:00
 ---
 
 It's very convenient to run service processes (for development purposes!) without admin permissions, rather starting it as system service.

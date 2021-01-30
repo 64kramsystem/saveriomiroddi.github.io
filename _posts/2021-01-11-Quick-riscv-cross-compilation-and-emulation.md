@@ -4,7 +4,7 @@ title: Quick RISC-V cross compilation and emulation
 tags: [hardware,linux,small,sysadmin,ubuntu,virtualization]
 redirect_from:
 - Quick_riscv_cross_compilation_and_emulation
-last_modified_at: 2020-01-19 16:04:00
+last_modified_at: 2020-01-30 22:19:00
 ---
 
 RISC-V is a hot topic lately. There's lots of talk, and experimentation/research.
@@ -79,18 +79,15 @@ sudo apt install autoconf automake autotools-dev curl python3 libmpc-dev libmpfr
 git clone --recursive https://github.com/riscv/riscv-gnu-toolchain
 cd riscv-gnu-toolchain
 
-# Build the project in a `build` directory. The binaries will be under `build/bin`, which is what we
-# added in the preliminary step.
-#
-mkdir build
-cd !$
-
 # Configure and build the Linux cross compiler. The alternative is the so-called "Newlib" cross-compiler,
-# which is typically used in embedded environments; since our target is the Fedora distribution, we
+# which is typically used in embedded environments; since our target is linux distributions, we
 # compile the Linux version.
 # In order to build the Newlib version, remove the `linux` parameter from the `make` command.
 #
-../configure --prefix="$PWD"
+# The project is built in a `build` directory. The binaries will be under `build/bin`, which is what we
+# added in the preliminary step.
+#
+./configure --prefix="$PWD/build"
 make linux
 ```
 

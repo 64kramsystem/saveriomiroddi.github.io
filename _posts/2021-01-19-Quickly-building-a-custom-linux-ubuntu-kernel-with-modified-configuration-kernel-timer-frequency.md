@@ -2,6 +2,7 @@
 layout: post
 title: Quickly building a custom Linux (Ubuntu) kernel, with modified configuration (kernel timer frequency)
 tags: [linux,small,sysadmin,ubuntu]
+last_modified_at: 2020-01-30 22:19:00
 ---
 
 Recently, I had to build a custom Linux kernel with a modified configuration (specifically, a modified kernel timer frequency).
@@ -136,11 +137,11 @@ Enter the kernel source directory:
 cd */
 ```
 
-Now we need to generate the configuration, and optionally modify it.
+Now we need to generate the configuration (`.config` file), and optionally modify it.
 
-The kernel configuration is defined by a large set of files. Even a single change like the kernel timer frequency is not a single line change, and it involves multiple files; additionally, it's typically desirable to use the same kernel customizations of the currently used Linux distribution.
+Modifications to the kernel configuration should not be performed manually; even a single change like the kernel timer frequency is not a single line change.
 
-Using the kernel source packages (downloaded in the previous section) has the advantage that it provides the changes used by the Ubuntu kernel(s).
+Using the kernel source packages (downloaded in the previous section) has the advantage that it includes the changes used by the Ubuntu kernel(s).
 
 Now we have a few options.
 

@@ -66,6 +66,7 @@
   position:absolute;
   height:300px;
   padding:10px;
+  width: 100%;
 }
 .bottom-to-top {
   top:100%;

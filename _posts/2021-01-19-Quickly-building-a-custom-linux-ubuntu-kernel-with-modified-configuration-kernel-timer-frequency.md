@@ -2,7 +2,7 @@
 layout: post
 title: Quickly building a custom Linux (Ubuntu) kernel, with modified configuration (kernel timer frequency)
 tags: [linux,small,sysadmin,ubuntu]
-last_modified_at: 2020-01-30 22:19:00
+last_modified_at: 2020-03-16 23:43:00
 ---
 
 Recently, I had to build a custom Linux kernel with a modified configuration (specifically, a modified kernel timer frequency).
@@ -24,6 +24,7 @@ Content:
   - [Customizing the kernel configuration](/Quickly-building-a-custom-linux-ubuntu-kernel-with-modified-configuration-kernel-timer-frequency#customizing-the-kernel-configuration)
     - [Create the default Ubuntu configuration](/Quickly-building-a-custom-linux-ubuntu-kernel-with-modified-configuration-kernel-timer-frequency#create-the-default-ubuntu-configuration)
     - [Create the default Ubuntu configuration, and customize it](/Quickly-building-a-custom-linux-ubuntu-kernel-with-modified-configuration-kernel-timer-frequency#create-the-default-ubuntu-configuration-and-customize-it)
+    - [Conveniently displaying the changes](/Quickly-building-a-custom-linux-ubuntu-kernel-with-modified-configuration-kernel-timer-frequency#conveniently-displaying-the-changes)
   - [Building the kernel](/Quickly-building-a-custom-linux-ubuntu-kernel-with-modified-configuration-kernel-timer-frequency#building-the-kernel)
   - [Installing, rebooting and testing](/Quickly-building-a-custom-linux-ubuntu-kernel-with-modified-configuration-kernel-timer-frequency#installing-rebooting-and-testing)
 - [Conclusion](/Quickly-building-a-custom-linux-ubuntu-kernel-with-modified-configuration-kernel-timer-frequency#conclusion)
@@ -139,11 +140,11 @@ cd */
 
 Now we need to generate the configuration (`.config` file), and optionally modify it.
 
-Modifications to the kernel configuration should not be performed manually; even a single change like the kernel timer frequency is not a single line change.
+Modifications to the kernel configuration should not be performed manually; even a single change like the kernel timer frequency may not be a single line change.
 
 Using the kernel source packages (downloaded in the previous section) has the advantage that it includes the changes used by the Ubuntu kernel(s).
 
-Now we have a few options.
+Now there are a few options to generate and customize the configuration.
 
 #### Create the default Ubuntu configuration
 
@@ -174,6 +175,34 @@ however, the GUI version is much more practical, since it shows the configuratio
 For those who want to change the kernel timer frequency, the entry is listed as `Processor type and features` -> `Timer frequency`.
 
 Unnecessary components can be removed, which will save compile time, although it's important to be 100% sure of it 🙂
+
+#### Conveniently displaying the changes
+
+There is a script for conveniently comparing two config files, `scripts/diffconfig`.
+
+If, for example, the configuration was first created via `make oldconfig`, then modified it via `make xconfig`, the backup and current configuration files can be compared via:
+
+```sh
+$ scripts/diffconfig .config{.old,}
+HZ 250 -> 100
+HZ_100 n -> y
+HZ_250 y -> n
+```
+
+This is clearer than the conventional diff:
+
+```sh
+457,458c457,458
+< # CONFIG_HZ_100 is not set
+< CONFIG_HZ_250=y
+---
+> CONFIG_HZ_100=y
+> # CONFIG_HZ_250 is not set
+461c461
+< CONFIG_HZ=250
+---
+> CONFIG_HZ=100
+```
 
 ### Building the kernel
 
@@ -222,3 +251,4 @@ Happy kernel hacking!
 - [Compiling the kernel with default configurations](https://unix.stackexchange.com/questions/29439/compiling-the-kernel-with-default-configurations)
 - [What does “make oldconfig” do exactly in the Linux kernel makefile?](https://stackoverflow.com/questions/4178526/what-does-make-oldconfig-do-exactly-in-the-linux-kernel-makefile)
 - [Where can I get the 11.04 kernel .config file?](https://askubuntu.com/questions/28047/where-can-i-get-the-11-04-kernel-config-file)
+- [make config vs oldconfig vs defconfig vs menuconfig vs savedefconfig](http://embeddedguruji.blogspot.com/2019/01/make-config-vs-oldconfig-vs-defconfig.html)

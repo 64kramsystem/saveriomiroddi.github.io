@@ -2,7 +2,7 @@
 layout: post
 title: Quickly building a custom Linux (Ubuntu) kernel, with modified configuration (kernel timer frequency)
 tags: [linux,small,sysadmin,ubuntu]
-last_modified_at: 2020-03-16 23:43:00
+last_modified_at: 2021-04-23 17:17:00
 ---
 
 Recently, I had to build a custom Linux kernel with a modified configuration (specifically, a modified kernel timer frequency).
@@ -26,6 +26,7 @@ Content:
     - [Create the default Ubuntu configuration, and customize it](/Quickly-building-a-custom-linux-ubuntu-kernel-with-modified-configuration-kernel-timer-frequency#create-the-default-ubuntu-configuration-and-customize-it)
     - [Conveniently displaying the changes](/Quickly-building-a-custom-linux-ubuntu-kernel-with-modified-configuration-kernel-timer-frequency#conveniently-displaying-the-changes)
   - [Building the kernel](/Quickly-building-a-custom-linux-ubuntu-kernel-with-modified-configuration-kernel-timer-frequency#building-the-kernel)
+    - [Solving the `debian/canonical-certs.pem` error](/Quickly-building-a-custom-linux-ubuntu-kernel-with-modified-configuration-kernel-timer-frequency#solving-the-debiancanonical-certspem-error)
   - [Installing, rebooting and testing](/Quickly-building-a-custom-linux-ubuntu-kernel-with-modified-configuration-kernel-timer-frequency#installing-rebooting-and-testing)
 - [Conclusion](/Quickly-building-a-custom-linux-ubuntu-kernel-with-modified-configuration-kernel-timer-frequency#conclusion)
 - [References](/Quickly-building-a-custom-linux-ubuntu-kernel-with-modified-configuration-kernel-timer-frequency#references)
@@ -216,6 +217,17 @@ fakeroot make-kpkg -j "$(nproc)" --initrd --append-to-version="$kernel_local_ver
 ```
 
 This will take some time (several minutes), and generate two `*.deb` packages in the parent directory.
+
+#### Solving the `debian/canonical-certs.pem` error
+
+On some setups, the user may receive the following error while compiling:
+
+```
+make[2]: *** No rule to make target 'debian/canonical-certs.pem', needed by 'certs/x509_certificate_list'.  Stop.
+make[2]: *** Waiting for unfinished jobs....
+```
+
+In this case, just set the configuration entry `CONFIG_SYSTEM_TRUSTED_KEYS = ""`.
 
 ### Installing, rebooting and testing
 

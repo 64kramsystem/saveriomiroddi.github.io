@@ -2,12 +2,12 @@
 layout: post
 title: Installing Ruby Tk bindings/gem on Ubuntu
 tags: [gui,ruby,ubuntu]
-last_modified_at: 2020-10-22 21:52:00
+last_modified_at: 2021-04-29 10:34:00
 ---
 
 The bindings for the standard Ruby GUI toolkit, Tk, need some trickery in order to be installed on Ubuntu. This article shows how to do it.
 
-*Updated on 22/Oct/2020: Use v8.6 for Ubuntu 20.04, which has been tested and works.*
+*Updated on 29/Apr/2021: Updated procedure to use Rubygems' provided options for build flags.*
 
 Contents:
 
@@ -23,24 +23,27 @@ The extraction actually made the setup easier, as (not considering the workaroun
 
 ## Prerequisites
 
-The Tcl/Tk libraries and development files need to be installed; the version depends on the O/S:
+Different Ubuntu versions may ship different Tcl/Tk versions, or even (ie. Ubuntu 18.04) with multiple versions.
 
-- on Ubuntu 18.04, install 8.5;
-- on Ubuntu 20.04, install 8.6.
+Generally speaking, one can use the latest version (8.6 for both Ubuntu 18.04 and 20.04); if 8.6 happens not to work, use version 8.5.
 
-In this guide I'll use v8.5; Ubuntu 20.04 users can perform a simple textual search/replace in the commands provided.
-
-Both versions have been verified on Ruby 2.5, 2.6 and 2.7. If v8.6 happened not to work on your (20.04) system, please leave a comment at the bottom, and in the meanwhile, try the v8.5 packages from the Ubuntu Bionic repository.
-
-Install the required version of the (development) libraries:
+First, let's install the Tcl/Tk development libraries:
 
 ```sh
-$ sudo apt-get install tcl8.5-dev tk8.5-dev
+# Ignore the apt `WARNING: apt does not have a stable CLI interface`.
+#
+# If 8.6 doesn't work, set `latest_version=8.5`.
+#
+$ latest_version=$(apt search '^tcl[[:digit:]]+\.[[:digit:]]+-dev' | perl -lne 'print /^tcl(\d+\.\d+)/' | sort -V | tail -n 1)
+
+# If the compiler suite is not installed, this will do it.
+#
+$ sudo apt-get install --yes "tcl${latest_version}-dev" "tk${latest_version}-dev"
 ```
 
 ## Workaround and installation
 
-Ruby extensions are written in C, and they follow the typical steps of a C program build: configuration and compile.
+Ruby extensions are written in C, and they follow the typical steps of a C program build: configuration and compilation.
 
 The gem installation takes care of both, however, on Ubuntu, the Tcl/Tk library files are not found:
 
@@ -62,22 +65,28 @@ Can't find proper Tcl/Tk libraries. So, can't make tcltklib.so which is required
 If you have Tcl/Tk libraries on your environment, you may be able to use them with configure options (see ext/tk/README.tcltklib).
 ```
 
-The gem provides many switches for specifying the configuration parameters, however, the related parameters (`--with-tk-lib` and `--with-tcl-lib`) don't yield the desired effect (actually, any effect at all).
+This is because the gem expects the libraries to be under `/usr/lib`, while in Ubuntu, they're under `/usr/lib/x86_64-linux-gnu`.
 
-The workaround, originally found in [a Ruby forum](https://www.ruby-forum.com/t/building-ext-tk-on-ubuntu-14-04/231470/5) is to symlink the libraries to the paths where the extension expects them to be:
+The gem provides the options for specifying the locations - the key is to pass them not as Rubygems options, rather, as build flags:
 
 ```sh
-sudo ln -s /usr/lib/x86_64-linux-gnu/tcl8.5/tclConfig.sh /usr/lib/
-sudo ln -s /usr/lib/x86_64-linux-gnu/tk8.5/tkConfig.sh /usr/lib/
-sudo ln -s /usr/lib/x86_64-linux-gnu/libtcl8.5.so.0 /usr/lib/
-sudo ln -s /usr/lib/x86_64-linux-gnu/libtk8.5.so.0 /usr/lib/
+$ Usage: gem install GEMNAME [GEMNAME ...] [options] -- --build-flags [options]
 ```
 
-After this, the gem will install without any problem!:
+which is accomplished by specifying two dashes (`--`) before the build flags.
+
+Therefore, we can build the gem this way:
 
 ```
-$ gem install tk
-Building native extensions. This could take a while...
-Successfully installed tk-0.2.0
+$ gem install tk -- \
+  --with-tcltkversion="$latest_version" \
+  --with-tcl-lib=/usr/lib/x86_64-linux-gnu \
+  --with-tk-lib=/usr/lib/x86_64-linux-gnu \
+  --with-tcl-include=/usr/include/tcl"$latest_version" \
+  --with-tk-include=/usr/include/tcl"$latest_version" \
+  --enable-pthread
+Building native extensions with: '--with-tcltkversion=8.6 --with-tcl-lib=/usr/lib/x86_64-linux-gnu --with-tk-lib=/usr/lib/x86_64-linux-gnu --with-tcl-include=/usr/include/tcl8.6 --with-tk-include=/usr/include/tcl8.6 --enable-pthread'
+This could take a while...
+Successfully installed tk-0.4.0
 1 gem installed
 ```

@@ -10,16 +10,17 @@ v_book_name=
 v_cover_file=
 
 function decode_cmdline_options {
-  if [[ $# -ne 2 ]]; then
+  if [[ $# -ne 1 ]]; then
     echo "\
-Usage: $(basename "$0") <book_name_underscore> <cover_file>
+Usage: $(basename "$0") <cover_file>
+
+The cover filename (without extension) must be the underscore version of the book name.
 
 Takes care of everything, including creating the PR and merging, so carefully review the commit content when presented."
     exit
   fi
 
-  v_book_name=$1
-  v_cover_file=$2
+  v_cover_file=$1
 }
 
 function check_preconditions {
@@ -27,6 +28,10 @@ function check_preconditions {
     >&2 echo "The git index is dirty!"
     exit 1
   fi
+}
+
+function set_book_name {
+  v_book_name=$(basename "${v_cover_file%.*}")
 }
 
 function create_branch {
@@ -64,6 +69,7 @@ function create_pr_and_merge {
 
 decode_cmdline_options "$@"
 check_preconditions
+set_book_name
 create_branch
 clear_existing_books
 add_image

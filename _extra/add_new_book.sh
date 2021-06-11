@@ -58,6 +58,15 @@ MD
   vim "_bookshelf/$v_book_name.md"
 }
 
+function start_server_and_open_blog {
+  jekyll serve &
+  while ! nc -z localhost 4000; do sleep 0.25; done
+  xdg-open http://localhost:4000/bookshelf
+  echo "Press any key to commit and follow up..."
+  read -rsn1
+  pkill -f 'jekyll serve'
+}
+
 function create_commit {
   git ca -m "Add to bookshelf: $v_book_name"
 }
@@ -70,9 +79,10 @@ function create_pr_and_merge {
 decode_cmdline_options "$@"
 check_preconditions
 set_book_name
-create_branch
 clear_existing_books
 add_image
 add_new_book_description
+start_server_and_open_blog
+create_branch
 create_commit
 create_pr_and_merge

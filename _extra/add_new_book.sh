@@ -10,7 +10,7 @@ v_book_name=
 v_cover_file=
 
 function decode_cmdline_options {
-  if [[ $# -ne 1 ]]; then
+  if [[ $# -ne 1 || $1 == -h || $1 == --help ]]; then
     echo "\
 Usage: $(basename "$0") <cover_file>
 

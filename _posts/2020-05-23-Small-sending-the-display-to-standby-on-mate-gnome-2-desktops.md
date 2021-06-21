@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Small&#58; Sending the display to standby on MATE (GNOME 2) desktops
-tags: [linux,shell_scripting,small,sysadmin,ubuntu]
+tags: [linux,shell_scripting,quick,sysadmin,ubuntu]
 redirect_from:
 - Small_sending_the_display_to_standby_on_mate_gnome_2_desktops
 ---

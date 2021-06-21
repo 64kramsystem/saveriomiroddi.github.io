@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Quickly setting up PostgreSQL for running without admin permissions
-tags: [databases,postgresql,small,sysadmin]
+tags: [databases,postgresql,quick,sysadmin]
 last_modified_at: 2020-01-30 22:19:00
 ---
 

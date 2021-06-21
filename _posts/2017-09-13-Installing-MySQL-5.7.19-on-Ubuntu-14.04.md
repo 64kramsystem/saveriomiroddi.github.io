@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Installing MySQL 5.7.19 on Ubuntu 14.04
-tags: [mysql, sysadmin, small]
+tags: [mysql, sysadmin, quick]
 category: mysql
 last_modified_at: 2017-12-23 12:42:00
 ---

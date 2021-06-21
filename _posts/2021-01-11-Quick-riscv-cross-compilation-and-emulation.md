@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Quick RISC-V cross compilation and emulation
-tags: [hardware,linux,small,sysadmin,ubuntu,virtualization]
+tags: [hardware,linux,quick,sysadmin,ubuntu,virtualization]
 redirect_from:
 - Quick_riscv_cross_compilation_and_emulation
 last_modified_at: 2020-01-30 22:19:00

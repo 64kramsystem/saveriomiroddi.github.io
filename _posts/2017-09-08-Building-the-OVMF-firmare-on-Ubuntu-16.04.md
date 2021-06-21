@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Building the OVMF firmware on Ubuntu 16.04
-tags: [vfio, virtualization, ubuntu, linux, small]
+tags: [vfio, virtualization, ubuntu, linux, quick]
 ---
 
 In my [VGA Passthrough guide][VGA Passthrough guide], I explain how to configure an Ubuntu machine for VFIO.

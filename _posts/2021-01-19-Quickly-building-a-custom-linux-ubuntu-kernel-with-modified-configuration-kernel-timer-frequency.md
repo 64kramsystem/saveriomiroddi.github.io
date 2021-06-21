@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Quickly building a custom Linux (Ubuntu) kernel, with modified configuration (kernel timer frequency)
-tags: [linux,small,sysadmin,ubuntu]
+tags: [linux,quick,sysadmin,ubuntu]
 last_modified_at: 2021-04-23 17:17:00
 ---
 

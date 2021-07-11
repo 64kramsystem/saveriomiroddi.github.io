@@ -59,7 +59,7 @@ MD
 }
 
 function start_server_and_open_blog {
-  jekyll serve &
+  bundle exec jekyll serve &
   while ! nc -z localhost 4000; do sleep 0.25; done
   xdg-open http://localhost:4000/bookshelf
   echo "Press any key to commit and follow up..."

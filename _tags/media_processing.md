@@ -1,3 +1,0 @@
----
-slug: media_processing
----

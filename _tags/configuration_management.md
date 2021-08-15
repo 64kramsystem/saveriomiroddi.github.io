@@ -1,3 +1,0 @@
----
-slug: configuration_management
----
